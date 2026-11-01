@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<title>Pulse — Multi-Date Engine & Dream AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-page:#05070c;
+    --bg-phone:#0a0e17;
+    --bg-surface:#131a2a;
+    --bg-surface-2:#1b2338;
+    --bg-surface-3:#232c46;
+    --input-bg:#151c28;
+    --border:rgba(255,255,255,.08);
+    --border-strong:rgba(255,255,255,.14);
+    --text-1:#f5f7fb;
+    --text-2:#9ca6c2;
+    --text-3:#67718c;
+
+    --cat-routine:#00e6a0;
+    --cat-routine-dim:rgba(0,230,160,.14);
+    --cat-todo:#8c7bff;
+    --cat-todo-dim:rgba(140,123,255,.14);
+    --cat-hobby:#ff7a59;
+    --cat-hobby-dim:rgba(255,122,89,.14);
+    --cat-bonus:#ffd23f;
+    --cat-bonus-dim:rgba(255,210,63,.14);
+
+    --prio-high:#ff4d4d;
+    --prio-med:#ffb800;
+    --prio-low:#3b82f6;
+
+    --ai-purple:#a855f7;
+    --ai-purple-dim:rgba(168,85,247,0.15);
+
+    --r-xl:28px; --r-lg:20px; --r-md:14px; --r-full:999px;
+    --font-d:'Space Grotesk',sans-serif;
+    --font-b:'Inter',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  button, input, select, textarea{font-family:inherit;border:none;background:none;color:inherit;}
+  html,body{min-height:100%;}
+  body{
+    background:var(--bg-page);
+    font-family:var(--font-b);
+    color:var(--text-1);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px 0;
+  }
+
+  /* DEVICE FRAME */
+  .device{
+    width:390px;
+    height:844px;
+    background:var(--bg-phone);
+    border-radius:46px;
+    border:1px solid var(--border-strong);
+    box-shadow:0 40px 80px -20px rgba(0,0,0,.6), inset 0 0 0 6px #05070c;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:80px;height:22px;background:#000;border-radius:16px;z-index:30;}
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:38px 26px 6px;font-family:var(--font-d);font-size:13px;font-weight:600;flex-shrink:0;z-index:29;}
+  .statusbar .icons{display:flex;gap:5px;align-items:center;opacity:.9;}
+
+  .screen-container{
+    flex:1;
+    position:relative;
+    width:100%;
+    overflow:hidden;
+  }
+
+  .screen{
+    position:absolute;
+    inset:0;
+    display:none;
+    flex-direction:column;
+    overflow-y:auto;
+    padding-bottom:110px;
+    scrollbar-width:none;
+  }
+  .screen::-webkit-scrollbar{display:none;}
+  .screen.active{display:flex;}
+
+  /* BRAND & FLEXIBLE DATE BAR */
+  .brandbar{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 0;flex-shrink:0;}
+  .wordmark{font-family:var(--font-d);font-weight:700;font-size:16px;color:var(--cat-routine);letter-spacing:.02em;}
+  
+  .date-selector-wrap{
+    display:flex;
+    align-items:center;
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    padding:3px;
+    border-radius:var(--r-full);
+    gap:2px;
+  }
+  .date-btn{
+    padding:5px 10px;
+    font-size:11px;
+    font-weight:600;
+    border-radius:var(--r-full);
+    color:var(--text-3);
+    cursor:pointer;
+    transition:all 0.2s ease;
+  }
+  .date-btn.active{
+    background:var(--bg-surface-3);
+    color:var(--text-1);
+  }
+  .date-picker-icon-btn{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    cursor:pointer;
+  }
+  .date-picker-icon-btn svg{width:14px;height:14px;stroke:var(--text-2);}
+  .date-picker-icon-btn input[type="date"]{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    cursor:pointer;
+  }
+
+  .hello{padding:14px 22px 10px;}
+  .hello h1{font-family:var(--font-d);font-size:22px;font-weight:600;}
+  .hello p{font-size:12.5px;color:var(--text-2);margin-top:2px;}
+
+  .screen-header{padding:16px 22px 14px;flex-shrink:0;}
+  .title-group h1{font-family:var(--font-d);font-size:22px;font-weight:600;}
+  .title-group p{font-size:12.5px;color:var(--text-2);margin-top:3px;}
+
+  /* BATTERY CARD */
+  .battery-card{
+    margin:0 22px 16px;
+    background:linear-gradient(180deg,var(--bg-surface-2),var(--bg-surface));
+    border:1px solid var(--border);
+    border-radius:var(--r-xl);
+    padding:20px;
+    transition:box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+  .battery-card.charging{
+    animation:pulse-charge 0.8s ease;
+    border-color:var(--cat-routine);
+    box-shadow:0 0 20px rgba(0,230,160,0.25);
+  }
+  @keyframes pulse-charge {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+
+  .battery-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:4px;}
+  .battery-pct-wrap{display:flex;align-items:baseline;gap:2px;}
+  .battery-pct{font-family:var(--font-d);font-size:42px;font-weight:700;line-height:1;}
+  .battery-pct .pct-sign{font-size:18px;font-weight:600;margin-left:1px;color:var(--text-2);}
+  .battery-timer{text-align:right;}
+  .battery-timer .t-val{font-family:var(--font-d);font-size:16px;font-weight:600;line-height:1.1;color:var(--cat-routine);}
+  .battery-timer .t-lab{font-size:10px;color:var(--text-3);margin-top:2px;}
+  .battery-state{font-size:12px;color:var(--text-2);margin-bottom:14px;}
+  
+  .segbar{position:relative;height:18px;border-radius:9px;background:var(--bg-surface-3);overflow:hidden;display:flex;gap:2px;padding:2px;}
+  .segbar .seg{height:100%;border-radius:6px;transition:all 0.5s ease-in-out;}
+  .seg-routine{background:var(--cat-routine);}
+  .seg-todo{background:var(--cat-todo);}
+  .seg-hobby{background:var(--cat-hobby);}
+  .seg-bonus{background:var(--cat-bonus);}
+  
+  .seg-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;}
+  .seg-legend-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text-2);}
+  .seg-legend-item .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .seg-legend-item .dot.routine{background:var(--cat-routine);}
+  .seg-legend-item .dot.todo{background:var(--cat-todo);}
+  .seg-legend-item .dot.hobby{background:var(--cat-hobby);}
+  .seg-legend-item .dot.bonus{background:var(--cat-bonus);}
+  .seg-legend-item b{color:var(--text-1);font-weight:600;}
+
+  /* LIFE BALANCE RADAR CARD */
+  .balance-card{
+    margin:0 22px 18px;
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    border-radius:var(--r-xl);
+    padding:18px 18px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .balance-header{display:flex;align-items:center;gap:12px;width:100%;}
+  .balance-header .ic{width:38px;height:38px;border-radius:12px;background:rgba(140,123,255,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .balance-header .ic svg{width:20px;height:20px;stroke:var(--cat-todo);}
+  .balance-header .body{flex:1;min-width:0;}
+  .balance-header h3{font-family:var(--font-d);font-size:16px;font-weight:600;}
+  .balance-header p{font-size:11.5px;color:var(--text-2);margin-top:1px;}
+
+  .balance-body{display:flex;flex-direction:column;align-items:center;width:100%;}
+  .balance-svg{width:100%;max-width:270px;height:auto;display:block;}
+  .balance-axis-label{font-family:var(--font-b);font-size:10px;font-weight:700;letter-spacing:0.05em;fill:var(--text-2);}
+  .balance-axis-pct{font-family:var(--font-d);font-size:11px;font-weight:700;}
+  .balance-grid-ring{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:1;}
+  .balance-spoke{stroke:rgba(255,255,255,0.08);stroke-width:1;}
+  .balance-fill{fill:rgba(140,123,255,0.22);stroke:var(--cat-todo);stroke-width:2;stroke-linejoin:round;transition:all 0.5s ease-in-out;}
+  .balance-node{stroke:var(--bg-surface);stroke-width:2;transition:all 0.5s ease-in-out;}
+
+  /* NAV CARDS */
+  .nav-cards{display:flex;flex-direction:column;gap:10px;padding:0 22px 22px;}
+  .nav-card{display:flex;align-items:center;gap:12px;width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;text-align:left;border-left:4px solid var(--accent,var(--border));cursor:pointer;}
+  .nav-card:active{transform:scale(0.98);background:var(--bg-surface-2);}
+  .nav-card .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .nav-card .ic svg{width:18px;height:18px;}
+  .nav-card .body{flex:1;min-width:0;}
+  .nav-card h3{font-family:var(--font-d);font-size:15px;font-weight:600;}
+  .nav-card p{font-size:12px;color:var(--text-2);margin-top:2px;}
+  .nav-card .chev{width:16px;height:16px;stroke:var(--text-3);flex-shrink:0;}
+
+  /* LIST ITEMS */
+  .list{display:flex;flex-direction:column;gap:10px;padding:0 22px;}
+  .item-row{display:flex;gap:12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;align-items:flex-start;transition:border-color 0.2s, opacity 0.2s, transform 0.15s ease;}
+  .item-row:active{transform:scale(0.99);}
+  .check-circle{width:24px;height:24px;border-radius:50%;border:2px solid var(--dot, var(--cat-routine));display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;cursor:pointer;background:transparent;transition:all 0.2s ease;}
+  .check-circle svg{width:12px;height:12px;stroke:var(--bg-phone);stroke-width:3;display:none;}
+  .item-row.done{opacity:0.65;border-color:transparent;}
+  .item-row.done .check-circle{background:var(--dot, var(--cat-routine));}
+  .item-row.done .check-circle svg{display:block;}
+  .item-info{flex:1;min-width:0;}
+  .item-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline;}
+  .item-name{font-family:var(--font-d);font-size:14.5px;font-weight:600;}
+  .item-row.done .item-name{text-decoration:line-through;color:var(--text-3);}
+  .item-time{font-size:11px;color:var(--text-3);flex-shrink:0;white-space:nowrap;}
+  .item-desc{font-size:12.5px;color:var(--text-2);margin-top:3px;line-height:1.4;}
+  
+  .item-prio-badge{
+    display:inline-block;
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:10px;
+    font-weight:700;
+    text-transform:uppercase;
+    margin-right:6px;
+  }
+  .badge-high{background:rgba(255,77,77,0.2);color:var(--prio-high);}
+  .badge-medium{background:rgba(255,184,0,0.2);color:var(--prio-med);}
+  .badge-low{background:rgba(59,130,246,0.2);color:var(--prio-low);}
+
+  .fab{position:absolute;right:22px;bottom:100px;display:flex;align-items:center;gap:8px;background:var(--accent-fab,var(--cat-routine));color:#04140e;font-weight:600;font-size:13.5px;padding:13px 18px;border-radius:var(--r-full);box-shadow:0 12px 24px -8px rgba(0,230,160,.5);z-index:15;cursor:pointer;}
+  .fab svg{width:16px;height:16px;stroke:#04140e;stroke-width:2.4;}
+
+  /* TAB BAR WITH DREAM AI */
+  .tabbar{position:absolute;left:0;right:0;bottom:0;display:flex;background:rgba(10,14,23,.94);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:10px 4px 24px;z-index:20;}
+  .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;border-radius:14px;cursor:pointer;}
+  .tab-btn svg{width:19px;height:19px;stroke:var(--text-3);transition:stroke 0.2s;}
+  .tab-btn span{font-size:8.5px;color:var(--text-3);font-weight:500;transition:color 0.2s;white-space:nowrap;}
+  .tab-btn.active svg{stroke:var(--tab-accent,var(--cat-routine));}
+  .tab-btn.active span{color:var(--tab-accent,var(--cat-routine));}
+
+  /* DREAM AI SCREEN */
+  #screen-ai{
+    display:none;
+    flex-direction:column;
+    height:100%;
+    padding-bottom:100px;
+    overflow:hidden;
+  }
+  #screen-ai.active{display:flex;}
+  
+  .ai-container{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    padding:0 22px 10px;
+    gap:14px;
+    height:100%;
+    overflow:hidden;
+  }
+  .ai-chat-body{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    overflow-y:auto;
+    padding-right:4px;
+    scrollbar-width:none;
+  }
+  .ai-chat-body::-webkit-scrollbar{display:none;}
+  .chat-msg{font-size:13.5px;line-height:1.45;padding:14px 16px;border-radius:18px;}
+  .chat-msg.assistant{background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.22);color:var(--text-1);align-self:flex-start;max-width:88%;}
+  .chat-msg.user{background:var(--bg-surface-3);color:var(--text-1);align-self:flex-end;max-width:85%;}
+
+  .ai-input-wrap{
+    display:flex;
+    gap:8px;
+    background:var(--bg-surface);
+    padding:8px 8px 8px 16px;
+    border-radius:var(--r-full);
+    border:1px solid rgba(168,85,247,0.3);
+    margin-top:auto;
+  }
+  .ai-input-wrap input{flex:1;font-size:13.5px;outline:none;}
+  .ai-send-btn{width:36px;height:36px;border-radius:50%;background:var(--ai-purple);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+  .ai-send-btn svg{width:16px;height:16px;stroke:#fff;}
+
+  /* POPUP MODAL */
+  .modal-overlay{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,0.65);
+    backdrop-filter:blur(6px);
+    z-index:100;
+    display:none;
+    justify-content:flex-end;
+    flex-direction:column;
+    animation:fadeIn 0.2s ease;
+  }
+  .modal-overlay.active{display:flex;}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+  .modal-sheet{
+    background:#0f1522;
+    border-top:1px solid var(--border-strong);
+    border-radius:32px 32px 0 0;
+    padding:16px 22px 30px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    max-height:90%;
+    overflow-y:auto;
+    animation:slideUp 0.25s cubic-bezier(0.16,1,0.3,1);
+  }
+  @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+
+  .modal-handle{width:38px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;align-self:center;margin-bottom:2px;}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;}
+  .modal-header h2{font-family:var(--font-d);font-size:20px;font-weight:700;}
+  .modal-close{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .modal-close svg{width:16px;height:16px;stroke:var(--text-2);}
+
+  .form-group{display:flex;flex-direction:column;gap:5px;}
+  .form-label{font-size:12px;font-weight:600;color:var(--text-2);}
+  .form-input, .form-textarea, .form-select{
+    width:100%;
+    background:var(--input-bg);
+    border:1px solid var(--border-strong);
+    border-radius:14px;
+    padding:12px 14px;
+    font-size:13.5px;
+    color:var(--text-1);
+    outline:none;
+  }
+  .form-input::placeholder, .form-textarea::placeholder{color:var(--text-3);}
+  .form-textarea{resize:none;height:65px;}
+
+  .prio-group{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  .prio-btn{
+    padding:10px;
+    border-radius:12px;
+    background:var(--input-bg);
+    border:1px solid var(--border);
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--text-2);
+    cursor:pointer;
+    text-align:center;
+    transition:all 0.2s ease;
+  }
+  .prio-btn.active[data-prio="High"]{background:var(--prio-high);color:#fff;border-color:transparent;}
+  .prio-btn.active[data-prio="Medium"]{background:var(--prio-med);color:#0a0e17;border-color:transparent;}
+  .prio-btn.active[data-prio="Low"]{background:var(--prio-low);color:#fff;border-color:transparent;}
+
+  .time-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  .btn-save-modal{
+    width:100%;
+    padding:15px;
+    border-radius:16px;
+    background:var(--cat-routine);
+    color:#04140e;
+    font-weight:700;
+    font-size:14.5px;
+    cursor:pointer;
+    margin-top:6px;
+    text-align:center;
+  }
+  /* Dream AI 2.0: action-kort + "tänker"-bubbla */
+  .chat-msg.typing{opacity:.6;font-style:italic;}
+  .action-list{display:flex;flex-direction:column;gap:6px;align-self:flex-start;width:88%;}
+  .action-card{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:var(--bg-surface-2);border:1px solid var(--border);border-left:3px solid var(--c);font-size:12.5px;cursor:pointer;text-align:left;}
+  .action-card.delete{opacity:.7;}
+  .action-card.delete .action-txt{text-decoration:line-through;}
+  .action-ic{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:#0a0e17;font-weight:700;font-size:12px;flex-shrink:0;}
+  .action-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .action-date{color:var(--text-3);font-size:11px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="device">
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span id="current-time">09:41</span>
+    <span class="icons">
+      <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M1 8l1.5-2 1.5 3 2-6 2 4 1.5-2L11 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x="1" y="1" width="18" height="9" rx="2.5" stroke="currentColor" stroke-width="1.2"/><rect x="2.5" y="2.5" width="12" height="6" rx="1.2" fill="currentColor"/><rect x="20" y="3.5" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <div class="screen-container">
+    
+    <!-- HOME SCREEN -->
+    <div id="screen-home" class="screen active">
+      <div class="brandbar">
+        <span class="wordmark">Pulse</span>
+        
+        <!-- FLEXIBLE DATE BAR WITH CALENDAR PICKER -->
+        <div class="date-selector-wrap">
+          <button class="date-btn active" id="btn-date-today" onclick="selectQuickDate('today')">Idag</button>
+          <button class="date-btn" id="btn-date-tomorrow" onclick="selectQuickDate('tomorrow')">Imorgon</button>
+          <div class="date-picker-icon-btn" title="Välj datum i kalendern">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <input type="date" id="nav-date-picker" onchange="selectCustomDate(this.value)" />
+          </div>
+        </div>
+      </div>
+
+      <div class="hello">
+        <h1>Welcome back, Oscar</h1>
+        <p id="view-date-subtitle">Visar dagens energipott och framsteg.</p>
+      </div>
+
+      <!-- BATTERY CARD -->
+      <div class="battery-card" id="battery-card-element">
+        <div class="battery-top">
+          <div class="battery-pct-wrap"><span class="battery-pct" id="total-battery-pct">54</span><span class="pct-sign">%</span></div>
+          <div class="battery-timer">
+            <div class="t-val" id="battery-time-left">12:57:36</div>
+            <div class="t-lab" id="battery-time-lab">until empty</div>
+          </div>
+        </div>
+        <div class="battery-state" id="battery-state-text">Building momentum</div>
+        <div class="segbar">
+          <div class="seg seg-routine" id="seg-routine" style="flex:0 0 25%"></div>
+          <div class="seg seg-todo" id="seg-todo" style="flex:0 0 25%"></div>
+          <div class="seg seg-hobby" id="seg-hobby" style="flex:0 0 25%"></div>
+          <div class="seg seg-bonus" id="seg-bonus" style="flex:0 0 25%"></div>
+        </div>
+        <div class="seg-legend">
+          <div class="seg-legend-item"><span class="dot routine"></span>Routines <b id="leg-routine">0%</b></div>
+          <div class="seg-legend-item"><span class="dot todo"></span>To-dos <b id="leg-todo">0%</b></div>
+          <div class="seg-legend-item"><span class="dot hobby"></span>Hobbies <b id="leg-hobby">0%</b></div>
+          <div class="seg-legend-item"><span class="dot bonus"></span>Bonus <b id="leg-bonus">0%</b></div>
+        </div>
+      </div>
+
+      <!-- RADAR CARD -->
+      <div class="balance-card">
+        <div class="balance-header">
+          <div class="ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>
+          </div>
+          <div class="body">
+            <h3>Life balance</h3>
+            <p>Aktivitetsbalans för valt datum</p>
+          </div>
+        </div>
+        
+        <div class="balance-body">
+          <svg class="balance-svg" viewBox="0 0 280 250" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(0, 5)">
+              <polygon class="balance-grid-ring" points="140,105 162,125 140,145 118,125" />
+              <polygon class="balance-grid-ring" points="140,85 184,125 140,165 96,125" />
+              <polygon class="balance-grid-ring" points="140,65 206,125 140,185 74,125" />
+              <polygon class="balance-grid-ring" points="140,45 228,125 140,205 52,125" />
+              
+              <line class="balance-spoke" x1="140" y1="125" x2="140" y2="45" />
+              <line class="balance-spoke" x1="140" y1="125" x2="228" y2="125" />
+              <line class="balance-spoke" x1="140" y1="125" x2="140" y2="205" />
+              <line class="balance-spoke" x1="140" y1="125" x2="52" y2="125" />
+              
+              <polygon class="balance-fill" id="radar-polygon" points="140,77 169,125 140,178.6 101.2,125" />
+              
+              <circle class="balance-node" id="node-routine" cx="140" cy="77" r="4.5" fill="#00e6a0" />
+              <circle class="balance-node" id="node-todo" cx="169" cy="125" r="4.5" fill="#8c7bff" />
+              <circle class="balance-node" id="node-hobby" cx="140" cy="178.6" r="4.5" fill="#ff7a59" />
+              <circle class="balance-node" id="node-bonus" cx="101.2" cy="125" r="4.5" fill="#ffd23f" />
+
+              <text class="balance-axis-label" x="140" y="20" text-anchor="middle">ROUTINES</text>
+              <text class="balance-axis-pct" id="radar-lbl-routine" x="140" y="33" text-anchor="middle" fill="#00e6a0">0%</text>
+              
+              <text class="balance-axis-label" x="236" y="121" text-anchor="start">TO-DOS</text>
+              <text class="balance-axis-pct" id="radar-lbl-todo" x="236" y="134" text-anchor="start" fill="#8c7bff">0%</text>
+              
+              <text class="balance-axis-label" x="140" y="224" text-anchor="middle">HOBBIES</text>
+              <text class="balance-axis-pct" id="radar-lbl-hobby" x="140" y="237" text-anchor="middle" fill="#ff7a59">0%</text>
+              
+              <text class="balance-axis-label" x="44" y="121" text-anchor="end">BONUS</text>
+              <text class="balance-axis-pct" id="radar-lbl-bonus" x="44" y="134" text-anchor="end" fill="#ffd23f">0%</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- NAV CARDS -->
+      <div class="nav-cards">
+        <button class="nav-card" style="--accent:var(--cat-routine)" onclick="switchTab('screen-routines')">
+          <span class="ic" style="background:var(--cat-routine-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cat-routine)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="1.4"/><circle cx="5" cy="12" r="1.4"/><circle cx="5" cy="18" r="1.4"/><path d="M9 6h11M9 12h11M9 18h11"/></svg></span>
+          <span class="body"><h3>Daily routines</h3><p id="nav-routines-sub">0 of 0 done</p></span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+
+        <button class="nav-card" style="--accent:var(--cat-todo)" onclick="switchTab('screen-todos')">
+          <span class="ic" style="background:var(--cat-todo-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cat-todo)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+          <span class="body"><h3>To-dos</h3><p id="nav-todos-sub">0 of 0 complete</p></span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+
+        <button class="nav-card" style="--accent:var(--cat-hobby)" onclick="switchTab('screen-hobbies')">
+          <span class="ic" style="background:var(--cat-hobby-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cat-hobby)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+          <span class="body"><h3>Hobbies & Activities</h3><p id="nav-hobbies-sub">0 of 0 logged</p></span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ROUTINES SCREEN -->
+    <div id="screen-routines" class="screen">
+      <div class="screen-header"><div class="title-group"><h1>Daily routines</h1><p id="hdr-routines-sub">Schema</p></div></div>
+      <div class="list" id="list-routines"></div>
+      <button class="fab" style="--accent-fab:var(--cat-routine)" onclick="openModal('routine')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>New routine
+      </button>
+    </div>
+
+    <!-- TODOS SCREEN -->
+    <div id="screen-todos" class="screen">
+      <div class="screen-header"><div class="title-group"><h1>To-dos</h1><p id="hdr-todos-sub">Schema</p></div></div>
+      <div class="list" id="list-todos"></div>
+      <button class="fab" style="--accent-fab:var(--cat-todo)" onclick="openModal('todo')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>New task
+      </button>
+    </div>
+
+    <!-- HOBBIES SCREEN -->
+    <div id="screen-hobbies" class="screen">
+      <div class="screen-header"><div class="title-group"><h1>Hobbies & Bonus</h1><p id="hdr-hobbies-sub">Schema</p></div></div>
+      <div class="list" id="list-hobbies"></div>
+      <button class="fab" style="--accent-fab:var(--cat-hobby)" onclick="openModal('hobby')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Add activity
+      </button>
+    </div>
+
+    <!-- DREAM AI SCREEN -->
+    <div id="screen-ai" class="screen">
+      <div class="screen-header">
+        <div class="title-group" style="display:flex;align-items:center;gap:8px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ai-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>
+          <h1 style="color:var(--ai-purple)">Dream AI</h1>
+        </div>
+        <p>Din personliga energi- och vaneassistent</p>
+      </div>
+
+      <div class="ai-container">
+        <div class="ai-chat-body" id="ai-chat-body">
+          <div class="chat-msg assistant">Hej Oscar! Jag är Dream AI. Batteriet ligger på <strong id="ai-chat-pct">0%</strong>. Be mig lägga in uppgifter, bocka av saker eller göra en hobbyplan åt dig.</div>
+        </div>
+        <div class="ai-input-wrap">
+          <input type="text" id="ai-input" placeholder="t.ex. Gör en gitarrplan för veckan" onkeydown="if(event.key==='Enter') sendAiMsg()" />
+          <button class="ai-send-btn" onclick="sendAiMsg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tabbar">
+    <button class="tab-btn active" id="tab-home" style="--tab-accent:var(--cat-routine)" onclick="switchTab('screen-home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="tab-btn" id="tab-routines" style="--tab-accent:var(--cat-routine)" onclick="switchTab('screen-routines')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="1.4"/><circle cx="5" cy="12" r="1.4"/><circle cx="5" cy="18" r="1.4"/><path d="M9 6h11M9 12h11M9 18h11"/></svg>
+      <span>Routines</span>
+    </button>
+    <button class="tab-btn" id="tab-todos" style="--tab-accent:var(--cat-todo)" onclick="switchTab('screen-todos')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>To-dos</span>
+    </button>
+    <button class="tab-btn" id="tab-hobbies" style="--tab-accent:var(--cat-hobby)" onclick="switchTab('screen-hobbies')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Hobbies</span>
+    </button>
+    <button class="tab-btn" id="tab-ai" style="--tab-accent:var(--ai-purple)" onclick="switchTab('screen-ai')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>
+      <span>Dream AI</span>
+    </button>
+  </div>
+
+  <!-- POPUP MODAL -->
+  <div class="modal-overlay" id="add-modal" onclick="closeModalOnOverlay(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h2 id="modal-title">New routine</h2>
+        <button class="modal-close" onclick="closeModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <input type="text" class="form-input" id="input-title" placeholder="t.ex. Tandläkare / Studera" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="input-desc" placeholder="t.ex. Årskontroll hos Tandläkarna i Centrum"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Datum då detta ska göras</label>
+        <input type="date" class="form-input" id="input-date" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Priority</label>
+        <div class="prio-group">
+          <button class="prio-btn" data-prio="High" onclick="setPrio(this)">High</button>
+          <button class="prio-btn active" data-prio="Medium" onclick="setPrio(this)">Medium</button>
+          <button class="prio-btn" data-prio="Low" onclick="setPrio(this)">Low</button>
+        </div>
+      </div>
+
+      <div class="time-grid">
+        <div class="form-group">
+          <label class="form-label">Min time (min)</label>
+          <input type="number" class="form-input" id="input-min" value="30" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max time (min)</label>
+          <input type="number" class="form-input" id="input-max" value="60" />
+        </div>
+      </div>
+
+      <button class="btn-save-modal" id="btn-save" onclick="saveItem()">Save routine</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ===== API-LAGER: all data går via backend (server.js) =====
+  const api = {
+    async req(method, url, body) {
+      const res = await fetch(url, {
+        method,
+        headers: body ? { 'Content-Type': 'application/json' } : undefined,
+        body: body ? JSON.stringify(body) : undefined
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      return data;
+    },
+    list: date => api.req('GET', `/api/items?date=${date}`),
+    add: item => api.req('POST', '/api/items', item),
+    update: (id, patch) => api.req('PATCH', `/api/items/${id}`, patch),
+    chat: (history, today) => api.req('POST', '/api/chat', { history, today })
+  };
+
+  // ===== DATUM (lokal tid, inte UTC) =====
+  function localDate(offset = 0) {
+    const d = new Date();
+    d.setDate(d.getDate() + offset);
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  }
+  const todayStr = localDate(0);
+  const tomorrowStr = localDate(1);
+
+  let activeSelectedDate = todayStr;
+  let currentCategory = 'routine';
+  let selectedPriority = 'Medium';
+  let items = [];        // items för valt datum, hämtade från servern
+  let chatHistory = [];  // [{role, content}] skickas till /api/chat
+
+  // Skydd mot HTML-injektion: namn kan nu komma från AI:n
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // ===== INIT =====
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('nav-date-picker').value = activeSelectedDate;
+    document.getElementById('input-date').value = activeSelectedDate;
+    updateClock();
+    setInterval(updateClock, 1000);
+    loadItems();
+  });
+
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('current-time').textContent =
+      `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  }
+
+  async function loadItems() {
+    try {
+      items = await api.list(activeSelectedDate);
+    } catch (e) {
+      items = [];
+      console.error(e);
+    }
+    renderAll();
+  }
+
+  // ===== NAVIGATION =====
+  function selectQuickDate(type) {
+    activeSelectedDate = type === 'tomorrow' ? tomorrowStr : todayStr;
+    document.getElementById('btn-date-today').classList.toggle('active', type === 'today');
+    document.getElementById('btn-date-tomorrow').classList.toggle('active', type === 'tomorrow');
+    document.getElementById('nav-date-picker').value = activeSelectedDate;
+    loadItems();
+  }
+
+  function selectCustomDate(val) {
+    if (!val) return;
+    activeSelectedDate = val;
+    document.getElementById('btn-date-today').classList.toggle('active', val === todayStr);
+    document.getElementById('btn-date-tomorrow').classList.toggle('active', val === tomorrowStr);
+    loadItems();
+  }
+
+  function switchTab(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    const map = { 'screen-home': 'tab-home', 'screen-routines': 'tab-routines', 'screen-todos': 'tab-todos', 'screen-hobbies': 'tab-hobbies', 'screen-ai': 'tab-ai' };
+    if (map[screenId]) document.getElementById(map[screenId]).classList.add('active');
+  }
+
+  // ===== RENDER =====
+  function renderAll() {
+    const dateFormatted = new Date(activeSelectedDate + 'T12:00:00').toLocaleDateString('sv-SE', { weekday: 'short', day: 'numeric', month: 'short' });
+    document.getElementById('view-date-subtitle').textContent = `Visar energipott för ${dateFormatted}.`;
+    for (const k of ['routines', 'todos', 'hobbies']) document.getElementById(`hdr-${k}-sub`).textContent = `Schema för ${dateFormatted}`;
+
+    renderList('routine', 'list-routines');
+    renderList('todo', 'list-todos');
+    renderList(['hobby', 'bonus'], 'list-hobbies');
+    calculateStats(items);
+  }
+
+  function renderList(types, containerId) {
+    const container = document.getElementById(containerId);
+    const typeArr = Array.isArray(types) ? types : [types];
+    const list = items.filter(item => typeArr.includes(item.type));
+
+    if (list.length === 0) {
+      container.innerHTML = `<p style="font-size:13px;color:var(--text-3);padding:10px 0;">Inga aktiviteter för detta datum.</p>`;
+      return;
+    }
+    container.innerHTML = '';
+    list.forEach(item => {
+      const colorVar = `--cat-${item.type}`;
+      const prioClass = item.prio === 'High' ? 'badge-high' : item.prio === 'Medium' ? 'badge-medium' : 'badge-low';
+      const row = document.createElement('div');
+      row.className = `item-row ${item.done ? 'done' : ''}`;
+      row.innerHTML = `
+        <button class="check-circle" style="--dot:var(${colorVar})" onclick="toggleDone(${Number(item.id)})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg>
+        </button>
+        <div class="item-info">
+          <div class="item-top">
+            <span class="item-name">${esc(item.name)}</span>
+            <span class="item-time">${Number(item.minTime)}-${Number(item.maxTime)} min</span>
+          </div>
+          <div class="item-desc">
+            <span class="item-prio-badge ${prioClass}">${esc(item.prio)}</span>
+            ${esc(item.desc)}
+          </div>
+        </div>`;
+      container.appendChild(row);
+    });
+  }
+
+  function chargeAnimation() {
+    const card = document.getElementById('battery-card-element');
+    card.classList.remove('charging');
+    void card.offsetWidth;
+    card.classList.add('charging');
+  }
+
+  // Optimistisk uppdatering: UI ändras direkt, servern sparar i bakgrunden.
+  async function toggleDone(id) {
+    const item = items.find(i => i.id === id);
+    if (!item) return;
+    item.done = !item.done;
+    chargeAnimation();
+    renderAll();
+    try {
+      await api.update(id, { done: item.done });
+    } catch (e) {
+      item.done = !item.done; // rulla tillbaka om servern misslyckas
+      renderAll();
+      alert('Kunde inte spara: ' + e.message);
+    }
+  }
+
+  // ===== BATTERI & RADAR =====
+  function calculateStats(items) {
+    const stats = { routine: { total: 0, done: 0 }, todo: { total: 0, done: 0 }, hobby: { total: 0, done: 0 }, bonus: { total: 0, done: 0 } };
+    items.forEach(i => {
+      if (stats[i.type]) {
+        stats[i.type].total++;
+        if (i.done) stats[i.type].done++;
+      }
+    });
+    const getPct = cat => stats[cat].total > 0 ? Math.round((stats[cat].done / stats[cat].total) * 100) : 0;
+    const rPct = getPct('routine'), tPct = getPct('todo'), hPct = getPct('hobby'), bPct = getPct('bonus');
+
+    document.getElementById('nav-routines-sub').textContent = `${stats.routine.done} of ${stats.routine.total} done`;
+    document.getElementById('nav-todos-sub').textContent = `${stats.todo.done} of ${stats.todo.total} complete`;
+    document.getElementById('nav-hobbies-sub').textContent = `${stats.hobby.done + stats.bonus.done} of ${stats.hobby.total + stats.bonus.total} logged`;
+
+    const overallDone = items.filter(i => i.done).length;
+    const totalBattery = items.length > 0 ? Math.round((overallDone / items.length) * 100) : 0;
+    document.getElementById('total-battery-pct').textContent = totalBattery;
+    const chatPct = document.getElementById('ai-chat-pct');
+    if (chatPct) chatPct.textContent = totalBattery + '%';
+
+    const stateElem = document.getElementById('battery-state-text');
+    if (totalBattery === 100) stateElem.textContent = 'Fully Charged! Max energy';
+    else if (totalBattery >= 60) stateElem.textContent = 'Building great momentum';
+    else if (totalBattery >= 30) stateElem.textContent = 'Steady progress';
+    else stateElem.textContent = 'Low charge — start your routines';
+
+    document.getElementById('seg-routine').style.flex = `0 0 ${rPct}%`;
+    document.getElementById('seg-todo').style.flex = `0 0 ${tPct}%`;
+    document.getElementById('seg-hobby').style.flex = `0 0 ${hPct}%`;
+    document.getElementById('seg-bonus').style.flex = `0 0 ${bPct}%`;
+
+    document.getElementById('leg-routine').textContent = rPct + '%';
+    document.getElementById('leg-todo').textContent = tPct + '%';
+    document.getElementById('leg-hobby').textContent = hPct + '%';
+    document.getElementById('leg-bonus').textContent = bPct + '%';
+
+    // Radar: centrum (140,125), radie 80 vertikalt / 88 horisontellt
+    const ry = 125 - (rPct / 100) * 80;
+    const tx = 140 + (tPct / 100) * 88;
+    const hy = 125 + (hPct / 100) * 80;
+    const bx = 140 - (bPct / 100) * 88;
+    document.getElementById('radar-polygon').setAttribute('points', `140,${ry} ${tx},125 140,${hy} ${bx},125`);
+    document.getElementById('node-routine').setAttribute('cy', ry);
+    document.getElementById('node-todo').setAttribute('cx', tx);
+    document.getElementById('node-hobby').setAttribute('cy', hy);
+    document.getElementById('node-bonus').setAttribute('cx', bx);
+    document.getElementById('radar-lbl-routine').textContent = rPct + '%';
+    document.getElementById('radar-lbl-todo').textContent = tPct + '%';
+    document.getElementById('radar-lbl-hobby').textContent = hPct + '%';
+    document.getElementById('radar-lbl-bonus').textContent = bPct + '%';
+  }
+
+  // ===== MODAL =====
+  function openModal(type) {
+    currentCategory = type;
+    selectedPriority = 'Medium';
+    const titles = { routine: 'New routine', todo: 'New task', hobby: 'Add activity' };
+    const btnTexts = { routine: 'Save routine', todo: 'Save task', hobby: 'Save activity' };
+    document.getElementById('modal-title').textContent = titles[type] || 'New item';
+    document.getElementById('btn-save').textContent = btnTexts[type] || 'Save';
+    document.getElementById('input-title').value = '';
+    document.getElementById('input-desc').value = '';
+    document.getElementById('input-min').value = '30';
+    document.getElementById('input-max').value = '60';
+    document.getElementById('input-date').value = activeSelectedDate;
+    document.querySelectorAll('.prio-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.prio === 'Medium'));
+    document.getElementById('add-modal').classList.add('active');
+  }
+  function closeModal() { document.getElementById('add-modal').classList.remove('active'); }
+  function closeModalOnOverlay(e) { if (e.target.classList.contains('modal-overlay')) closeModal(); }
+  function setPrio(btn) {
+    selectedPriority = btn.dataset.prio;
+    document.querySelectorAll('.prio-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  async function saveItem() {
+    const name = document.getElementById('input-title').value.trim();
+    if (!name) return alert('Vänligen ange en titel.');
+    try {
+      await api.add({
+        date: document.getElementById('input-date').value || activeSelectedDate,
+        type: currentCategory,
+        name,
+        desc: document.getElementById('input-desc').value.trim(),
+        minTime: parseInt(document.getElementById('input-min').value) || 15,
+        maxTime: parseInt(document.getElementById('input-max').value) || 30,
+        prio: selectedPriority
+      });
+      closeModal();
+      loadItems();
+    } catch (e) {
+      alert('Kunde inte spara: ' + e.message);
+    }
+  }
+
+  // ===== DREAM AI: riktig agent via /api/chat =====
+  function addBubble(role, text) {
+    const chatBody = document.getElementById('ai-chat-body');
+    const el = document.createElement('div');
+    el.className = `chat-msg ${role}`;
+    el.textContent = text;
+    chatBody.appendChild(el);
+    chatBody.scrollTop = chatBody.scrollHeight;
+    return el;
+  }
+
+  // Varje handling agenten gjorde visas som ett kort → användaren ser exakt vad som ändrats.
+  function addActionCards(actions) {
+    if (!actions?.length) return;
+    const labels = { add: 'La till', done: 'Bockade av', update: 'Ändrade', delete: 'Tog bort' };
+    const icons = { add: '+', done: '✓', update: '✎', delete: '×' };
+    const chatBody = document.getElementById('ai-chat-body');
+    const wrap = document.createElement('div');
+    wrap.className = 'action-list';
+    actions.forEach(a => {
+      const d = new Date(a.item.date + 'T12:00:00').toLocaleDateString('sv-SE', { weekday: 'short', day: 'numeric', month: 'short' });
+      const card = document.createElement('div');
+      card.className = `action-card ${a.kind}`;
+      card.style.setProperty('--c', `var(--cat-${a.item.type})`);
+      card.innerHTML = `<span class="action-ic">${icons[a.kind]}</span>
+        <span class="action-txt"><b>${labels[a.kind]}:</b> ${esc(a.item.name)}</span>
+        <span class="action-date">${esc(d)}</span>`;
+      card.onclick = () => { selectCustomDate(a.item.date); document.getElementById('nav-date-picker').value = a.item.date; switchTab('screen-home'); };
+      wrap.appendChild(card);
+    });
+    chatBody.appendChild(wrap);
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
+  let aiBusy = false;
+  async function sendAiMsg() {
+    const input = document.getElementById('ai-input');
+    const text = input.value.trim();
+    if (!text || aiBusy) return;
+    aiBusy = true;
+    input.value = '';
+    addBubble('user', text);
+    chatHistory.push({ role: 'user', content: text });
+
+    const typing = addBubble('assistant', 'Dream AI tänker…');
+    typing.classList.add('typing');
+
+    try {
+      const { reply, actions } = await api.chat(chatHistory, todayStr);
+      typing.remove();
+      addBubble('assistant', reply);
+      addActionCards(actions);
+      chatHistory.push({ role: 'assistant', content: reply });
+      if (actions?.length) { chargeAnimation(); loadItems(); } // live-uppdatera batteri, radar, listor
+    } catch (e) {
+      typing.remove();
+      addBubble('assistant', 'Oj, något gick fel: ' + e.message);
+      chatHistory.pop(); // låt användaren försöka igen
+    } finally {
+      aiBusy = false;
+    }
+  }
+</script>
+</body>
+</html>
