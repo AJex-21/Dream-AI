@@ -1,7 +1,6 @@
 // agent.js – Dream AI som agent: Claude väljer verktyg, servern kör dem, loopar tills svaret är klart.
 import * as db from './db.js';
 
-const MODEL = process.env.MODEL || 'claude-haiku-5-5';
 const MAX_STEPS = 6; // skydd mot oändlig loop
 
 const itemSchema = {
@@ -95,8 +94,9 @@ Appen har tre delar: hälsa (hälsobatteri), vardagsrutiner och hobbystöd.
 Idag är ${weekday} ${today}. Räkna ut datum som "imorgon" eller "på fredag" utifrån det.
 
 Du kan läsa och ändra användarens schema med verktygen. Regler:
-- Gör det användaren ber om direkt med verktygen, fråga bara om något viktigt saknas.
-- Hobbyplan: fråga om mål och tid per dag om det saknas, skapa sedan konkreta pass med add_items (ett item per pass, type "hobby").
+- Agera hellre än fråga. Fråga bara om du inte kan göra en rimlig gissning.
+- När användaren säger att hen gjort något: kör list_items för idag, hitta det item som matchar bäst (även om språket skiljer, t.ex. "kall dusch" = "Cold Shower") och bocka av med update_item done=true. Finns inget som matchar, fråga om du ska lägga till det.
+- Hobbyplan: om hobby och tid per dag finns, skapa planen direkt med add_items (7 dagar från idag om inget annat sägs, type "hobby", ett pass per dag, stegrande svårighet). Fråga bara om hobbyn saknas.
 - Hälsotips (vatten, promenad, mikropaus) läggs som type "bonus".
 - Hämta id med list_items innan du ändrar eller tar bort. Ta bort flera saker bara om användaren tydligt bett om det.
 - Svara på svenska, kort (1–3 meningar), peppigt men inte överdrivet. Ingen markdown.`;
@@ -108,12 +108,14 @@ Du kan läsa och ändra användarens schema med verktygen. Regler:
  * @param {string} today   YYYY-MM-DD (klientens lokala datum)
  */
 export async function runAgent(client, history, today) {
+  // Läses här, inte vid import: server.js kör dotenv.config() först efter att importerna laddats.
+  const model = process.env.MODEL || 'claude-haiku-5-5';
   const messages = history.map(m => ({ role: m.role, content: m.content }));
   const actions = [];
 
   for (let step = 0; step < MAX_STEPS; step++) {
     const res = await client.messages.create({
-      model: MODEL,
+      model,
       max_tokens: 1024,
       system: systemPrompt(today),
       tools,

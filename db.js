@@ -17,16 +17,16 @@ export function localDate(offsetDays = 0) {
 function seed() {
   const t = localDate(0), tm = localDate(1);
   const items = [
-    { date: t, type: 'routine', name: 'Morning Meditation', desc: 'Mindfulness practice', minTime: 10, maxTime: 15, prio: 'Medium', done: true },
-    { date: t, type: 'routine', name: 'Plugga & Läsa', desc: 'Read 30 pages and notes', minTime: 30, maxTime: 60, prio: 'High', done: true },
-    { date: t, type: 'routine', name: 'Styrketräning', desc: 'Upper body workout session', minTime: 45, maxTime: 60, prio: 'High', done: false },
-    { date: t, type: 'todo', name: 'Tandläkarbesök', desc: 'Checkup at Centrum Clinic', minTime: 30, maxTime: 45, prio: 'High', done: true },
-    { date: t, type: 'todo', name: 'Pay bills', desc: 'Electricity and Internet invoices', minTime: 15, maxTime: 20, prio: 'Medium', done: false },
-    { date: t, type: 'hobby', name: 'Guitar Practice', desc: 'Acoustic fingerpicking technique', minTime: 20, maxTime: 40, prio: 'Low', done: true },
-    { date: t, type: 'bonus', name: 'Cold Shower', desc: '2 minutes recovery boost', minTime: 2, maxTime: 5, prio: 'Low', done: false },
-    { date: tm, type: 'routine', name: 'Morning Run', desc: '5km cardio round', minTime: 25, maxTime: 35, prio: 'High', done: false },
-    { date: tm, type: 'todo', name: 'Weekly Grocery Shopping', desc: 'Buy mealprep ingredients', minTime: 45, maxTime: 60, prio: 'Medium', done: false },
-    { date: tm, type: 'hobby', name: 'Read Sci-Fi Novel', desc: 'Chapter 4 to 6', minTime: 30, maxTime: 45, prio: 'Low', done: false }
+    { date: t, type: 'routine', name: 'Morgonmeditation', desc: 'Mindfulnessövning', minTime: 10, maxTime: 15, prio: 'Medium', done: true },
+    { date: t, type: 'routine', name: 'Plugga & läsa', desc: 'Läs 30 sidor och anteckna', minTime: 30, maxTime: 60, prio: 'High', done: true },
+    { date: t, type: 'routine', name: 'Styrketräning', desc: 'Pass för överkroppen', minTime: 45, maxTime: 60, prio: 'High', done: false },
+    { date: t, type: 'todo', name: 'Tandläkarbesök', desc: 'Kontroll på Centrumkliniken', minTime: 30, maxTime: 45, prio: 'High', done: true },
+    { date: t, type: 'todo', name: 'Betala räkningar', desc: 'El- och internetfakturor', minTime: 15, maxTime: 20, prio: 'Medium', done: false },
+    { date: t, type: 'hobby', name: 'Gitarrövning', desc: 'Fingerplockning på akustisk gitarr', minTime: 20, maxTime: 40, prio: 'Low', done: true },
+    { date: t, type: 'bonus', name: 'Kall dusch', desc: '2 minuters återhämtningsboost', minTime: 2, maxTime: 5, prio: 'Low', done: false },
+    { date: tm, type: 'routine', name: 'Morgonlöpning', desc: '5 km konditionsrunda', minTime: 25, maxTime: 35, prio: 'High', done: false },
+    { date: tm, type: 'todo', name: 'Veckohandla', desc: 'Köp ingredienser till matlådor', minTime: 45, maxTime: 60, prio: 'Medium', done: false },
+    { date: tm, type: 'hobby', name: 'Läsa sci-fi-roman', desc: 'Kapitel 4 till 6', minTime: 30, maxTime: 45, prio: 'Low', done: false }
   ].map((it, i) => ({ id: i + 1, ...it }));
   return { nextId: items.length + 1, items };
 }

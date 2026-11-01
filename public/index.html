@@ -749,7 +749,7 @@
   // ===== RENDER =====
   function renderAll() {
     const dateFormatted = new Date(activeSelectedDate + 'T12:00:00').toLocaleDateString('sv-SE', { weekday: 'short', day: 'numeric', month: 'short' });
-    document.getElementById('view-date-subtitle').textContent = `Visar energipott för ${dateFormatted}.`;
+    document.getElementById('view-date-subtitle').textContent = `Visar energipott för ${dateFormatted}`;
     for (const k of ['routines', 'todos', 'hobbies']) document.getElementById(`hdr-${k}-sub`).textContent = `Schema för ${dateFormatted}`;
 
     renderList('routine', 'list-routines');

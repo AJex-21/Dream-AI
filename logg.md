@@ -42,3 +42,32 @@ Format: vad, alternativ, varför.
 - Batteritimern ("until empty") är fortfarande statisk.
 - Jev (TypeSafe) som snabb router före Claude: avgör om meddelandet är chatt eller en åtgärd, så enkla frågor inte kostar ett LLM-anrop.
 - Notifikationer när batteriet är lågt.
+
+## Iteration: test mot riktig modell
+
+**Vad som inte fungerade.** Enhetstesterna (mock-klient) gick igenom, men de manuella kontrollerna mot riktiga Claude (`claude-haiku-5-5`) gjorde det inte. Varje chattkontroll kördes 4 gånger.
+- "Gör en gitarrplan för veckan, 20 min om dagen": 0/4. Modellen frågade varje gång vad målet med övningen var i stället för att lägga in pass. När man svarade på frågan lades 7 pass in, så verktygen fungerade.
+- "Jag har tagit en kall dusch": 1/4. I tre av fyra fall körde modellen aldrig `list_items`, utan frågade om den skulle lägga in något nytt.
+- `MODEL` i `.env` ignorerades. Appen använde alltid `claude-haiku-5-5`, oavsett vad som stod i `.env`.
+
+**Varför.**
+- Gitarr: systemprompten sa "fråga om mål och tid per dag om det saknas". Målet saknades alltid, så modellen följde regeln och frågade.
+- Dusch: prompten sa inget om att "jag har gjort X" betyder "bocka av X". Dessutom hette uppgiften "Cold Shower" medan användaren skrev på svenska.
+- `MODEL`: `agent.js` läste `process.env.MODEL` när filen importerades. I ES-moduler laddas alla importer innan resten av `server.js` körs, så `dotenv.config()` hade inte hunnit läsa `.env` än.
+
+**Vad vi ändrade.**
+- Nya regler i systemprompten: agera hellre än fråga. "Jag har gjort X" → `list_items` för idag, hitta bäst matchande item (även om språket skiljer) och bocka av med `update_item`. Hobbyplanen skapas direkt om hobby och tid per dag finns (7 dagar från idag, ett pass per dag, stegrande svårighet).
+- `MODEL` läses inne i `runAgent()` i stället för vid import. Kontrollerat: med `MODEL=model-from-dotenv` i `.env` skickas nu den modellen till API:t.
+- Seed-datan är översatt till svenska, som är appens språk.
+- Buggfix: dubbel punkt i datumraden på hemskärmen ("sön 1 nov..").
+
+**Resultat.** 4 körningar per kontroll. Efter ändringen startade varje körning från ny seed-data.
+
+| Kontroll | Före | Ny prompt, engelsk seed | Ny prompt, svensk seed |
+|---|---|---|---|
+| Gitarrplan i ett meddelande | 0/4 | 3/4 | 3/4 |
+| Kall dusch bockas av, batteriet stiger | 1/4 | 4/4 | 4/4 |
+
+Duschen gick 4/4 redan med engelska namn ("Cold Shower"), så det var promptändringen som gav förbättringen och inte översättningen. I de lyckade gitarrkörningarna lades 7 pass in, ett per dag, från idag.
+
+**Kvarstår.** De två misslyckade gitarrkörningarna svarade "Klart!" utan att lägga in något. I sex extra körningar där varje steg loggades använde steget som skriver alla sju pass (tänkande + verktygsanrop) 817–1012 output-tokens, och taket är `max_tokens: 1024`. Troligen nådde de misslyckade körningarna taket. Då klipps verktygsanropet av, loopen tolkar svaret som färdigt och visar standardtexten "Klart!". Själva `stop_reason` loggades inte i de misslyckade körningarna. Nästa steg: höj `max_tokens` och ge ett ärligt felmeddelande när `stop_reason` är `max_tokens`.
