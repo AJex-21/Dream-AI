@@ -32,7 +32,10 @@ UI:t och agenten använder **samma funktioner i `db.js`**. Det AI:n gör syns di
 flowchart TD
   A[Användaren skriver i chatten] --> B[POST /api/chat]
   B --> C[Skicka historik + verktyg till Claude]
-  C --> D{stop_reason = tool_use?}
+  C --> M{stop_reason = max_tokens?}
+  M -- Ja --> N["Kör inga verktyg, input kan vara avklippt<br>Svar: be om färre dagar"]
+  N --> J
+  M -- Nej --> D{stop_reason = tool_use?}
   D -- Ja --> E[Kör verktyget i db.js]
   E --> F[Skicka tool_result tillbaka]
   F --> G{Max 6 steg?}
