@@ -116,15 +116,20 @@ export async function runAgent(client, history, today) {
   for (let step = 0; step < MAX_STEPS; step++) {
     const res = await client.messages.create({
       model,
-      max_tokens: 1024,
+      max_tokens: 4096,
       system: systemPrompt(today),
       tools,
       messages
     });
 
+    // Svaret klipptes av: tool_use-input kan vara ofullständig, så inga verktyg körs.
+    if (res.stop_reason === 'max_tokens') {
+      return { reply: 'Planen blev för lång för mig, be om färre dagar så försöker jag igen.', actions };
+    }
+
     if (res.stop_reason !== 'tool_use') {
       const reply = res.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
-      return { reply: reply || 'Klart!', actions };
+      return { reply: reply || (actions.length ? 'Klart!' : 'Jag fick inget svar, försök igen.'), actions };
     }
 
     // Modellen vill köra verktyg: spara dess tur, kör alla tool_use, skicka tillbaka resultaten.

@@ -77,3 +77,17 @@ test('loopen stannar efter MAX_STEPS', async () => {
   const out = await runAgent(mockClient(script), [{ role: 'user', content: 'loop' }], db.localDate());
   assert.match(out.reply, /hann inte/);
 });
+
+test('max_tokens: avklippt tool_use körs inte', async () => {
+  const before = (await db.listItems()).length;
+  const client = mockClient([
+    { stop_reason: 'max_tokens', content: [{ type: 'tool_use', id: 'm1', name: 'add_items', input: { items: [
+      { date: db.localDate(), type: 'hobby', name: 'Avklippt pass' }
+    ] } }] }
+  ]);
+  const out = await runAgent(client, [{ role: 'user', content: 'gör en plan för hela året' }], db.localDate());
+  assert.equal(out.reply, 'Planen blev för lång för mig, be om färre dagar så försöker jag igen.');
+  assert.equal(out.actions.length, 0);
+  assert.equal((await db.listItems()).length, before);
+  assert.equal(client.calls.length, 1); // inget tool_result skickades tillbaka
+});
