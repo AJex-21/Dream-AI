@@ -2,51 +2,90 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="color-scheme" content="dark" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="color-scheme" content="dark light" />
+<meta name="theme-color" content="#100e1a" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#f5f3f7" media="(prefers-color-scheme: light)" />
 <title>Pulse</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&display=swap" rel="stylesheet">
 <style>
+  /* Skymning: kategorierna är bågarna i batteriringen, från hav via himmel och solnedgång till sol.
+     Paletten är kontrollerad för färgblindhet och finns i två varianter, färg bär aldrig betydelsen ensam. */
   :root{
-    --bg-page:#05070c;
-    --bg-phone:#0a0e17;
-    --bg-surface:#131a2a;
-    --bg-surface-2:#1b2338;
-    --bg-surface-3:#232c46;
-    --input-bg:#151c28;
+    --bg-page:#08070f;
+    --bg-phone:#100e1a;
+    --bg-surface:#1a1727;
+    --bg-surface-2:#242035;
+    --bg-surface-3:#312c47;
+    --input-bg:#1a1727;
+    --sheet-solid:#171423;
     --border:rgba(255,255,255,.08);
-    --border-strong:rgba(255,255,255,.14);
-    --text-1:#f5f7fb;
-    --text-2:#a7b0ca;
-    --text-3:#8b95b0;
+    --border-strong:rgba(255,255,255,.16);
+    --text-1:#f4f2fa;
+    --text-2:#b1adc6;
+    --text-3:#938fa9;
+    --ink:#12101d;         /* text på färgad yta */
+    --solid:#f4f2fa;       /* neutral huvudknapp */
+    --on-solid:#12101d;
+    --glass:rgba(34,30,50,.62);
+    --glass-edge:rgba(255,255,255,.14);
+    --scrim:rgba(5,4,10,.62);
 
-    --cat-routine:#00e6a0;
-    --cat-routine-dim:rgba(0,230,160,.14);
-    --cat-todo:#8c7bff;
-    --cat-todo-dim:rgba(140,123,255,.14);
-    --cat-hobby:#ff7a59;
-    --cat-hobby-dim:rgba(255,122,89,.14);
-    --cat-bonus:#ffd23f;
-    --cat-bonus-dim:rgba(255,210,63,.14);
+    --cat-routine:#2cc4ae;
+    --cat-todo:#8b98ff;
+    --cat-hobby:#ff7e6b;
+    --cat-bonus:#f2b83f;
+    --on-cat:#12101d;
+    --swipe-check:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2312101d' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
 
-    --prio-high:#ff6b6b;
-    --prio-med:#ffb800;
-    --prio-low:#6aa6ff;
-
-    --ai-purple:#a855f7;
-    --ai-purple-dim:rgba(168,85,247,0.15);
+    --danger:#ff8a8a;
+    --ai:#b7a4ff;
+    --ai-dim:rgba(183,164,255,.14);
 
     --r-xl:28px; --r-lg:20px; --r-md:14px; --r-full:999px;
-    --font-d:'Space Grotesk',sans-serif;
-    --font-b:'Inter',sans-serif;
+    --font-d:'Bricolage Grotesque',system-ui,sans-serif;
+    --font-b:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    /* rem: texten följer läsarens egen textstorlek */
+    --t-xs:.75rem; --t-sm:.8125rem; --t-md:.9375rem; --t-lg:1.0625rem; --t-xl:1.375rem; --t-2xl:1.75rem;
+  }
+  @media (prefers-color-scheme:light){
+    :root{
+      --bg-page:#e7e3ee;
+      --bg-phone:#f5f3f7;
+      --bg-surface:#ffffff;
+      --bg-surface-2:#f0edf5;
+      --bg-surface-3:#e4e0ec;
+      --input-bg:#ffffff;
+      --sheet-solid:#fbfafd;
+      --border:rgba(30,24,60,.09);
+      --border-strong:rgba(30,24,60,.18);
+      --text-1:#191627;
+      --text-2:#565269;
+      --text-3:#676379;
+      --ink:#191627;
+      --solid:#191627;
+      --on-solid:#ffffff;
+      --glass:rgba(255,255,255,.66);
+      --glass-edge:rgba(255,255,255,.8);
+      --scrim:rgba(30,24,50,.38);
+      --cat-routine:#0b8f80;
+      --cat-todo:#5c6cf0;
+      --cat-hobby:#e0446a;
+      --cat-bonus:#b98000;
+      --on-cat:#ffffff;
+      --swipe-check:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
+      --danger:#c8283c;
+      --ai:#6a4fd8;
+      --ai-dim:rgba(106,79,216,.1);
+    }
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   [hidden]{display:none !important;}
   button, input, select, textarea{font-family:inherit;border:none;background:none;color:inherit;}
-  button{cursor:pointer;}
-  :focus-visible{outline:2px solid var(--cat-routine);outline-offset:2px;}
+  button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  :focus-visible{outline:2px solid var(--text-1);outline-offset:2px;}
   html,body{min-height:100%;}
   body{
     background:var(--bg-page);
@@ -58,7 +97,12 @@
     min-height:100vh;
     min-height:100dvh;
     padding:20px 0;
+    -webkit-font-smoothing:antialiased;
   }
+  svg.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;display:block;}
+  /* Trycket syns direkt, inte när fingret släpps */
+  button:active{transition:transform 90ms ease-out;}
+  .tab-btn:active,.icon-btn:active,.chip-btn:active,.suggest:active,.fab:active,.btn-save-modal:active,.ai-send-btn:active,.type-btn:active,.day-pill:active,.prio-btn:active{transform:scale(.95);}
 
   /* DEVICE FRAME: telefonramen är bara till för datorskärm, se media query längst ner */
   .device{
@@ -68,20 +112,24 @@
     background:var(--bg-phone);
     border-radius:46px;
     border:1px solid var(--border-strong);
-    box-shadow:0 40px 80px -20px rgba(0,0,0,.6), inset 0 0 0 6px #05070c;
+    box-shadow:0 40px 80px -24px rgba(0,0,0,.5);
     overflow:hidden;
     display:flex;
     flex-direction:column;
     position:relative;
   }
-  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:80px;height:22px;background:#000;border-radius:16px;z-index:30;}
-  .statusbar{padding:38px 26px 6px;font-family:var(--font-d);font-size:13px;font-weight:600;flex-shrink:0;z-index:29;}
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:84px;height:24px;background:#000;border-radius:14px;z-index:30;}
+  .statusbar{padding:14px 30px 0;font-family:var(--font-d);font-size:var(--t-sm);font-weight:600;flex-shrink:0;z-index:29;font-variant-numeric:tabular-nums;}
 
   .screen-container{
     flex:1;
     position:relative;
     width:100%;
     overflow:hidden;
+    min-height:0;
+    /* Bakgrunden trycks bakåt när ett ark ligger över */
+    transform:scale(calc(1 - .05 * var(--sheet, 0)));
+    border-radius:calc(28px * var(--sheet, 0));
   }
 
   .screen{
@@ -95,339 +143,375 @@
   }
   .screen::-webkit-scrollbar{display:none;}
   .screen.active{display:flex;}
+  .screen.enter{animation:screen-in .32s cubic-bezier(.2,.9,.25,1);}
+  @keyframes screen-in{from{opacity:0;transform:translateX(var(--from,0));}to{opacity:1;transform:none;}}
 
-  /* BRAND */
-  .brandbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 22px 14px;flex-shrink:0;}
-  .wordmark{font-family:var(--font-d);font-weight:700;font-size:14px;color:var(--cat-routine);letter-spacing:.02em;display:block;}
-  .hello{font-family:var(--font-d);font-size:22px;font-weight:600;margin-top:1px;overflow-wrap:anywhere;}
+  /* TOPP */
+  .topbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;padding:18px 20px 8px;flex-shrink:0;}
+  .top-title{flex:1 1 min-content;min-width:0;}
+  .top-title h1{white-space:nowrap;}
+  .top-title h1,.title-group h1{font-family:var(--font-d);font-size:var(--t-2xl);font-weight:700;letter-spacing:-.02em;line-height:1.1;}
+  .top-title p,.title-group p{font-size:var(--t-sm);color:var(--text-2);margin-top:3px;font-variant-numeric:tabular-nums;min-height:1.2em;}
+  .top-tools{display:flex;align-items:center;gap:0;flex-shrink:0;margin-left:auto;}
+  .top-sub{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
+  .top-sub .link-btn{min-height:32px;min-width:44px;padding:0;margin-block:-6px -7px;text-decoration:underline;text-underline-offset:3px;}
 
-  .seg-toggle{display:flex;align-items:center;background:var(--bg-surface);border:1px solid var(--border);padding:3px;border-radius:var(--r-full);gap:2px;flex-shrink:0;}
-  .seg-toggle button{min-height:36px;padding:0 14px;font-size:12.5px;font-weight:600;border-radius:var(--r-full);color:var(--text-2);transition:all 0.2s ease;}
-  .seg-toggle button[aria-pressed="true"]{background:var(--bg-surface-3);color:var(--text-1);}
-  .seg-toggle.wide button{flex:1;}
+  .seg-toggle{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--bg-surface-2);padding:3px;border-radius:var(--r-full);flex-shrink:0;isolation:isolate;}
+  .seg-toggle::before{content:'';position:absolute;z-index:-1;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:var(--r-full);background:var(--bg-surface);box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .34s cubic-bezier(.3,1.25,.5,1);}
+  .seg-toggle:has(button:last-child[aria-pressed="true"])::before{transform:translateX(100%);}
+  .seg-toggle button{min-height:36px;padding:0 13px;font-size:var(--t-sm);font-weight:600;border-radius:var(--r-full);color:var(--text-2);transition:color .2s ease;}
+  .seg-toggle button[aria-pressed="true"]{color:var(--text-1);}
 
-  .screen-header{padding:16px 22px 14px;flex-shrink:0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
-  .title-group h1{font-family:var(--font-d);font-size:22px;font-weight:600;}
-  .title-group p{font-size:12.5px;color:var(--text-2);margin-top:3px;}
+  .screen-header{padding:18px 20px 14px;flex-shrink:0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
 
-  /* BATTERY CARD */
+  /* BATTERIRINGEN: appens signatur, samma ringar som bockarna och tidslinjen */
   .battery-card{
-    display:block;
-    width:calc(100% - 44px);
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    width:calc(100% - 40px);
     flex-shrink:0;
     text-align:left;
-    margin:0 22px 14px;
-    background:linear-gradient(180deg,var(--bg-surface-2),var(--bg-surface));
-    border:1px solid var(--border);
-    border-radius:var(--r-xl);
-    padding:18px 20px;
-    transition:box-shadow 0.3s ease, border-color 0.3s ease;
+    margin:4px 20px 14px;
   }
-  .battery-card.charging{animation:pulse-charge 0.8s ease;}
-  @keyframes pulse-charge {
-    0% { transform:scale(1); border-color:var(--border); }
-    50% { transform:scale(1.02); border-color:var(--cat-routine); box-shadow:0 0 20px rgba(0,230,160,0.25); }
-    100% { transform:scale(1); border-color:var(--border); }
-  }
+  .ring-wrap{position:relative;width:148px;height:148px;flex-shrink:0;transition:transform .25s cubic-bezier(.3,1.3,.5,1);}
+  .battery-card:active .ring-wrap{transform:scale(.97);}
+  .ring{width:100%;height:100%;display:block;overflow:visible;}
+  .ring circle{fill:none;stroke-width:15;}
+  .ring-track{stroke:var(--bg-surface-3);}
+  .ring-seg{stroke-linecap:round;stroke-dasharray:0 100;opacity:0;}
+  .ring .ring-halo{stroke-width:6;opacity:0;transform-box:fill-box;transform-origin:center;}
+  .ring-num{font-family:var(--font-d);font-size:56px;font-weight:700;letter-spacing:-.03em;text-anchor:middle;font-variant-numeric:tabular-nums;fill:var(--text-1);}
+  .ring-pct{font-size:22px;font-weight:600;fill:var(--text-2);}
 
-  .battery-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
-  .battery-pct-wrap{display:flex;align-items:baseline;gap:2px;}
-  .battery-pct{font-family:var(--font-d);font-size:42px;font-weight:700;line-height:1;}
-  .pct-sign{font-size:18px;font-weight:600;margin-left:1px;color:var(--text-2);}
-  .battery-timer{text-align:right;min-width:0;}
-  .battery-timer .t-val{display:block;font-family:var(--font-d);font-size:16px;font-weight:600;line-height:1.2;color:var(--cat-routine);}
-  .battery-timer .t-lab{display:block;font-size:12px;color:var(--text-2);margin-top:2px;}
-  .battery-state{display:block;font-size:12.5px;color:var(--text-2);margin-top:12px;line-height:1.4;}
+  .hero-info{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .t-val{display:block;font-family:var(--font-d);font-size:var(--t-xl);font-weight:700;line-height:1.12;letter-spacing:-.015em;overflow-wrap:anywhere;}
+  .t-lab{display:block;font-size:var(--t-sm);color:var(--text-2);margin-top:4px;line-height:1.3;}
+  .hero-cats{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin-top:12px;}
+  .hero-cat{display:flex;align-items:center;gap:5px;font-size:var(--t-sm);font-weight:600;font-variant-numeric:tabular-nums;color:var(--text-1);}
+  .hero-cat svg.ic{width:15px;height:15px;color:var(--c);}
 
-  .segbar{height:14px;border-radius:7px;background:var(--bg-surface-3);overflow:hidden;display:flex;}
-  .segbar .seg{height:100%;flex:0 0 0;transition:flex-basis 0.5s ease-in-out;}
-  .seg-routine{background:var(--cat-routine);}
-  .seg-todo{background:var(--cat-todo);}
-  .seg-hobby{background:var(--cat-hobby);}
-  .seg-bonus{background:var(--cat-bonus);}
-
-  .seg-legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;}
-  .seg-legend-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text-2);}
-  .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;}
-  .dot.routine{background:var(--cat-routine);}
-  .dot.todo{background:var(--cat-todo);}
-  .dot.hobby{background:var(--cat-hobby);}
-  .dot.bonus{background:var(--cat-bonus);}
-  .seg-legend-item b{color:var(--text-1);font-weight:600;}
+  /* Laddningen flyger från bocken till sin båge i ringen: man ser vad som orsakade den */
+  .fly{position:absolute;left:0;top:0;width:14px;height:14px;margin:-7px;border-radius:50%;background:var(--c);box-shadow:0 0 14px var(--c);z-index:50;pointer-events:none;}
 
   /* VECKOREMSA */
-  .date-row{display:flex;align-items:center;gap:2px;padding:0 12px;flex-shrink:0;}
-  .icon-btn{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-2);}
-  .icon-btn svg{width:18px;height:18px;stroke:currentColor;}
-  .week-strip{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:2px;min-width:0;}
-  .week-arrow{width:24px;height:52px;display:flex;align-items:center;justify-content:center;color:var(--text-3);flex-shrink:0;}
-  .week-arrow svg{width:16px;height:16px;stroke:currentColor;}
-  .day-cell{display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 0 6px;border-radius:12px;min-height:52px;color:var(--text-2);}
-  .dc-wd{font-size:10.5px;font-weight:500;}
-  .dc-num{font-family:var(--font-d);font-size:15px;font-weight:600;color:var(--text-1);}
-  .dc-bar{width:20px;height:3px;border-radius:2px;background:var(--bg-surface-3);overflow:hidden;margin-top:2px;}
-  .dc-bar span{display:block;height:100%;background:var(--cat-routine);}
-  .day-cell.today .dc-num{color:var(--cat-routine);}
-  .day-cell.active{background:var(--bg-surface-3);}
+  .date-row{display:flex;align-items:center;padding:0 6px;flex-shrink:0;}
+  .week-wrap{position:relative;flex:1;min-width:0;touch-action:pan-y;}
+  .strip-ind{position:absolute;top:0;left:0;bottom:0;width:calc(100% / 7);padding:0 1px;pointer-events:none;}
+  .strip-ind::before{content:'';display:block;height:100%;border-radius:16px;background:var(--bg-surface-3);}
+  .week-strip{position:relative;display:grid;grid-template-columns:repeat(7,1fr);min-width:0;}
+  .week-arrow{width:26px;height:56px;display:flex;align-items:center;justify-content:center;color:var(--text-3);flex-shrink:0;}
+  .week-arrow svg.ic{width:15px;height:15px;}
+  .day-cell{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;margin:0 1px;border-radius:16px;min-height:56px;color:var(--text-2);isolation:isolate;}
+  /* Varje dag är ett litet glas som fylls när något bockas av */
+  .day-cell::after{content:'';position:absolute;z-index:-1;left:0;right:0;bottom:0;height:var(--f,0%);background:var(--cat-routine);opacity:.24;transition:height .5s cubic-bezier(.2,.9,.25,1);}
+  .dc-wd{font-size:var(--t-xs);font-weight:500;}
+  .dc-num{font-family:var(--font-d);font-size:var(--t-lg);font-weight:700;color:var(--text-1);font-variant-numeric:tabular-nums;}
+  .day-cell.today .dc-wd{color:var(--text-1);font-weight:700;}
+  .day-cell.today .dc-num{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;}
 
   /* DAGEN */
-  .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 22px 8px;}
-  .section-head h2{font-family:var(--font-d);font-size:16px;font-weight:600;}
-  .section-head .count{font-size:12px;color:var(--text-2);margin-top:1px;}
-  .section-tools{display:flex;align-items:center;gap:2px;flex-shrink:0;}
-  .link-btn{min-height:44px;padding:0 10px;font-size:12.5px;font-weight:600;color:var(--cat-routine);flex-shrink:0;}
-  .list-label{font-size:12px;font-weight:600;color:var(--text-2);padding:12px 22px 6px;}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 20px 6px;}
+  .section-head h2{font-family:var(--font-d);font-size:var(--t-lg);font-weight:700;letter-spacing:-.01em;}
+  .link-btn{min-height:44px;padding:0 10px;font-size:var(--t-sm);font-weight:600;color:var(--text-1);flex-shrink:0;}
+  .list-label{font-size:var(--t-sm);font-weight:600;color:var(--text-2);padding:14px 20px 4px;}
   .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
-  .date-input-hidden{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;}
+  .icon-btn{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-2);}
 
-  /* LIST ITEMS */
-  .list{display:flex;flex-direction:column;gap:8px;padding:0 22px;}
-  .item-row{display:flex;gap:2px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:4px 12px 4px 4px;align-items:flex-start;transition:border-color 0.2s;}
-  .check-circle{width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:50%;}
-  .check-dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--dot, var(--cat-routine));display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;}
-  .check-dot svg{width:13px;height:13px;stroke:var(--bg-phone);stroke-width:3;display:none;}
+  #day-view{padding-top:8px;}
+
+  /* LIST ITEMS: dagen är en tidslinje, ringarna sitter på en gemensam tråd */
+  .list{display:flex;flex-direction:column;padding:0 14px;}
+  .item-row{--x:0px;position:relative;display:flex;gap:2px;align-items:flex-start;border-radius:18px;touch-action:pan-y;user-select:none;-webkit-user-select:none;}
+  .item-row > *{transform:translateX(var(--x));position:relative;z-index:1;}
+  .item-row::before{content:'';position:absolute;left:0;top:3px;bottom:3px;width:var(--x);max-width:100%;border-radius:18px;background:var(--dot,var(--cat-routine));}
+  .item-row:not(.done)::before{background:var(--swipe-check) 13px center/20px no-repeat, var(--dot,var(--cat-routine));}
+  .list.rail .item-row:not(:last-child)::after{content:'';position:absolute;left:21px;top:38px;bottom:-6px;width:2px;border-radius:1px;background:var(--dot);opacity:.26;transform:translateX(var(--x));}
+  .list.rail .item-row.done:not(:last-child)::after{opacity:.6;}
+  .check-circle{width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:50%;margin-top:3px;}
+  .check-dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--dot, var(--cat-routine));display:flex;align-items:center;justify-content:center;transition:background .18s ease, transform .34s cubic-bezier(.3,1.7,.5,1);}
+  .check-circle:active .check-dot{transform:scale(.84);}
+  .check-dot svg{width:14px;height:14px;stroke:var(--on-cat);stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:26;stroke-dashoffset:26;transition:stroke-dashoffset .26s ease .04s;}
   .check-circle.future{cursor:not-allowed;}
-  .check-circle.future .check-dot{border-style:dashed;opacity:.55;}
+  .check-circle.future .check-dot{border-style:dashed;opacity:.5;}
   .check-circle.off-day .check-dot{border-style:dashed;opacity:.7;}
-  .item-row.done{background:transparent;border-color:var(--border);}
   .item-row.done .check-dot{background:var(--dot, var(--cat-routine));}
-  .item-row.done .check-dot svg{display:block;}
-  .item-info{flex:1;min-width:0;display:block;text-align:left;padding:9px 0 9px 4px;min-height:44px;border-radius:12px;}
+  .item-row.done .check-dot svg{stroke-dashoffset:0;}
+  .item-info{flex:1;min-width:0;display:block;text-align:left;padding:11px 8px 11px 4px;min-height:50px;border-radius:12px;}
   .item-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline;}
-  .item-name{font-family:var(--font-d);font-size:14.5px;font-weight:600;overflow-wrap:anywhere;}
-  .item-row.done .item-name{text-decoration:line-through;color:var(--text-2);}
-  .item-charge{font-size:11.5px;font-weight:600;color:var(--cat-routine);flex-shrink:0;white-space:nowrap;}
-  .item-meta{display:block;font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4;}
-  .item-meta.late{color:var(--prio-high);font-weight:600;}
-  .item-desc{display:block;font-size:12.5px;color:var(--text-2);margin-top:3px;line-height:1.4;overflow-wrap:anywhere;}
-  .item-prio-badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-right:6px;background:rgba(255,107,107,0.2);color:var(--prio-high);}
+  .item-name{font-size:var(--t-lg);font-weight:600;letter-spacing:-.005em;overflow-wrap:anywhere;transition:color .2s;}
+  .item-row.done .item-name{color:var(--text-3);text-decoration:line-through;text-decoration-thickness:1px;}
+  .item-charge{font-size:var(--t-sm);font-weight:700;flex-shrink:0;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .item-meta{display:block;font-size:var(--t-sm);color:var(--text-2);margin-top:2px;line-height:1.35;font-variant-numeric:tabular-nums;}
+  .item-meta.late{color:var(--danger);font-weight:600;}
+  .item-desc{display:block;font-size:var(--t-sm);color:var(--text-2);margin-top:2px;line-height:1.35;overflow-wrap:anywhere;}
+  .item-prio-badge{display:inline-block;margin-right:6px;font-weight:700;color:var(--danger);}
+  /* Nästa sak: enda raden med yta, så ögat hamnar rätt direkt */
+  .item-row.next{background:var(--bg-surface);box-shadow:0 0 0 1px var(--border), 0 10px 24px -14px rgba(0,0,0,.45);}
+  .item-row.next::before{top:0;bottom:0;}
 
-  .empty{font-size:13px;line-height:1.5;color:var(--text-2);padding:10px 22px;}
-  .load-error{margin:0 22px;padding:14px;border-radius:var(--r-md);background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);font-size:13px;line-height:1.5;}
-  .load-error button{display:block;min-height:44px;font-weight:600;color:var(--prio-high);}
+  .now-line{display:flex;align-items:center;gap:8px;height:18px;padding-left:17px;color:var(--text-1);font-size:var(--t-xs);font-weight:700;font-variant-numeric:tabular-nums;}
+  .now-line::before{content:'';width:10px;height:10px;border-radius:50%;background:var(--text-1);box-shadow:0 0 0 3px var(--bg-phone);flex-shrink:0;}
+  .now-line i{flex:1;height:1px;background:var(--border-strong);}
+  .now-line span{padding-right:8px;}
+
+  .empty{font-size:var(--t-md);line-height:1.5;color:var(--text-2);padding:10px 20px;}
+  .load-error{margin:0 20px;padding:14px;border-radius:var(--r-md);background:var(--bg-surface);border:1px solid var(--danger);font-size:var(--t-sm);line-height:1.5;}
+  .load-error button{display:block;min-height:44px;font-weight:600;color:var(--danger);}
 
   /* VECKA */
-  .week-view{display:flex;flex-direction:column;gap:8px;padding:12px 22px 0;}
-  .week-day{display:block;width:100%;text-align:left;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;}
-  .week-day.today{border-color:var(--cat-routine);}
-  .week-head{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--text-2);}
-  .week-head b{font-family:var(--font-d);font-size:14px;font-weight:600;color:var(--text-1);}
-  .week-item{display:flex;align-items:center;gap:7px;font-size:12.5px;margin-top:6px;min-width:0;}
+  .week-view{display:flex;flex-direction:column;gap:6px;padding:6px 20px 0;}
+  .week-day{display:block;width:100%;text-align:left;background:var(--bg-surface);border-radius:var(--r-md);padding:12px 14px;box-shadow:0 0 0 1px var(--border);}
+  .week-day.today{box-shadow:0 0 0 1.5px var(--text-1);}
+  .week-day.rest{background:none;box-shadow:none;padding:8px 14px;}
+  .week-day.rest b{color:var(--text-3);}
+  .week-head{display:flex;justify-content:space-between;gap:8px;font-size:var(--t-sm);color:var(--text-2);font-variant-numeric:tabular-nums;}
+  .week-head b{font-size:var(--t-md);font-weight:600;color:var(--text-1);}
+  .week-item{display:flex;align-items:center;gap:7px;font-size:var(--t-sm);margin-top:6px;min-width:0;}
+  .week-item svg.ic{width:14px;height:14px;color:var(--c);}
   .week-item .wi-time{color:var(--text-2);flex-shrink:0;font-variant-numeric:tabular-nums;}
   .week-item .wi-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .week-item.done .wi-name{text-decoration:line-through;color:var(--text-2);}
+  .week-item.done .wi-name{text-decoration:line-through;color:var(--text-3);}
 
-  /* FRAMSTEG */
+  /* FRAMSTEG: fylld, ring med snedstreck, streckad eller prickad, formen säger samma sak som färgen */
   .dots{display:flex;gap:4px;margin-top:8px;}
-  .day-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--text-3);}
-  .day-dot.done{background:var(--c);color:#0a0e17;}
-  .day-dot.missed{border:1.5px solid var(--text-3);color:var(--text-2);}
+  .day-dot{position:relative;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6875rem;font-weight:700;color:var(--text-3);}
+  .day-dot.done{background:var(--c);color:var(--on-cat);}
+  .day-dot.missed{border:1.5px solid var(--text-3);color:var(--text-2);overflow:hidden;}
+  .day-dot.missed::after{content:'';position:absolute;left:-2px;right:-2px;top:50%;height:1.5px;background:var(--text-3);transform:rotate(-45deg);}
   .day-dot.pending{border:1.5px dashed var(--c);color:var(--text-1);}
   .day-dot.planned{border:1.5px dotted var(--text-3);color:var(--text-2);}
-  .dots-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11.5px;color:var(--text-2);padding:0 22px 12px;}
-  .dots-legend .day-dot{width:12px;height:12px;display:inline-block;margin-right:5px;vertical-align:-2px;--c:var(--cat-routine);}
-  .streak{font-size:11.5px;font-weight:600;color:var(--c);flex-shrink:0;white-space:nowrap;}
-  .hobby-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;--c:var(--cat-hobby);}
+  .streak{font-size:var(--t-sm);font-weight:700;flex-shrink:0;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .hobby-card{background:var(--bg-surface);border-radius:var(--r-lg);padding:14px 14px 8px;--c:var(--cat-hobby);box-shadow:0 0 0 1px var(--border);}
   .hobby-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
-  .hobby-head h2{font-family:var(--font-d);font-size:16px;font-weight:600;overflow-wrap:anywhere;}
-  .hobby-sub{font-size:12px;color:var(--text-2);margin-top:3px;}
-  .hobby-next{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
-  .hobby-next .item-row{background:var(--bg-surface-2);}
+  .hobby-head h2{font-family:var(--font-d);font-size:var(--t-lg);font-weight:700;overflow-wrap:anywhere;}
+  .hobby-sub{font-size:var(--t-sm);color:var(--text-2);margin-top:2px;font-variant-numeric:tabular-nums;}
+  .hobby-next{margin:8px -10px 0;display:flex;flex-direction:column;}
+  #list-hobbies{gap:10px;padding:0 20px;}
+  .list.flat{gap:6px;}
 
-  .fab{position:absolute;right:22px;bottom:96px;display:flex;align-items:center;gap:8px;min-height:44px;background:var(--accent-fab,var(--cat-routine));color:#04140e;font-weight:600;font-size:13.5px;padding:13px 18px;border-radius:var(--r-full);box-shadow:0 12px 24px -8px rgba(0,0,0,.6);z-index:15;}
-  .fab svg{width:16px;height:16px;stroke:#04140e;stroke-width:2.4;}
+  .fab{position:absolute;right:20px;bottom:98px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--accent-fab,var(--cat-routine));color:var(--on-cat);box-shadow:0 12px 24px -8px rgba(0,0,0,.55);z-index:15;transition:background .25s ease, opacity .18s ease, transform .34s cubic-bezier(.3,1.5,.5,1);}
+  .fab.gone{opacity:0;transform:scale(.4);pointer-events:none;}
+  .fab svg.ic{width:24px;height:24px;stroke-width:2.4;}
 
-  .toast{position:absolute;left:16px;right:16px;bottom:150px;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--bg-surface-3);border:1px solid var(--border-strong);border-radius:var(--r-md);padding:12px 14px;font-size:13px;line-height:1.4;box-shadow:0 12px 24px -8px rgba(0,0,0,.6);opacity:0;transform:translateY(8px);transition:all .2s ease;pointer-events:none;}
-  .toast.show{opacity:1;transform:translateY(0);pointer-events:auto;}
-  .toast.error{border-color:var(--prio-high);}
-  .toast button{font-weight:700;color:var(--cat-routine);flex-shrink:0;min-height:32px;}
+  /* ÖN: beskeden växer ut ur toppen av skärmen, ångra finns där fingret kan nå det */
+  .toast{position:absolute;left:50%;top:8px;z-index:120;width:max-content;max-width:calc(100% - 28px);display:flex;align-items:center;gap:12px;background:#000;color:#fff;border-radius:22px;padding:11px 16px;min-height:44px;font-size:var(--t-sm);font-weight:600;line-height:1.3;font-variant-numeric:tabular-nums;opacity:0;pointer-events:none;transform-origin:top center;transform:translateX(-50%) scale(.5);box-shadow:0 14px 30px -12px rgba(0,0,0,.6);}
+  .toast.show{pointer-events:auto;}
+  .toast.error{box-shadow:0 0 0 1.5px #ff8a8a;}
+  .toast button{font-weight:700;color:#fff;text-decoration:underline;text-underline-offset:3px;flex-shrink:0;min-height:32px;min-width:44px;}
 
-  /* TAB BAR WITH DREAM AI */
-  .tabbar{position:absolute;left:0;right:0;bottom:0;display:flex;background:rgba(10,14,23,.94);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:8px 4px 20px;z-index:20;}
-  .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;min-height:44px;border-radius:14px;}
-  .tab-btn svg{width:20px;height:20px;stroke:var(--text-2);transition:stroke 0.2s;}
-  .tab-btn span{font-size:11px;color:var(--text-2);font-weight:500;transition:color 0.2s;white-space:nowrap;}
-  .tab-btn.active svg{stroke:var(--tab-accent,var(--cat-routine));}
-  .tab-btn.active span{color:var(--tab-accent,var(--cat-routine));}
+  /* FLIKAR: flytande glas över innehållet */
+  .tabbar{position:absolute;left:12px;right:12px;bottom:14px;height:66px;display:flex;background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);box-shadow:inset 0 0 0 1px var(--glass-edge), 0 16px 32px -14px rgba(0,0,0,.5);padding:5px;border-radius:33px;z-index:20;}
+  .tab-ind{position:absolute;left:0;top:5px;bottom:5px;border-radius:28px;background:var(--bg-surface-3);opacity:.85;pointer-events:none;}
+  .tab-btn{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:28px;color:var(--text-2);transition:color .2s ease;}
+  .tab-btn svg.ic{width:21px;height:21px;}
+  .tab-btn span{font-size:var(--t-xs);font-weight:600;white-space:nowrap;}
+  .tab-btn.active{color:var(--text-1);}
+  .tab-btn.active svg.ic{color:var(--tab-accent,var(--text-1));}
+  .screen-fade{position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(to top,var(--bg-phone) 30%,transparent);pointer-events:none;z-index:14;}
 
-  /* DREAM AI SCREEN */
+  /* DREAM AI */
   #screen-ai{
     display:none;
     flex-direction:column;
     height:100%;
-    padding-bottom:84px;
+    padding-bottom:88px;
     overflow:hidden;
   }
   #screen-ai.active{display:flex;}
-
-  .ai-container{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    padding:0 22px 10px;
-    gap:14px;
-    min-height:0;
-    overflow:hidden;
-  }
-  .ai-chat-body{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-    overflow-y:auto;
-    padding-right:4px;
-    scrollbar-width:none;
-  }
+  .ai-title{display:flex;align-items:center;gap:8px;}
+  .ai-title svg.ic{width:24px;height:24px;color:var(--ai);}
+  .ai-container{flex:1;display:flex;flex-direction:column;padding:0 20px 8px;gap:12px;min-height:0;overflow:hidden;position:relative;z-index:15;}
+  .ai-chat-body{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding-right:2px;scrollbar-width:none;}
   .ai-chat-body::-webkit-scrollbar{display:none;}
-  .chat-msg{font-size:13.5px;line-height:1.45;padding:14px 16px;border-radius:18px;overflow-wrap:anywhere;flex-shrink:0;}
-  .chat-msg.assistant{background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.22);color:var(--text-1);align-self:flex-start;max-width:88%;}
-  .chat-msg.user{background:var(--bg-surface-3);color:var(--text-1);align-self:flex-end;max-width:85%;}
+  .chat-msg{font-size:var(--t-md);line-height:1.45;padding:11px 15px;border-radius:20px;overflow-wrap:anywhere;flex-shrink:0;white-space:pre-wrap;}
+  .chat-msg.assistant{background:var(--ai-dim);color:var(--text-1);align-self:flex-start;max-width:88%;border-bottom-left-radius:6px;}
+  .chat-msg.user{background:var(--bg-surface-3);color:var(--text-1);align-self:flex-end;max-width:85%;border-bottom-right-radius:6px;}
+  .chat-msg.fresh{animation:msg-in .34s cubic-bezier(.2,.9,.25,1);transform-origin:bottom left;}
+  .chat-msg.user.fresh{transform-origin:bottom right;}
+  @keyframes msg-in{from{opacity:0;transform:scale(.92) translateY(8px);}to{opacity:1;transform:none;}}
+  .chat-msg.typing{display:flex;gap:5px;padding:15px 16px;}
+  .chat-msg.typing i{width:7px;height:7px;border-radius:50%;background:var(--ai);animation:blink 1.1s infinite ease-in-out;}
+  .chat-msg.typing i:nth-child(2){animation-delay:.15s;}
+  .chat-msg.typing i:nth-child(3){animation-delay:.3s;}
+  @keyframes blink{0%,70%,100%{opacity:.3;}35%{opacity:1;}}
+  .ai-empty{margin-top:auto;display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding-bottom:4px;}
+  .ai-empty h2{font-family:var(--font-d);font-size:var(--t-2xl);font-weight:700;letter-spacing:-.02em;margin-bottom:6px;overflow-wrap:anywhere;}
+  .suggest{min-height:44px;padding:9px 15px;border-radius:22px;background:var(--bg-surface);box-shadow:inset 0 0 0 1px var(--border-strong);font-size:var(--t-md);font-weight:500;text-align:left;overflow-wrap:anywhere;transition:transform .1s ease-out;}
 
-  .ai-input-wrap{
-    display:flex;
-    gap:8px;
-    background:var(--bg-surface);
-    padding:6px 6px 6px 16px;
-    border-radius:var(--r-full);
-    border:1px solid rgba(168,85,247,0.3);
-    flex-shrink:0;
-  }
-  .ai-input-wrap:focus-within{border-color:var(--ai-purple);}
-  .ai-input-wrap input{flex:1;font-size:16px;outline:none;min-width:0;}
+  .ai-input-wrap{display:flex;gap:8px;background:var(--bg-surface);padding:5px 5px 5px 18px;border-radius:var(--r-full);box-shadow:inset 0 0 0 1px var(--border-strong);flex-shrink:0;transition:box-shadow .2s ease;}
+  .ai-input-wrap:focus-within{box-shadow:inset 0 0 0 1.5px var(--ai);}
+  .ai-input-wrap input{flex:1;font-size:1rem;outline:none;min-width:0;}
   .ai-input-wrap input::placeholder{color:var(--text-3);}
-  .ai-send-btn{width:44px;height:44px;border-radius:50%;background:var(--ai-purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .ai-send-btn svg{width:16px;height:16px;stroke:#fff;}
+  .ai-send-btn{width:44px;height:44px;border-radius:50%;background:var(--ai);color:var(--on-cat);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .1s ease-out;}
+  .ai-send-btn svg.ic{width:19px;height:19px;stroke-width:2.2;}
+  .action-list{display:flex;flex-direction:column;gap:6px;align-self:flex-start;width:88%;flex-shrink:0;}
+  .action-card{display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 12px 8px 8px;border-radius:14px;background:var(--bg-surface);box-shadow:inset 0 0 0 1px var(--border);font-size:var(--t-sm);text-align:left;width:100%;}
+  .action-card.delete .action-txt, .action-card.skip .action-txt{text-decoration:line-through;color:var(--text-2);}
+  .action-ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:var(--on-cat);font-weight:700;font-size:var(--t-sm);flex-shrink:0;}
+  .action-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .action-date{color:var(--text-2);font-size:var(--t-xs);flex-shrink:0;}
 
-  /* POPUP MODAL */
-  .modal-overlay{
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,0.65);
-    backdrop-filter:blur(6px);
-    z-index:100;
-    display:none;
-    justify-content:flex-end;
-    flex-direction:column;
-    animation:fadeIn 0.2s ease;
-  }
+  /* ARK: följer fingret, se Spring och drag() i skriptet */
+  .modal-overlay{position:absolute;inset:0;z-index:100;display:none;justify-content:flex-end;flex-direction:column;}
+  .modal-overlay::before{content:'';position:absolute;inset:0;background:var(--scrim);opacity:var(--p,0);}
   .modal-overlay.active{display:flex;}
-  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-
   .modal-sheet{
-    background:#0f1522;
-    border-top:1px solid var(--border-strong);
-    border-radius:32px 32px 0 0;
-    padding:16px 22px 0;
+    position:relative;
+    background:var(--sheet-solid);
+    box-shadow:inset 0 1px 0 var(--border-strong);
+    border-radius:30px 30px 0 0;
+    padding:0 20px;
     display:flex;
     flex-direction:column;
     gap:14px;
     max-height:92%;
     overflow-y:auto;
-    animation:slideUp 0.25s cubic-bezier(0.16,1,0.3,1);
+    overscroll-behavior:contain;
+    scrollbar-width:none;
+    transform:translateY(100%);
+    will-change:transform;
   }
-  @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
-
-  .modal-handle{width:38px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;align-self:center;margin-bottom:2px;flex-shrink:0;}
-  .modal-header{display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
-  .modal-header h2{font-family:var(--font-d);font-size:20px;font-weight:700;}
-  .modal-close{width:44px;height:44px;margin-right:-6px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
-  .modal-close svg{width:18px;height:18px;stroke:var(--text-2);}
+  .modal-sheet::-webkit-scrollbar{display:none;}
+  .sheet-grip{position:sticky;top:0;z-index:2;margin:0 -20px -14px;padding:0 20px;background:var(--sheet-solid);touch-action:none;cursor:grab;flex-shrink:0;}
+  .modal-handle{width:38px;height:5px;background:var(--border-strong);border-radius:3px;margin:9px auto 4px;}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;min-height:48px;padding-bottom:8px;}
+  .modal-header h2{font-family:var(--font-d);font-size:var(--t-xl);font-weight:700;letter-spacing:-.015em;}
+  .modal-close{width:44px;height:44px;margin-right:-10px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text-2);}
+  .sheet-grip + *{margin-top:14px;}
 
   .form-group{display:flex;flex-direction:column;gap:5px;min-width:0;}
-  .form-label{font-size:12px;font-weight:600;color:var(--text-2);}
-  .form-hint{font-size:12.5px;line-height:1.45;color:var(--text-2);}
-  .form-error{font-size:13px;font-weight:600;color:var(--prio-high);}
+  .form-label{font-size:var(--t-sm);font-weight:600;color:var(--text-2);}
+  .form-hint{font-size:var(--t-sm);line-height:1.45;color:var(--text-2);}
+  .form-error{font-size:var(--t-sm);font-weight:600;color:var(--danger);}
   .form-input, .form-textarea{
     width:100%;
     background:var(--input-bg);
-    border:1px solid var(--border-strong);
+    box-shadow:inset 0 0 0 1px var(--border);
     border-radius:14px;
     padding:12px 14px;
-    font-size:16px;
+    font-size:1rem;
     color:var(--text-1);
     min-height:46px;
+    font-variant-numeric:tabular-nums;
   }
-  .form-input:focus, .form-textarea:focus{outline:2px solid var(--cat-routine);outline-offset:0;}
+  .form-input:focus, .form-textarea:focus{outline:2px solid var(--text-1);outline-offset:-1px;}
   .form-input::placeholder, .form-textarea::placeholder{color:var(--text-3);}
-  .form-input::-webkit-calendar-picker-indicator{filter:invert(.8);}
   .form-textarea{resize:none;height:70px;}
+  .title-input{font-family:var(--font-d);font-size:var(--t-xl);font-weight:600;letter-spacing:-.01em;background:none;box-shadow:none;padding:4px 0;border-radius:0;min-height:48px;}
+  .title-input:focus{outline:none;}
 
   .prio-group{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
   .type-group{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0;}
   .prio-btn, .type-btn{
+    display:flex;align-items:center;justify-content:center;gap:5px;
     min-height:44px;
     padding:0 4px;
-    border-radius:12px;
-    background:var(--input-bg);
-    border:1px solid var(--border);
-    font-size:12.5px;
+    border-radius:14px;
+    background:var(--bg-surface-2);
+    font-size:var(--t-sm);
     font-weight:600;
     color:var(--text-2);
     text-align:center;
-    transition:all 0.2s ease;
+    transition:background .18s ease,color .18s ease,transform .1s ease-out;
   }
-  .prio-btn[aria-pressed="true"]{background:var(--bg-surface-3);color:var(--text-1);border-color:var(--text-2);}
-  .type-btn[aria-pressed="true"]{background:var(--c);color:#0a0e17;border-color:transparent;}
+  .type-btn{flex-direction:column;gap:2px;min-height:58px;}
+  .type-btn svg.ic{color:var(--c);transition:color .18s ease;}
+  .prio-btn[aria-pressed="true"]{background:var(--solid);color:var(--on-solid);}
+  .type-btn[aria-pressed="true"]{background:var(--c);color:var(--on-cat);}
+  .type-btn[aria-pressed="true"] svg.ic{color:var(--on-cat);}
 
   .day-pills{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
-  .day-pill{height:44px;border-radius:12px;background:var(--input-bg);border:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text-2);}
-  .day-pill[aria-pressed="true"]{background:var(--cat-routine);color:#04140e;border-color:transparent;}
-  .day-presets{display:flex;gap:6px;margin-top:2px;}
-  .day-presets button{min-height:36px;padding:0 10px;font-size:12.5px;font-weight:600;color:var(--cat-routine);}
-  .switch-row{display:flex;align-items:center;gap:10px;min-height:44px;font-size:13.5px;cursor:pointer;}
-  .switch-row input{width:20px;height:20px;accent-color:var(--cat-routine);flex-shrink:0;}
-  .more-toggle{align-self:flex-start;min-height:44px;font-size:13px;font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:6px;}
-  .more-toggle svg{width:14px;height:14px;stroke:currentColor;transition:transform .2s;}
-  .more-toggle[aria-expanded="true"] svg{transform:rotate(90deg);}
+  .day-pill{height:44px;border-radius:14px;background:var(--bg-surface-2);font-size:var(--t-sm);font-weight:700;color:var(--text-2);transition:background .18s ease,color .18s ease,transform .1s ease-out;}
+  .day-pill[aria-pressed="true"]{background:var(--c,var(--cat-routine));color:var(--on-cat);}
+  .day-presets{display:flex;gap:2px;margin:2px -10px 0;}
+  .day-presets button{min-height:44px;padding:0 10px;font-size:var(--t-sm);font-weight:600;color:var(--text-1);}
+  .switch-row{display:flex;align-items:center;gap:10px;min-height:44px;font-size:var(--t-md);cursor:pointer;}
+  .switch-row input{width:20px;height:20px;accent-color:var(--cat-todo);flex-shrink:0;}
+  .more-toggle{align-self:flex-start;min-height:44px;font-size:var(--t-sm);font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:6px;}
+  .more-toggle svg.ic{width:14px;height:14px;transition:transform .25s cubic-bezier(.3,1.3,.5,1);}
+  .more-toggle[aria-expanded="true"] svg.ic{transform:rotate(90deg);}
   .more-fields{display:flex;flex-direction:column;gap:14px;}
 
   .time-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
-  .session-box{background:var(--input-bg);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
-  .session-actions{display:flex;flex-wrap:wrap;gap:8px;}
-  .chip-btn{min-height:44px;padding:0 12px;border-radius:12px;background:var(--bg-surface-2);font-size:13px;font-weight:600;color:var(--text-1);}
-  .chip-btn.solid{background:var(--cat-routine);color:#04140e;flex-shrink:0;}
-  .move-row{display:flex;gap:8px;align-items:center;}
-  .link-row{padding:10px 0 0;}
+  /* KALENDER */
+  .date-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;cursor:pointer;}
+  .date-btn svg.ic{width:18px;height:18px;color:var(--text-3);}
+  .date-btn:not([value]) span,.date-btn[value=""] span{color:var(--text-3);}
+  .cal-nav{display:flex;margin-right:-10px;}
+  #cal-title::first-letter{text-transform:uppercase;}
+  .cal-week,.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+  .cal-week{font-size:var(--t-xs);font-weight:600;color:var(--text-3);text-align:center;margin-bottom:-8px;}
+  .cal-grid{gap:2px 0;touch-action:pan-y;flex-shrink:0;}
+  .cal-day{position:relative;height:46px;border-radius:16px;font-family:var(--font-d);font-size:var(--t-md);font-weight:600;font-variant-numeric:tabular-nums;color:var(--text-1);transition:background .18s ease,color .18s ease,transform .1s ease-out;}
+  .cal-day:active{transform:scale(.9);}
+  .cal-day.other{color:var(--text-3);font-weight:500;}
+  .cal-day.today{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;}
+  .cal-day[aria-pressed="true"]{background:var(--cal-bg,var(--solid));color:var(--cal-fg,var(--on-solid));}
+  .cal-day:disabled{color:var(--text-3);opacity:.4;cursor:not-allowed;}
+  .cal-quick{display:flex;gap:8px;}
+  .cal-quick .chip-btn{flex:1;}
+  .cal-quick .chip-btn:disabled{opacity:.4;cursor:not-allowed;}
 
-  .modal-actions{position:sticky;bottom:0;background:#0f1522;padding:8px 0 22px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-top:auto;}
+  /* KLOCKAN: samma ringar som batteriet, fingret tar tag i dem var som helst */
+  .dial{display:block;width:100%;max-width:320px;margin:0 auto;flex-shrink:0;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;}
+  .dial:active{cursor:grabbing;}
+  .dial circle{fill:none;}
+  .dial .dial-track{stroke:var(--bg-surface-3);stroke-width:22;}
+  .dial-tick{fill:none;stroke:var(--text-3);stroke-width:1.5;stroke-linecap:round;opacity:.55;}
+  .dial .dial-arc{stroke:var(--cal-bg,var(--solid));stroke-width:22;stroke-linecap:round;stroke-dasharray:0 100;}
+  #dial-arc-m{opacity:.6;}
+  .dial .dial-knob{fill:var(--solid);stroke:var(--sheet-solid);stroke-width:3;outline:none;}
+  .dial .dial-knob:focus-visible{stroke:var(--text-2);}
+  .dial-label{font-size:12px;font-weight:600;fill:var(--text-2);text-anchor:middle;dominant-baseline:central;font-variant-numeric:tabular-nums;pointer-events:none;}
+  .dial-time{font-family:var(--font-d);font-size:36px;font-weight:700;letter-spacing:-.02em;text-anchor:middle;font-variant-numeric:tabular-nums;fill:var(--text-1);pointer-events:none;}
+  .dial-part{font-size:13px;font-weight:600;text-anchor:middle;fill:var(--text-2);pointer-events:none;}
+
+  .session-box{background:var(--bg-surface-2);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+  .session-actions{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip-btn{min-height:44px;padding:0 13px;border-radius:14px;background:var(--bg-surface-3);font-size:var(--t-sm);font-weight:600;color:var(--text-1);transition:transform .1s ease-out;}
+  .chip-btn.solid{background:var(--solid);color:var(--on-solid);flex-shrink:0;}
+  .move-row{display:flex;gap:8px;align-items:center;}
+
+  .modal-actions{position:sticky;bottom:0;background:var(--sheet-solid);padding:8px 0 22px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-top:auto;}
+  .modal-actions:empty{padding:0 0 16px;}
   .btn-save-modal{
     width:100%;
-    min-height:50px;
+    min-height:52px;
     padding:15px;
-    border-radius:16px;
-    background:var(--cat-routine);
-    color:#04140e;
+    border-radius:18px;
+    background:var(--solid);
+    color:var(--on-solid);
     font-weight:700;
-    font-size:14.5px;
+    font-size:var(--t-md);
     text-align:center;
+    transition:transform .1s ease-out;
   }
-  .btn-secondary{width:100%;min-height:44px;font-size:13.5px;font-weight:600;color:var(--text-2);border-radius:12px;}
-  .btn-danger{color:var(--prio-high);}
+  .btn-secondary{width:100%;min-height:44px;font-size:var(--t-sm);font-weight:600;color:var(--text-2);border-radius:12px;}
+  .btn-danger{color:var(--danger);}
   .delete-ask{display:flex;flex-direction:column;gap:2px;}
-  .delete-ask p{font-size:13px;color:var(--text-2);text-align:center;padding:4px 0;}
+  .delete-ask p{font-size:var(--t-sm);color:var(--text-2);text-align:center;padding:4px 0;}
 
-  .explain{font-size:13px;line-height:1.5;color:var(--text-2);}
+  .explain{font-size:var(--t-md);line-height:1.5;color:var(--text-2);}
   .explain b{color:var(--text-1);font-weight:600;}
-  .balance-title{font-family:var(--font-d);font-size:15px;font-weight:600;}
+  .bat-legend{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+  .bat-cell{display:flex;flex-direction:column;gap:3px;background:var(--bg-surface-2);border-radius:14px;padding:10px;min-width:0;}
+  .bat-cell svg.ic{width:17px;height:17px;color:var(--c);}
+  .bat-cell b{font-family:var(--font-d);font-size:var(--t-xl);font-weight:700;line-height:1.05;font-variant-numeric:tabular-nums;}
+  .bat-cell span{font-size:var(--t-xs);color:var(--text-2);white-space:nowrap;}
+  .balance-title{font-family:var(--font-d);font-size:var(--t-lg);font-weight:700;margin-top:4px;}
   .balance-body{display:flex;flex-direction:column;align-items:center;width:100%;flex-shrink:0;}
   .balance-svg{width:100%;max-width:310px;height:auto;display:block;}
-  .balance-axis-label{font-family:var(--font-b);font-size:10px;font-weight:700;letter-spacing:0.05em;fill:var(--text-2);}
-  .balance-axis-pct{font-family:var(--font-d);font-size:11px;font-weight:700;}
-  .balance-grid-ring{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:1;}
-  .balance-spoke{stroke:rgba(255,255,255,0.08);stroke-width:1;}
-  .balance-fill{fill:rgba(140,123,255,0.22);stroke:var(--cat-todo);stroke-width:2;stroke-linejoin:round;transition:all 0.5s ease-in-out;}
-  .balance-node{stroke:var(--bg-surface);stroke-width:2;transition:all 0.5s ease-in-out;}
-
-  /* Dream AI 2.0: action-kort + "tänker"-bubbla */
-  .chat-msg.typing{opacity:.6;font-style:italic;}
-  .action-list{display:flex;flex-direction:column;gap:6px;align-self:flex-start;width:88%;flex-shrink:0;}
-  .action-card{display:flex;align-items:center;gap:10px;min-height:44px;padding:9px 12px;border-radius:12px;background:var(--bg-surface-2);border:1px solid var(--border);border-left:3px solid var(--c);font-size:12.5px;text-align:left;width:100%;}
-  .action-card.delete, .action-card.skip{opacity:.8;}
-  .action-card.delete .action-txt, .action-card.skip .action-txt{text-decoration:line-through;}
-  .action-ic{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:#0a0e17;font-weight:700;font-size:12px;flex-shrink:0;}
-  .action-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .action-date{color:var(--text-2);font-size:11px;flex-shrink:0;}
+  .balance-axis-label{font-family:var(--font-b);font-size:11px;font-weight:600;fill:var(--text-2);}
+  .balance-axis-pct{font-family:var(--font-d);font-size:13px;font-weight:700;fill:var(--text-1);font-variant-numeric:tabular-nums;}
+  .balance-grid-ring{fill:none;stroke:var(--border-strong);stroke-width:1;}
+  .balance-spoke{stroke:var(--border-strong);stroke-width:1;}
+  .balance-fill{fill:var(--cat-todo);fill-opacity:.22;stroke:var(--cat-todo);stroke-width:2;stroke-linejoin:round;}
+  .balance-node{stroke:var(--sheet-solid);stroke-width:2;}
+  #node-routine{fill:var(--cat-routine);} #node-todo{fill:var(--cat-todo);}
+  #node-hobby{fill:var(--cat-hobby);} #node-bonus{fill:var(--cat-bonus);}
 
   /* På en riktig telefon är appen hela skärmen, utan påhittad ram, notch och klocka */
   @media (max-width:500px){
@@ -435,18 +519,53 @@
     body{display:block;padding:0;}
     .device{width:100%;height:100vh;height:100dvh;border:none;border-radius:0;box-shadow:none;}
     .notch,.statusbar{display:none;}
-    .brandbar{padding-top:16px;}
-    .tabbar{padding-bottom:calc(8px + env(safe-area-inset-bottom));}
+    .topbar,.screen-header{padding-top:calc(16px + env(safe-area-inset-top));}
+    .toast{top:calc(8px + env(safe-area-inset-top));}
+    .tabbar{bottom:calc(10px + env(safe-area-inset-bottom));}
+    .fab{bottom:calc(94px + env(safe-area-inset-bottom));}
+    #screen-ai{padding-bottom:calc(84px + env(safe-area-inset-bottom));}
     .modal-actions{padding-bottom:calc(14px + env(safe-area-inset-bottom));}
+  }
+  /* Glömmer inte mindre skärmar: ringen krymper före texten */
+  @media (max-width:350px){
+    .ring-wrap{width:118px;height:118px;}
+    .battery-card{gap:12px;}
+    .tabbar{left:8px;right:8px;}
+    .tab-btn span{font-size:.6875rem;letter-spacing:-.01em;}
   }
   @media (prefers-reduced-motion:reduce){
     *{animation:none !important;transition:none !important;}
+  }
+  @media (prefers-reduced-transparency:reduce){
+    .tabbar{background:var(--bg-surface);-webkit-backdrop-filter:none;backdrop-filter:none;}
+  }
+  @media (prefers-contrast:more){
+    :root{--border:var(--text-2);--border-strong:var(--text-1);--text-2:var(--text-1);--text-3:var(--text-1);}
+    .tabbar{background:var(--bg-surface);-webkit-backdrop-filter:none;backdrop-filter:none;}
   }
 </style>
 </head>
 <body>
 
-<div class="device">
+<!-- Ikoner: samma symbol betyder samma sak överallt -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></symbol>
+  <symbol id="i-routine" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></symbol>
+  <symbol id="i-todo" viewBox="0 0 24 24"><path d="M9 11l3 3 9-10"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+  <symbol id="i-hobby" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></symbol>
+  <symbol id="i-bonus" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-ai" viewBox="0 0 24 24"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></symbol>
+  <symbol id="i-new" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+</svg>
+
+<div class="device" id="device">
   <div class="notch"></div>
   <div class="statusbar"><span id="current-time">09:41</span></div>
 
@@ -454,58 +573,58 @@
 
     <!-- IDAG: dagen i tidsordning, batteriet är alltid läget just nu -->
     <section id="screen-home" class="screen active" aria-label="Idag">
-      <div class="brandbar">
-        <div>
-          <span class="wordmark">Pulse</span>
-          <h1 class="hello" id="hello">Hej!</h1>
+      <header class="topbar">
+        <div class="top-title">
+          <h1 id="day-title">Idag</h1>
+          <div class="top-sub">
+            <p id="day-count"></p>
+            <button class="link-btn" id="btn-go-today" aria-label="Till idag" onclick="selectDate(today())" hidden>Idag</button>
+          </div>
         </div>
-        <div class="seg-toggle" role="group" aria-label="Visa dag eller vecka">
-          <button id="btn-view-day" aria-pressed="true" onclick="setHomeView('day')">Dag</button>
-          <button id="btn-view-week" aria-pressed="false" onclick="setHomeView('week')">Vecka</button>
+        <div class="top-tools">
+          <button class="icon-btn" id="btn-week-prev" aria-label="Föregående vecka" onclick="shiftWeek(-1)" hidden><svg class="ic" aria-hidden="true"><use href="#i-left"/></svg></button>
+          <button class="icon-btn" id="btn-week-next" aria-label="Nästa vecka" onclick="shiftWeek(1)" hidden><svg class="ic" aria-hidden="true"><use href="#i-right"/></svg></button>
+          <button class="icon-btn" id="btn-calendar" aria-label="Välj datum i kalendern" onclick="openDatePicker()"><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg></button>
+          <div class="seg-toggle" role="group" aria-label="Visa dag eller vecka">
+            <button id="btn-view-day" aria-pressed="true" onclick="setHomeView('day')">Dag</button>
+            <button id="btn-view-week" aria-pressed="false" onclick="setHomeView('week')">Vecka</button>
+          </div>
         </div>
-      </div>
+      </header>
 
       <button class="battery-card" id="battery-card-element" onclick="openBatterySheet()">
-        <span class="battery-top">
-          <span class="battery-pct-wrap"><span class="battery-pct" id="total-battery-pct">0</span><span class="pct-sign">%</span></span>
-          <span class="battery-timer">
-            <span class="t-val" id="battery-time-left"></span>
-            <span class="t-lab" id="battery-time-lab"></span>
+        <span class="ring-wrap">
+          <svg class="ring" id="ring" viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="ring-halo" id="ring-halo" cx="100" cy="100" r="86"/>
+            <circle class="ring-track" cx="100" cy="100" r="86"/>
+            <g transform="rotate(-90 100 100)">
+              <circle class="ring-seg" id="seg-routine" style="stroke:var(--cat-routine)" cx="100" cy="100" r="86" pathLength="100"/>
+              <circle class="ring-seg" id="seg-todo" style="stroke:var(--cat-todo)" cx="100" cy="100" r="86" pathLength="100"/>
+              <circle class="ring-seg" id="seg-hobby" style="stroke:var(--cat-hobby)" cx="100" cy="100" r="86" pathLength="100"/>
+              <circle class="ring-seg" id="seg-bonus" style="stroke:var(--cat-bonus)" cx="100" cy="100" r="86" pathLength="100"/>
+            </g>
+            <text class="ring-num" x="100" y="120"><tspan id="ring-val">0</tspan><tspan class="ring-pct" dx="2">%</tspan></text>
+          </svg>
+        </span>
+        <span class="hero-info">
+          <span class="t-val" id="battery-time-left"></span>
+          <span class="t-lab" id="battery-time-lab"></span>
+          <span class="hero-cats">
+            <span class="hero-cat" style="--c:var(--cat-routine)"><svg class="ic" aria-hidden="true"><use href="#i-routine"/></svg><span id="leg-routine">0</span></span>
+            <span class="hero-cat" style="--c:var(--cat-todo)"><svg class="ic" aria-hidden="true"><use href="#i-todo"/></svg><span id="leg-todo">0</span></span>
+            <span class="hero-cat" style="--c:var(--cat-hobby)"><svg class="ic" aria-hidden="true"><use href="#i-hobby"/></svg><span id="leg-hobby">0</span></span>
+            <span class="hero-cat" style="--c:var(--cat-bonus)"><svg class="ic" aria-hidden="true"><use href="#i-bonus"/></svg><span id="leg-bonus">0</span></span>
           </span>
         </span>
-        <span class="segbar" aria-hidden="true">
-          <span class="seg seg-routine" id="seg-routine"></span>
-          <span class="seg seg-todo" id="seg-todo"></span>
-          <span class="seg seg-hobby" id="seg-hobby"></span>
-          <span class="seg seg-bonus" id="seg-bonus"></span>
-        </span>
-        <span class="seg-legend">
-          <span class="seg-legend-item"><span class="dot routine"></span>Rutiner <b id="leg-routine">0</b></span>
-          <span class="seg-legend-item"><span class="dot todo"></span>Att göra <b id="leg-todo">0</b></span>
-          <span class="seg-legend-item"><span class="dot hobby"></span>Hobby <b id="leg-hobby">0</b></span>
-          <span class="seg-legend-item"><span class="dot bonus"></span>Bonus <b id="leg-bonus">0</b></span>
-        </span>
-        <span class="battery-state" id="battery-state-text"></span>
       </button>
 
       <div class="date-row" id="date-row">
-        <button class="week-arrow" aria-label="Föregående vecka" onclick="shiftWeek(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
-        <div class="week-strip" id="week-strip"></div>
-        <button class="week-arrow" aria-label="Nästa vecka" onclick="shiftWeek(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-      </div>
-
-      <div class="section-head">
-        <div>
-          <h2 id="day-title">Idag</h2>
-          <p class="count" id="day-count"></p>
+        <button class="week-arrow" aria-label="Föregående vecka" onclick="shiftWeek(-1)"><svg class="ic" aria-hidden="true"><use href="#i-left"/></svg></button>
+        <div class="week-wrap" id="week-wrap">
+          <div class="strip-ind" id="strip-ind"></div>
+          <div class="week-strip" id="week-strip"></div>
         </div>
-        <div class="section-tools">
-          <button class="link-btn" id="btn-go-today" onclick="selectDate(today())" hidden>Till idag</button>
-          <button class="icon-btn" id="btn-week-prev" aria-label="Föregående vecka" onclick="shiftWeek(-1)" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
-          <button class="icon-btn" id="btn-week-next" aria-label="Nästa vecka" onclick="shiftWeek(1)" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-          <button class="icon-btn" aria-label="Välj datum i kalendern" onclick="openDatePicker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
-          <input type="date" class="date-input-hidden" id="nav-date-picker" tabindex="-1" aria-hidden="true" onchange="selectDate(this.value)" />
-        </div>
+        <button class="week-arrow" aria-label="Nästa vecka" onclick="shiftWeek(1)"><svg class="ic" aria-hidden="true"><use href="#i-right"/></svg></button>
       </div>
 
       <div id="day-view"></div>
@@ -514,13 +633,7 @@
 
     <!-- RUTINER -->
     <section id="screen-routines" class="screen" aria-label="Rutiner">
-      <div class="screen-header"><div class="title-group"><h1>Rutiner</h1><p>Det du gör regelbundet, och hur det går den här veckan</p></div></div>
-      <div class="dots-legend" aria-hidden="true">
-        <span><span class="day-dot done"></span>Klart</span>
-        <span><span class="day-dot missed"></span>Missat</span>
-        <span><span class="day-dot pending"></span>Kvar idag</span>
-        <span><span class="day-dot planned"></span>Kommer</span>
-      </div>
+      <div class="screen-header"><div class="title-group"><h1>Rutiner</h1></div></div>
       <div class="list" id="list-routines"></div>
     </section>
 
@@ -532,11 +645,11 @@
 
     <!-- HOBBY -->
     <section id="screen-hobbies" class="screen" aria-label="Hobby">
-      <div class="screen-header"><div class="title-group"><h1>Hobby</h1><p>Håller du i det? Så här går det den här veckan</p></div></div>
+      <div class="screen-header"><div class="title-group"><h1>Hobby</h1></div></div>
       <div class="list" id="list-hobbies"></div>
       <div class="section-head">
-        <div><h2>Bonus idag</h2><p class="count">Små saker som ger lite extra energi</p></div>
-        <button class="link-btn" style="color:var(--cat-bonus)" onclick="openModal('bonus')">Lägg till</button>
+        <h2>Bonus idag</h2>
+        <button class="icon-btn" aria-label="Lägg till bonus" style="color:var(--cat-bonus);margin-right:-10px" onclick="openModal('bonus')"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
       </div>
       <div class="list" id="list-bonus"></div>
     </section>
@@ -544,51 +657,50 @@
     <!-- DREAM AI SCREEN -->
     <section id="screen-ai" class="screen" aria-label="Dream AI">
       <div class="screen-header">
-        <div class="title-group">
-          <h1 style="color:var(--ai-purple);display:flex;align-items:center;gap:8px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="22" height="22"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>Dream AI</h1>
-          <p>Din personliga energi- och vaneassistent</p>
-        </div>
-        <button class="link-btn" style="color:var(--text-2)" onclick="clearChat()">Ny chatt</button>
+        <div class="title-group"><h1 class="ai-title"><svg class="ic" aria-hidden="true"><use href="#i-ai"/></svg>Dream AI</h1></div>
+        <button class="icon-btn" id="btn-new-chat" aria-label="Ny chatt" style="margin:-8px -10px 0 0" onclick="clearChat()" hidden><svg class="ic" aria-hidden="true"><use href="#i-new"/></svg></button>
       </div>
 
       <div class="ai-container">
         <div class="ai-chat-body" id="ai-chat-body" aria-live="polite"></div>
         <div class="ai-input-wrap">
           <label for="ai-input" class="visually-hidden">Skriv till Dream AI</label>
-          <input type="text" id="ai-input" maxlength="2000" autocomplete="off" placeholder="t.ex. Gör en gitarrplan för veckan" onkeydown="if(event.key==='Enter') sendAiMsg()" />
-          <button class="ai-send-btn" aria-label="Skicka" onclick="sendAiMsg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+          <input type="text" id="ai-input" maxlength="2000" autocomplete="off" placeholder="Skriv till Dream AI" onkeydown="if(event.key==='Enter') sendAiMsg()" />
+          <button class="ai-send-btn" aria-label="Skicka" onclick="sendAiMsg()"><svg class="ic" aria-hidden="true"><use href="#i-send"/></svg></button>
         </div>
       </div>
     </section>
 
+    <div class="screen-fade" aria-hidden="true"></div>
   </main>
 
   <button class="fab" id="fab" onclick="openModal(fabType)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span id="fab-label">Lägg till</span>
+    <svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg><span class="visually-hidden" id="fab-label">Lägg till</span>
   </button>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- TAB BAR -->
-  <nav class="tabbar" aria-label="Huvudmeny">
-    <button class="tab-btn" id="tab-home" style="--tab-accent:var(--cat-routine)" onclick="goToday()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg>
+  <nav class="tabbar" id="tabbar" aria-label="Huvudmeny">
+    <span class="tab-ind" id="tab-ind"></span>
+    <button class="tab-btn" id="tab-home" onclick="goToday()">
+      <svg class="ic" aria-hidden="true"><use href="#i-home"/></svg>
       <span>Idag</span>
     </button>
     <button class="tab-btn" id="tab-routines" style="--tab-accent:var(--cat-routine)" onclick="switchTab('screen-routines')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="6" r="1.4"/><circle cx="5" cy="12" r="1.4"/><circle cx="5" cy="18" r="1.4"/><path d="M9 6h11M9 12h11M9 18h11"/></svg>
+      <svg class="ic" aria-hidden="true"><use href="#i-routine"/></svg>
       <span>Rutiner</span>
     </button>
     <button class="tab-btn" id="tab-todos" style="--tab-accent:var(--cat-todo)" onclick="switchTab('screen-todos')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <svg class="ic" aria-hidden="true"><use href="#i-todo"/></svg>
       <span>Att göra</span>
     </button>
     <button class="tab-btn" id="tab-hobbies" style="--tab-accent:var(--cat-hobby)" onclick="switchTab('screen-hobbies')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>
+      <svg class="ic" aria-hidden="true"><use href="#i-hobby"/></svg>
       <span>Hobby</span>
     </button>
-    <button class="tab-btn" id="tab-ai" style="--tab-accent:var(--ai-purple)" onclick="switchTab('screen-ai')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>
+    <button class="tab-btn" id="tab-ai" style="--tab-accent:var(--ai)" onclick="switchTab('screen-ai')">
+      <svg class="ic" aria-hidden="true"><use href="#i-ai"/></svg>
       <span>Dream AI</span>
     </button>
   </nav>
@@ -596,42 +708,42 @@
   <!-- LÄGG TILL / ÄNDRA -->
   <div class="modal-overlay" id="add-modal" onclick="closeSheetOnOverlay(event)">
     <form class="modal-sheet" id="item-form" role="dialog" aria-modal="true" aria-labelledby="modal-title" onsubmit="saveItem(event)" novalidate>
-      <div class="modal-handle"></div>
-      <div class="modal-header">
-        <h2 id="modal-title">Lägg till</h2>
-        <button type="button" class="modal-close" aria-label="Stäng" onclick="closeSheet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      <div class="sheet-grip">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h2 id="modal-title">Lägg till</h2>
+          <button type="button" class="modal-close" aria-label="Stäng" onclick="closeSheet()"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+        </div>
       </div>
 
       <div class="type-group" id="type-group" role="group" aria-label="Vad vill du lägga till?">
-        <button type="button" class="type-btn" style="--c:var(--cat-routine)" data-type="routine" onclick="setType('routine')">Rutin</button>
-        <button type="button" class="type-btn" style="--c:var(--cat-todo)" data-type="todo" onclick="setType('todo')">Att göra</button>
-        <button type="button" class="type-btn" style="--c:var(--cat-hobby)" data-type="hobby" onclick="setType('hobby')">Hobby</button>
-        <button type="button" class="type-btn" style="--c:var(--cat-bonus)" data-type="bonus" onclick="setType('bonus')">Bonus</button>
+        <button type="button" class="type-btn" style="--c:var(--cat-routine)" data-type="routine" onclick="setType('routine')"><svg class="ic" aria-hidden="true"><use href="#i-routine"/></svg>Rutin</button>
+        <button type="button" class="type-btn" style="--c:var(--cat-todo)" data-type="todo" onclick="setType('todo')"><svg class="ic" aria-hidden="true"><use href="#i-todo"/></svg>Att göra</button>
+        <button type="button" class="type-btn" style="--c:var(--cat-hobby)" data-type="hobby" onclick="setType('hobby')"><svg class="ic" aria-hidden="true"><use href="#i-hobby"/></svg>Hobby</button>
+        <button type="button" class="type-btn" style="--c:var(--cat-bonus)" data-type="bonus" onclick="setType('bonus')"><svg class="ic" aria-hidden="true"><use href="#i-bonus"/></svg>Bonus</button>
       </div>
-      <p class="form-hint" id="type-hint"></p>
 
       <div class="form-group">
-        <label class="form-label" for="input-title">Namn</label>
-        <input type="text" class="form-input" id="input-title" maxlength="80" autocomplete="off" />
+        <label class="visually-hidden" for="input-title">Namn</label>
+        <input type="text" class="form-input title-input" id="input-title" maxlength="80" autocomplete="off" />
       </div>
 
       <div class="session-box" id="session-box" hidden>
         <p class="form-label" id="session-title"></p>
         <div class="session-actions">
-          <button type="button" class="chip-btn" onclick="showMove()">Flytta till en annan dag</button>
+          <button type="button" class="chip-btn" onclick="showMove()">Flytta</button>
           <button type="button" class="chip-btn" onclick="skipSession()">Hoppa över</button>
         </div>
         <div class="move-row" id="move-row" hidden>
           <label class="visually-hidden" for="input-move">Ny dag</label>
-          <input type="date" class="form-input" id="input-move" />
+          <button type="button" class="form-input date-btn" id="input-move" onclick="pickDate(this)"><span></span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg></button>
           <button type="button" class="chip-btn solid" onclick="moveSession()">Flytta</button>
         </div>
       </div>
-      <p class="form-hint" id="edit-scope" hidden>Det du ändrar nedan gäller alla pass. Pass du redan bockat behåller sin tid.</p>
+      <p class="form-hint" id="edit-scope" hidden>Gäller alla pass. Bockade pass behåller sin tid.</p>
 
       <div class="form-group" id="group-freq">
-        <span class="form-label">Hur ofta?</span>
-        <div class="seg-toggle wide" role="group" aria-label="Hur ofta?">
+        <div class="seg-toggle" role="group" aria-label="Hur ofta?">
           <button type="button" id="freq-once" onclick="setRepeating(false)">En gång</button>
           <button type="button" id="freq-repeat" onclick="setRepeating(true)">Upprepas</button>
         </div>
@@ -639,42 +751,42 @@
 
       <div class="form-group" id="group-date">
         <label class="form-label" for="input-date" id="label-date">Datum</label>
-        <input type="date" class="form-input" id="input-date" />
+        <button type="button" class="form-input date-btn" id="input-date" onclick="pickDate(this)"><span></span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg></button>
       </div>
 
       <div class="form-group" id="group-repeat">
-        <span class="form-label" id="label-days">Vilka dagar?</span>
+        <span class="visually-hidden" id="label-days">Vilka dagar?</span>
         <div class="day-pills" id="day-pills" role="group" aria-labelledby="label-days"></div>
         <div class="day-presets">
           <button type="button" onclick="setDays([0, 1, 2, 3, 4, 5, 6])">Varje dag</button>
           <button type="button" onclick="setDays([1, 2, 3, 4, 5])">Vardagar</button>
           <button type="button" onclick="setDays([0, 6])">Helger</button>
         </div>
-        <label class="switch-row"><input type="checkbox" id="input-period" onchange="syncForm()" /><span>Bara under en period</span></label>
+        <label class="switch-row"><input type="checkbox" id="input-period" onchange="syncForm()" /><span>Bara en period</span></label>
         <div class="time-grid" id="group-period">
           <div class="form-group">
             <label class="form-label" for="input-from">Från</label>
-            <input type="date" class="form-input" id="input-from" />
+            <button type="button" class="form-input date-btn" id="input-from" onclick="pickDate(this)"><span></span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg></button>
           </div>
           <div class="form-group">
             <label class="form-label" for="input-until">Till och med</label>
-            <input type="date" class="form-input" id="input-until" />
+            <button type="button" class="form-input date-btn" id="input-until" onclick="pickDate(this)"><span></span><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg></button>
           </div>
         </div>
       </div>
 
       <div class="time-grid">
         <div class="form-group">
-          <label class="form-label" for="input-time">Klockslag (valfritt)</label>
-          <input type="time" class="form-input" id="input-time" oninput="syncForm()" />
+          <label class="form-label" for="input-time">Tid</label>
+          <button type="button" class="form-input date-btn" id="input-time" onclick="openClock(this)"><span></span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg></button>
         </div>
         <div class="form-group">
-          <label class="form-label" for="input-minutes">Minuter (valfritt)</label>
+          <label class="form-label" for="input-minutes">Minuter</label>
           <input type="number" class="form-input" id="input-minutes" min="1" max="600" step="1" inputmode="numeric" />
         </div>
       </div>
 
-      <button type="button" class="more-toggle" id="btn-more" aria-expanded="false" aria-controls="group-more" onclick="toggleMore()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>Fler val</button>
+      <button type="button" class="more-toggle" id="btn-more" aria-expanded="false" aria-controls="group-more" onclick="toggleMore()"><svg class="ic" aria-hidden="true"><use href="#i-right"/></svg>Fler val</button>
       <div class="more-fields" id="group-more" hidden>
         <div class="form-group">
           <span class="form-label">Prioritet</span>
@@ -702,14 +814,22 @@
   <!-- BATTERIET FÖRKLARAT -->
   <div class="modal-overlay" id="battery-modal" onclick="closeSheetOnOverlay(event)">
     <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="battery-sheet-title">
-      <div class="modal-handle"></div>
-      <div class="modal-header">
-        <h2 id="battery-sheet-title">Så funkar batteriet</h2>
-        <button type="button" class="modal-close" aria-label="Stäng" onclick="closeSheet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      <div class="sheet-grip">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h2 id="battery-sheet-title">Batteriet</h2>
+          <button type="button" class="modal-close" aria-label="Stäng" onclick="closeSheet()"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+        </div>
+      </div>
+      <div class="bat-legend">
+        <div class="bat-cell" style="--c:var(--cat-routine)"><svg class="ic" aria-hidden="true"><use href="#i-routine"/></svg><b id="bat-routine">0</b><span>Rutiner</span></div>
+        <div class="bat-cell" style="--c:var(--cat-todo)"><svg class="ic" aria-hidden="true"><use href="#i-todo"/></svg><b id="bat-todo">0</b><span>Att göra</span></div>
+        <div class="bat-cell" style="--c:var(--cat-hobby)"><svg class="ic" aria-hidden="true"><use href="#i-hobby"/></svg><b id="bat-hobby">0</b><span>Hobby</span></div>
+        <div class="bat-cell" style="--c:var(--cat-bonus)"><svg class="ic" aria-hidden="true"><use href="#i-bonus"/></svg><b id="bat-bonus">0</b><span>Bonus</span></div>
       </div>
       <p class="explain" id="battery-explain"></p>
 
-      <h3 class="balance-title">Livsbalans, senaste 7 dagarna</h3>
+      <h3 class="balance-title">Plan som blev gjord, 7 dagar</h3>
       <div class="balance-body">
         <svg class="balance-svg" id="balance-svg" viewBox="-20 0 320 250" role="img" aria-label="Livsbalans" xmlns="http://www.w3.org/2000/svg">
           <g transform="translate(0, 5)">
@@ -725,36 +845,88 @@
 
             <polygon class="balance-fill" id="radar-polygon" points="140,125 140,125 140,125 140,125" />
 
-            <circle class="balance-node" id="node-routine" cx="140" cy="125" r="4.5" fill="#00e6a0" />
-            <circle class="balance-node" id="node-todo" cx="140" cy="125" r="4.5" fill="#8c7bff" />
-            <circle class="balance-node" id="node-hobby" cx="140" cy="125" r="4.5" fill="#ff7a59" />
-            <circle class="balance-node" id="node-bonus" cx="140" cy="125" r="4.5" fill="#ffd23f" />
+            <circle class="balance-node" id="node-routine" cx="140" cy="125" r="5" />
+            <circle class="balance-node" id="node-todo" cx="140" cy="125" r="5" />
+            <circle class="balance-node" id="node-hobby" cx="140" cy="125" r="5" />
+            <circle class="balance-node" id="node-bonus" cx="140" cy="125" r="5" />
 
-            <text class="balance-axis-label" x="140" y="20" text-anchor="middle">RUTINER</text>
-            <text class="balance-axis-pct" id="radar-lbl-routine" x="140" y="33" text-anchor="middle" fill="#00e6a0">–</text>
+            <text class="balance-axis-label" x="140" y="17" text-anchor="middle">Rutiner</text>
+            <text class="balance-axis-pct" id="radar-lbl-routine" x="140" y="32" text-anchor="middle">–</text>
 
-            <text class="balance-axis-label" x="236" y="121" text-anchor="start">ATT GÖRA</text>
-            <text class="balance-axis-pct" id="radar-lbl-todo" x="236" y="134" text-anchor="start" fill="#8c7bff">–</text>
+            <text class="balance-axis-label" x="236" y="120" text-anchor="start">Att göra</text>
+            <text class="balance-axis-pct" id="radar-lbl-todo" x="236" y="135" text-anchor="start">–</text>
 
-            <text class="balance-axis-label" x="140" y="224" text-anchor="middle">HOBBY</text>
-            <text class="balance-axis-pct" id="radar-lbl-hobby" x="140" y="237" text-anchor="middle" fill="#ff7a59">–</text>
+            <text class="balance-axis-label" x="140" y="224" text-anchor="middle">Hobby</text>
+            <text class="balance-axis-pct" id="radar-lbl-hobby" x="140" y="239" text-anchor="middle">–</text>
 
-            <text class="balance-axis-label" x="44" y="121" text-anchor="end">BONUS</text>
-            <text class="balance-axis-pct" id="radar-lbl-bonus" x="44" y="134" text-anchor="end" fill="#ffd23f">–</text>
+            <text class="balance-axis-label" x="44" y="120" text-anchor="end">Bonus</text>
+            <text class="balance-axis-pct" id="radar-lbl-bonus" x="44" y="135" text-anchor="end">–</text>
           </g>
         </svg>
       </div>
-      <p class="explain">Andelen av det du planerat som blev gjort. Ett streck betyder att inget var planerat.</p>
       <div class="modal-actions"></div>
+    </div>
+  </div>
+
+  <!-- KALENDER: webbläsarens egen datumruta går inte att styla, så appen har en egen -->
+  <div class="modal-overlay" id="cal-modal" onclick="closeSheetOnOverlay(event)">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="cal-title">
+      <div class="sheet-grip">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h2 id="cal-title" aria-live="polite"></h2>
+          <div class="cal-nav">
+            <button type="button" class="icon-btn" aria-label="Föregående månad" onclick="shiftMonth(-1)"><svg class="ic" aria-hidden="true"><use href="#i-left"/></svg></button>
+            <button type="button" class="icon-btn" aria-label="Nästa månad" onclick="shiftMonth(1)"><svg class="ic" aria-hidden="true"><use href="#i-right"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="cal-week" id="cal-week" aria-hidden="true"></div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="modal-actions">
+        <div class="cal-quick">
+          <button type="button" class="chip-btn" id="cal-today" onclick="chooseDate(today())">Idag</button>
+          <button type="button" class="chip-btn" id="cal-tomorrow" onclick="chooseDate(shiftDate(today(), 1))">Imorgon</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KLOCKA: två ringar som snurras med fingret, timmar innanför och minuter utanför -->
+  <div class="modal-overlay" id="clock-modal" onclick="closeSheetOnOverlay(event)">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="clock-title">
+      <div class="sheet-grip">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h2 id="clock-title">Tid</h2>
+          <button type="button" class="modal-close" aria-label="Stäng" onclick="closeSheet()"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+        </div>
+      </div>
+      <svg class="dial" id="dial" viewBox="0 0 320 320" aria-label="Klocka">
+        <g id="dial-face"></g>
+        <g transform="rotate(-90 160 160)">
+          <circle class="dial-arc" id="dial-arc-m" cx="160" cy="160" r="128" pathLength="100"/>
+          <circle class="dial-arc" id="dial-arc-h" cx="160" cy="160" r="96" pathLength="100"/>
+        </g>
+        <circle class="dial-knob" id="dial-knob-m" r="12" tabindex="0" role="slider" aria-label="Minut" aria-valuemin="0" aria-valuemax="59"/>
+        <circle class="dial-knob" id="dial-knob-h" r="12" tabindex="0" role="slider" aria-label="Timme" aria-valuemin="0" aria-valuemax="23"/>
+        <text class="dial-time" id="dial-time" x="160" y="168"></text>
+        <text class="dial-part" id="dial-part" x="160" y="188"></text>
+      </svg>
+      <div class="modal-actions">
+        <div class="cal-quick">
+          <button type="button" class="chip-btn" onclick="finishClock('')">Ingen tid</button>
+          <button type="button" class="chip-btn solid" onclick="finishClock(dialTime())">Klar</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- FÖRSTA START -->
   <div class="modal-overlay" id="setup-modal" data-locked="1">
     <form class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="setup-title" onsubmit="finishSetup(event, false)" novalidate>
-      <div class="modal-handle"></div>
-      <h2 id="setup-title" class="hello">Välkommen till Pulse</h2>
-      <p class="explain">Samla rutiner, att göra och hobbyer på ett ställe. Ditt batteri laddas när du gör dem.</p>
+      <div class="sheet-grip"><div class="modal-header" style="padding-top:18px"><h2 id="setup-title">Välkommen till Pulse</h2></div></div>
+      <p class="explain">Gör det du planerat, så laddas batteriet.</p>
       <div class="form-group">
         <label class="form-label" for="setup-name">Vad heter du?</label>
         <input type="text" class="form-input" id="setup-name" maxlength="30" autocomplete="given-name" />
@@ -797,6 +969,122 @@
     clearChat: () => api.req('DELETE', '/api/chat')
   };
 
+  // ===== RÖRELSE: fjädrar som går att avbryta. Inga bibliotek =====
+  // Apples två mått: damping (1 = ingen studs) och response (hur snabbt, i sekunder).
+  // En fjäder utgår alltid från sitt nuvarande läge och sin fart, så allt kan fångas mitt i rörelsen.
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  const springs = new Set();
+  let springClock = null;
+
+  class Spring {
+    constructor(value, { damping = 1, response = 0.4, onUpdate } = {}) {
+      Object.assign(this, { value, target: value, velocity: 0, damping, response, onUpdate, onRest: null });
+    }
+    to(target, { velocity, damping, response, onRest } = {}) {
+      if (velocity !== undefined) this.velocity = velocity;
+      if (damping !== undefined) this.damping = damping;
+      if (response !== undefined) this.response = response;
+      this.target = target;
+      this.onRest = onRest ?? null;
+      if (calm.matches) return this.set(target);
+      springs.add(this);
+      if (springClock === null) { springClock = performance.now(); requestAnimationFrame(stepSprings); }
+      return this;
+    }
+    set(value) {
+      springs.delete(this);
+      this.value = this.target = value;
+      this.velocity = 0;
+      this.onUpdate?.(value);
+      const done = this.onRest;
+      this.onRest = null;
+      done?.();
+      return this;
+    }
+    stop() { springs.delete(this); this.onRest = null; this.velocity = 0; }
+  }
+
+  function stepSprings(now) {
+    const dt = Math.min((now - springClock) / 1000, 1 / 30);
+    springClock = now;
+    for (const s of [...springs]) {
+      const w = (2 * Math.PI) / s.response;
+      for (let i = 0; i < 4; i++) {
+        s.velocity += (-w * w * (s.value - s.target) - 2 * s.damping * w * s.velocity) * (dt / 4);
+        s.value += s.velocity * (dt / 4);
+      }
+      if (Math.abs(s.value - s.target) < 0.05 && Math.abs(s.velocity) < 0.5) s.set(s.target);
+      else s.onUpdate?.(s.value);
+    }
+    if (springs.size) requestAnimationFrame(stepSprings); else springClock = null;
+  }
+
+  // Vart en svepning är på väg, inte var fingret släppte. Samma formel som scrollens inbromsning.
+  const project = (velocity, rate = 0.99) => (velocity / 1000) * rate / (1 - rate);
+  // Mjukt motstånd vid kanten i stället för ett hårt stopp.
+  const rubberband = (over, size, c = 0.55) => (over * size * c) / (size + c * Math.abs(over));
+
+  // CSS stänger inte av animationer som startas från skriptet, så de går alltid via play().
+  const play = (el, frames, options) => (calm.matches ? null : el.animate(frames, { easing: 'cubic-bezier(.2,.9,.25,1)', ...options }));
+
+  // Saker kommer in en i taget, uppifrån och ner: ögat får en väg att följa.
+  function cascade(els, { x = 0, y = 10, gap = 32, delay = 0 } = {}) {
+    [...els].slice(0, 9).forEach((el, i) => play(el,
+      [{ opacity: 0, transform: `translate(${x}px, ${y}px)` }, { opacity: 1, transform: 'none' }],
+      { duration: 420, delay: delay + i * gap, fill: 'backwards' }));
+  }
+
+  // Ny text glider upp på plats i stället för att bara bytas.
+  function swapText(el, text) {
+    const before = el.textContent;
+    if (before === text) return;
+    el.textContent = text;
+    if (before) play(el, [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 280 });
+  }
+
+  // Följer pekaren 1:1 efter 10 px, och ger upp om rörelsen går åt andra hållet (då är det scroll).
+  let dragging = 0;
+  function drag(e, { axis, move, end }) {
+    const key = axis === 'x' ? 'clientX' : 'clientY';
+    const cross = axis === 'x' ? 'clientY' : 'clientX';
+    const start = e[key], startCross = e[cross];
+    let active = false;
+    const history = [];
+    const cleanup = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onCancel);
+    };
+    const onMove = ev => {
+      const d = ev[key] - start;
+      if (!active) {
+        if (Math.abs(ev[cross] - startCross) > 10 && Math.abs(d) < 10) return cleanup();
+        if (Math.abs(d) < 10) return;
+        active = true;
+        dragging++;
+      }
+      history.push({ d, t: ev.timeStamp });
+      if (history.length > 5) history.shift();
+      move(d);
+    };
+    const finish = cancelled => {
+      cleanup();
+      if (!active) return;
+      dragging--;
+      const a = history[0], b = history.at(-1);
+      const dt = (b.t - a.t) / 1000;
+      end(b.d, cancelled || !dt ? 0 : (b.d - a.d) / dt, cancelled);
+      // Klicket som kommer efter en dragning ska inte öppna något.
+      window.addEventListener('click', ev => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
+      setTimeout(() => window.dispatchEvent(new Event('click')), 0);
+    };
+    const onUp = () => finish(false);
+    const onCancel = () => finish(true);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onCancel);
+  }
+
   // ===== DATUM (lokal tid, inte UTC) =====
   function localDate(offset = 0, from = new Date()) {
     const d = new Date(from);
@@ -835,6 +1123,10 @@
   const TYPE_NAME = { routine: 'rutin', todo: 'uppgift', hobby: 'hobby', bonus: 'bonus' };
   const SLUGS = { 'screen-home': 'idag', 'screen-routines': 'rutiner', 'screen-todos': 'att-gora', 'screen-hobbies': 'hobby', 'screen-ai': 'ai' };
   const TAB_IDS = { 'screen-home': 'tab-home', 'screen-routines': 'tab-routines', 'screen-todos': 'tab-todos', 'screen-hobbies': 'tab-hobbies', 'screen-ai': 'tab-ai' };
+  const SCREEN_ORDER = Object.keys(TAB_IDS);
+  const CATS = ['routine', 'todo', 'hobby', 'bonus'];
+  const LISTED = '.hobby-card, .week-day, .list-label, .empty, .item-row:not(.hobby-card *)'; // det som kommer in en i taget
+  const icon = name => `<svg class="ic" aria-hidden="true"><use href="#i-${name}"/></svg>`;
   const FAB = {
     'screen-home': ['Lägg till', 'routine'],
     'screen-routines': ['Ny rutin', 'routine'],
@@ -845,11 +1137,13 @@
   let knownToday = today();
   let activeDate = knownToday;
   let activeScreen = 'screen-home';
+  let shownScreen = null;
   let homeView = 'day';
   let fabType = 'routine';
   let profile = null;
   let day = null, week = null, overview = null; // senaste svaren från servern
   let loadError = false;
+  let navDir = 0; // åt vilket håll dagen just bytte: 1 = framåt, -1 = bakåt
   const known = new Map(); // id → senast visade data, ändra-arket fylls i från den
 
   // Skydd mot HTML-injektion: namn kan nu komma från AI:n
@@ -858,7 +1152,7 @@
   // ===== INIT =====
   document.addEventListener('DOMContentLoaded', async () => {
     buildDayPills();
-    document.getElementById('battery-card-element').addEventListener('animationend', e => e.currentTarget.classList.remove('charging'));
+    initGestures();
     readRoute();
     tick();
     setInterval(tick, 1000);
@@ -867,13 +1161,8 @@
 
     profile = await api.profile().catch(() => undefined); // undefined = servern svarar inte, inte "ny användare"
     if (profile === null) showSheet('setup-modal', 'setup-name');
-    renderProfile();
     await Promise.all([refresh(), loadChat()]);
   });
-
-  function renderProfile() {
-    document.getElementById('hello').textContent = profile?.name ? `Hej, ${profile.name}` : 'Hej!';
-  }
 
   async function finishSetup(e, demo) {
     e.preventDefault();
@@ -881,7 +1170,6 @@
     try {
       profile = await api.setup(document.getElementById('setup-name').value, demo);
       closeSheet(true);
-      renderProfile();
       renderChat([]);
       refresh();
     } catch (err) {
@@ -945,22 +1233,41 @@
   }
 
   function showScreen(screenId) {
+    const previous = shownScreen;
+    shownScreen = screenId;
     activeScreen = screenId;
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'enter'));
+    const screen = document.getElementById(screenId);
+    screen.classList.add('active');
+    if (previous && previous !== screenId) {
+      // Nästa skärm kommer från det håll fliken ligger åt
+      screen.style.setProperty('--from', SCREEN_ORDER.indexOf(screenId) > SCREEN_ORDER.indexOf(previous) ? '18px' : '-18px');
+      screen.classList.add('enter');
+      cascade(screen.querySelectorAll(LISTED), { y: 12, delay: 40 });
+      play(document.querySelector(`#${TAB_IDS[screenId]} svg`), { transform: ['scale(.78)', 'scale(1.14)', 'scale(1)'] }, { duration: 340 });
+    }
     document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
     const tab = document.getElementById(TAB_IDS[screenId]);
     tab.classList.add('active');
     tab.setAttribute('aria-current', 'page');
+    moveTabIndicator(!previous);
 
     const fab = document.getElementById('fab');
-    fab.hidden = !FAB[screenId];
+    fab.classList.toggle('gone', !FAB[screenId]);
+    fab.inert = !FAB[screenId];
     if (FAB[screenId]) {
       document.getElementById('fab-label').textContent = FAB[screenId][0];
       fabType = FAB[screenId][1];
       fab.style.setProperty('--accent-fab', `var(--cat-${fabType})`);
     }
     if (screenId === 'screen-ai') scrollChat();
+  }
+
+  const tabSpring = new Spring(0, { damping: 0.82, response: 0.38, onUpdate: x => { document.getElementById('tab-ind').style.transform = `translateX(${x}px)`; } });
+  function moveTabIndicator(instant) {
+    const tab = document.getElementById(TAB_IDS[activeScreen]);
+    document.getElementById('tab-ind').style.width = `${tab.offsetWidth}px`;
+    if (instant) tabSpring.set(tab.offsetLeft); else tabSpring.to(tab.offsetLeft);
   }
 
   function switchTab(screenId) {
@@ -978,6 +1285,7 @@
 
   function selectDate(date) {
     if (!date) return;
+    navDir = Math.sign(daysBetween(activeDate, date));
     activeDate = date;
     history.replaceState(null, '', routeHash());
     document.getElementById('screen-home').scrollTop = 0;
@@ -987,9 +1295,13 @@
   function shiftWeek(dir) { selectDate(shiftDate(activeDate, dir * 7)); }
 
   function setHomeView(view) {
+    if (view === homeView) return;
     homeView = view;
     history.replaceState(null, '', routeHash());
     renderHome();
+    const box = document.getElementById(view === 'week' ? 'week-view' : 'day-view');
+    const top = view === 'day' ? [document.getElementById('battery-card-element'), document.getElementById('date-row')] : [];
+    cascade([...top, ...box.querySelectorAll(LISTED)]);
   }
 
   function openDay(date) {
@@ -999,23 +1311,271 @@
     refresh();
   }
 
-  // Den riktiga datumväljaren öppnas från knappen, så att den funkar även med tangentbord.
   function openDatePicker() {
-    const input = document.getElementById('nav-date-picker');
-    input.value = activeDate;
-    try { input.showPicker(); } catch { input.focus(); }
+    openCalendar({ value: activeDate, onPick: selectDate });
+  }
+
+  // ===== KALENDER: alltid sex rader, så att arket inte hoppar när månaden byts =====
+  const cal = { month: '', value: null, min: null, onPick: null };
+
+  function pickerAccent(accent) {
+    const device = document.getElementById('device');
+    device.style.setProperty('--cal-bg', accent ? `var(--cat-${accent})` : 'var(--solid)');
+    device.style.setProperty('--cal-fg', accent ? 'var(--on-cat)' : 'var(--on-solid)');
+  }
+
+  function openCalendar({ value, min = null, accent = null, onPick }) {
+    Object.assign(cal, { value, min, onPick, month: (value || today()).slice(0, 7) });
+    pickerAccent(accent);
+    document.getElementById('cal-week').innerHTML = DAY_ORDER.map(d => `<span>${DAY_SHORT[d]}</span>`).join('');
+    document.getElementById('cal-today').disabled = Boolean(min) && today() < min;
+    document.getElementById('cal-tomorrow').disabled = Boolean(min) && shiftDate(today(), 1) < min;
+    renderCalendar();
+    showSheet('cal-modal');
+  }
+
+  function renderCalendar(dir = 0) {
+    const first = `${cal.month}-01`;
+    const start = shiftDate(first, -((parseDay(first).getDay() + 6) % 7));
+    swapText(document.getElementById('cal-title'), parseDay(first).toLocaleDateString('sv-SE', { month: 'long', year: 'numeric' }));
+    const grid = document.getElementById('cal-grid');
+    grid.innerHTML = Array.from({ length: 42 }, (_, i) => {
+      const date = shiftDate(start, i);
+      const classes = [date.slice(0, 7) !== cal.month && 'other', date === today() && 'today'].filter(Boolean).join(' ');
+      return `<button type="button" class="cal-day ${classes}" aria-pressed="${date === cal.value}" aria-label="${esc(fmtWeekday(date))} ${esc(fmtDay(date))}" ${cal.min && date < cal.min ? 'disabled' : ''} onclick="chooseDate('${date}')">${parseDay(date).getDate()}</button>`;
+    }).join('');
+    if (dir) play(grid, [{ opacity: 0, transform: `translateX(${dir * 26}px)` }, { opacity: 1, transform: 'none' }], { duration: 300 });
+  }
+
+  function shiftMonth(dir) {
+    const d = parseDay(`${cal.month}-01`);
+    d.setMonth(d.getMonth() + dir);
+    cal.month = localDate(0, d).slice(0, 7);
+    renderCalendar(dir);
+  }
+
+  // Valet syns ett ögonblick innan arket stängs.
+  function chooseDate(date) {
+    if (cal.min && date < cal.min) return;
+    cal.value = date;
+    cal.month = date.slice(0, 7);
+    renderCalendar();
+    setTimeout(() => { closeSheet(); cal.onPick?.(date); }, calm.matches ? 0 : 150);
+  }
+
+  // ===== KLOCKA: hela urtavlan är ett enda tal, minuter sedan midnatt, som en fjäder bär =====
+  // Precis som på en riktig klocka hänger visarna ihop: snurrar minuterna ett varv går timmen ett steg.
+  const DIAL_C = 160, DIAL_HOUR = 96, DIAL_MIN = 128;
+  const pad2 = n => String(n).padStart(2, '0');
+  const mod = (n, size) => ((n % size) + size) % size;
+  const hhmm = t => { const n = mod(Math.round(t), 1440); return `${pad2(Math.floor(n / 60))}:${pad2(n % 60)}`; };
+  const dialSpring = new Spring(0, { damping: 0.85, response: 0.42, onUpdate: () => drawDial() });
+  let dialHold = null; // minuterna står still medan timringen snurras
+  const dialTime = () => hhmm(dialSpring.target);
+
+  function dayPart(hour) {
+    return hour < 5 ? 'natt' : hour < 10 ? 'morgon' : hour < 12 ? 'förmiddag' : hour < 18 ? 'eftermiddag' : 'kväll';
+  }
+
+  function buildDial() {
+    const face = document.getElementById('dial-face');
+    if (face.children.length) return;
+    const polar = (r, turn) => [DIAL_C + Math.sin(turn * 2 * Math.PI) * r, DIAL_C - Math.cos(turn * 2 * Math.PI) * r];
+    const ticks = (r, count, major) => Array.from({ length: count }, (_, i) => {
+      const len = i % major ? 2 : 5;
+      const [x0, y0] = polar(r - len, i / count), [x1, y1] = polar(r + len, i / count);
+      return `M${x0.toFixed(1)} ${y0.toFixed(1)}L${x1.toFixed(1)} ${y1.toFixed(1)}`;
+    }).join('');
+    const labels = (r, list) => list.map((text, i) => {
+      const [x, y] = polar(r, i / list.length);
+      return `<text class="dial-label" x="${x.toFixed(1)}" y="${y.toFixed(1)}">${text}</text>`;
+    }).join('');
+    face.innerHTML = `<circle class="dial-track" cx="${DIAL_C}" cy="${DIAL_C}" r="${DIAL_MIN}"/>
+      <circle class="dial-track" cx="${DIAL_C}" cy="${DIAL_C}" r="${DIAL_HOUR}"/>
+      <path class="dial-tick" d="${ticks(DIAL_MIN, 60, 5)}${ticks(DIAL_HOUR, 24, 6)}"/>
+      ${labels(150, ['00', '15', '30', '45'])}${labels(72, ['00', '06', '12', '18'])}`;
+  }
+
+  function drawDial() {
+    const t = dialSpring.value;
+    const minute = dialHold === null ? mod(t, 60) : dialHold;
+    const day = mod(t, 1440);
+    const set = (key, turn, radius) => {
+      document.getElementById(`dial-arc-${key}`).style.strokeDasharray = `${turn * 100} 100`;
+      const knob = document.getElementById(`dial-knob-${key}`);
+      knob.setAttribute('cx', DIAL_C + Math.sin(turn * 2 * Math.PI) * radius);
+      knob.setAttribute('cy', DIAL_C - Math.cos(turn * 2 * Math.PI) * radius);
+    };
+    set('m', minute / 60, DIAL_MIN);
+    set('h', day / 1440, DIAL_HOUR);
+    // Under ett snurr på timringen visas timmen som landar, inte timmens delar.
+    const shown = dialHold === null ? t : Math.round((t - dialHold) / 60) * 60 + dialHold;
+    const text = hhmm(shown);
+    const el = document.getElementById('dial-time');
+    if (el.textContent === text) return;
+    el.textContent = text;
+    const [h, m] = text.split(':').map(Number);
+    document.getElementById('dial-part').textContent = dayPart(h);
+    document.getElementById('dial-knob-h').setAttribute('aria-valuenow', h);
+    document.getElementById('dial-knob-m').setAttribute('aria-valuenow', m);
+    if (dialDragging && (dialHold !== null || m % 5 === 0)) navigator.vibrate?.(4); // små hack, som ett riktigt reglage
+  }
+
+  function openClock(btn) {
+    buildDial();
+    pickerAccent(form.type);
+    const [h, m] = btn.value ? btn.value.split(':').map(Number) : [];
+    const now = new Date();
+    // Tomt fält: börja på nästa kvart, det är oftast nära det man vill ha.
+    const target = btn.value ? h * 60 + m : Math.ceil((now.getHours() * 60 + now.getMinutes()) / 15) * 15;
+    dialHold = null;
+    dialSpring.set(target - 150);
+    showSheet('clock-modal', 'dial-knob-h');
+    dialSpring.to(target, { damping: 0.82, response: 0.75 }); // klockan vrider fram sig när arket kommer upp
+  }
+
+  // Ta tag var som helst: närmaste ring följer fingret, varv efter varv.
+  let dialDragging = false;
+  function initDial() {
+    const svg = document.getElementById('dial');
+    const polar = e => {
+      const r = svg.getBoundingClientRect();
+      const scale = 320 / r.width;
+      const x = (e.clientX - r.left) * scale - DIAL_C, y = (e.clientY - r.top) * scale - DIAL_C;
+      return { angle: Math.atan2(x, -y), radius: Math.hypot(x, y) };
+    };
+    const shortest = a => mod(a + Math.PI, 2 * Math.PI) - Math.PI;
+    let grab = null;
+
+    svg.addEventListener('pointerdown', e => {
+      if (e.button) return;
+      const { angle, radius } = polar(e);
+      if (radius < 62) return; // mitten är tiden, inte ett reglage
+      e.preventDefault();
+      svg.setPointerCapture(e.pointerId);
+      const ring = Math.abs(radius - DIAL_MIN) < Math.abs(radius - DIAL_HOUR) ? 'm' : 'h';
+      grab = { ring, angle, start: angle, travel: 0, perTurn: ring === 'm' ? 60 : 1440, history: [] };
+      dialSpring.stop();
+      dialHold = ring === 'h' ? mod(Math.round(dialSpring.value), 60) : null;
+      dialDragging = true;
+      document.getElementById(`dial-knob-${ring}`).focus({ preventScroll: true });
+    });
+
+    svg.addEventListener('pointermove', e => {
+      if (!grab) return;
+      const { angle } = polar(e);
+      const delta = shortest(angle - grab.angle);
+      grab.angle = angle;
+      grab.travel += Math.abs(delta);
+      dialSpring.value += (delta / (2 * Math.PI)) * grab.perTurn;
+      dialSpring.target = dialSpring.value;
+      grab.history.push({ v: dialSpring.value, t: e.timeStamp });
+      if (grab.history.length > 5) grab.history.shift();
+      drawDial();
+    });
+
+    const release = (cancelled, at) => {
+      if (!grab) return;
+      const { ring, perTurn, history, travel, start } = grab;
+      grab = null;
+      dialDragging = false;
+      let velocity = 0, landing = dialSpring.value;
+      if (travel < 0.06) {
+        // Ett tryck: ringen vrider sig dit fingret pekade, den korta vägen.
+        const point = (mod(start, 2 * Math.PI) / (2 * Math.PI)) * perTurn;
+        landing += mod(point - landing + perTurn / 2, perTurn) - perTurn / 2;
+      } else if (history.length > 1 && !cancelled && at - history.at(-1).t < 80) { // stilla före släpp: ingen fart
+        const a = history[0], b = history.at(-1);
+        velocity = b.t > a.t ? ((b.v - a.v) / (b.t - a.t)) * 1000 : 0;
+        landing += project(velocity);
+      }
+      // Timringen behåller minuterna. Ett snabbt snurr landar på jämna fem, ett lugnt på exakt minut.
+      const snap = ring === 'h'
+        ? Math.round((landing - dialHold) / 60) * 60 + dialHold
+        : Math.round(landing / (Math.abs(velocity) > 40 ? 5 : 1)) * (Math.abs(velocity) > 40 ? 5 : 1);
+      dialSpring.to(snap, { velocity, damping: 0.85, response: 0.42, onRest: () => { dialHold = null; } });
+    };
+    svg.addEventListener('pointerup', e => release(false, e.timeStamp));
+    svg.addEventListener('pointercancel', e => release(true, e.timeStamp));
+
+    // Piltangenter: samma klocka utan pekare.
+    for (const [key, step] of [['h', 60], ['m', 1]]) {
+      document.getElementById(`dial-knob-${key}`).addEventListener('keydown', e => {
+        const dir = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1 }[e.key];
+        if (!dir) return;
+        e.preventDefault();
+        dialSpring.to(dialSpring.target + dir * step);
+      });
+    }
+  }
+
+  function finishClock(value) {
+    setTimeField(value);
+    closeSheet();
+    syncForm(); // "Klart senast" eller "Datum" beror på om det finns en tid
+  }
+
+  function setTimeField(value) {
+    const btn = document.getElementById('input-time');
+    btn.value = value ?? '';
+    btn.querySelector('span').textContent = value || 'Välj tid';
+  }
+
+  // Datumfälten är knappar: value fungerar som på ett input, resten av formuläret märker ingen skillnad.
+  function setDateField(id, value) {
+    const btn = document.getElementById(id);
+    btn.value = value ?? '';
+    btn.querySelector('span').textContent = value ? dayWord(value) : 'Välj datum';
+  }
+
+  function pickDate(btn) {
+    const earliest = {
+      'input-until': field('input-from').value,
+      'input-date': form.type === 'todo' && !form.editing ? today() : null
+    }[btn.id];
+    openCalendar({
+      value: btn.value || null,
+      min: earliest || null,
+      accent: form.type,
+      onPick: date => setDateField(btn.id, date)
+    });
   }
 
   // ===== RENDER =====
+  // Listorna ritas inte om mitt under en svepning, då skulle raden försvinna under fingret.
+  let renderHeldUntil = 0;
   function renderAll() {
+    if (dragging || performance.now() < renderHeldUntil) { setTimeout(renderAll, 120); return; }
     if (day) renderBattery(day.battery, day.next);
     renderHome();
     renderRoutines();
     renderTodos();
     renderHobbies();
+    renderSuggestions();
+    navDir = 0;
   }
 
-  const errorHtml = () => `<div class="load-error" role="alert">Kunde inte hämta dina saker. De är kvar, men servern svarar inte just nu.<button onclick="refresh()">Försök igen</button></div>`;
+  // Skriver bara om det som ändrats. Rader med samma nyckel glider till sin nya plats, nya tonar in.
+  // Är allt nytt, som vid byte av dag, kommer raderna in en i taget från det håll man gick.
+  function patch(el, html) {
+    if (el.dataset.html === html) return;
+    const rows = root => [...root.querySelectorAll('[data-key]')];
+    const before = new Map(el.offsetParent ? rows(el).map(r => [r.dataset.key, r.getBoundingClientRect().top]) : []);
+    const focused = el.contains(document.activeElement) ? document.activeElement.closest('[data-key]')?.dataset.key : null;
+    el.innerHTML = html;
+    el.dataset.html = html;
+    if (focused) el.querySelector(`[data-key="${focused}"] .check-circle`)?.focus({ preventScroll: true });
+    if (calm.matches || !el.offsetParent) return;
+    if (!rows(el).some(r => before.has(r.dataset.key))) return cascade(el.querySelectorAll(LISTED), { x: navDir * 18, y: navDir ? 0 : 10 });
+    for (const row of rows(el)) {
+      const top = before.get(row.dataset.key);
+      if (top === undefined) { if (before.size) row.animate({ opacity: [0, 1] }, { duration: 220, easing: 'ease-out' }); continue; }
+      const dy = top - row.getBoundingClientRect().top;
+      if (Math.abs(dy) > 1) row.animate({ transform: [`translateY(${dy}px)`, 'none'] }, { duration: 380, easing: 'cubic-bezier(.2,.9,.25,1)' });
+    }
+  }
+
+  const errorHtml = () => `<div class="load-error" role="alert">Servern svarar inte. Dina saker är kvar.<button onclick="refresh()">Försök igen</button></div>`;
 
   function isFuture(o) {
     if (o.type === 'todo') return Boolean(o.appointment) && o.deadline > today();
@@ -1026,13 +1586,13 @@
   function metaHtml(o, { showDate, showDeadline }) {
     const parts = [];
     if (showDate) parts.push(dayWord(o.date));
-    if (o.overdue) return `<span class="item-meta late">Försenad, skulle vara klar ${esc(fmtDay(o.deadline))}</span>`;
+    if (o.overdue) return `<span class="item-meta late">Försenad · ${esc(fmtDay(o.deadline))}</span>`;
     if (o.type === 'todo' && !o.done) {
       const diff = daysBetween(today(), o.deadline);
       if (o.appointment) { if (showDeadline) parts.push(dayWord(o.deadline)); }
-      else parts.push(diff === 0 ? 'Klart senast idag' : diff === 1 ? 'Klart senast imorgon' : `Klart senast ${fmtDay(o.deadline)} (om ${diff} dagar)`);
+      else parts.push(`Senast ${diff === 0 ? 'idag' : diff === 1 ? 'imorgon' : fmtDay(o.deadline)}`);
     }
-    if (o.time) parts.push(`kl ${o.time}`);
+    if (o.time) parts.push(o.time);
     if (o.minutes) parts.push(`${o.minutes} min`);
     const badge = o.prio === 'High' && !o.done ? '<span class="item-prio-badge">Viktig</span>' : '';
     return parts.length || badge ? `<span class="item-meta">${badge}${esc(parts.join(' · '))}</span>` : '';
@@ -1042,21 +1602,20 @@
     const future = isFuture(o);
     const verb = o.done ? 'Ångra' : 'Bocka av';
     const onclick = future ? `toast('Det ligger i framtiden. Bocka av det på dagen.')` : `toggleDone(${Number(o.id)}, '${esc(o.date)}', this)`;
-    return `<button class="check-circle ${future ? 'future' : ''}" role="checkbox" aria-checked="${Boolean(o.done)}" ${future ? 'aria-disabled="true"' : ''} aria-label="${verb}: ${esc(o.name)}" style="--dot:var(--cat-${esc(o.type)})" onclick="${onclick}">
-        <span class="check-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>
+    return `<button class="check-circle ${future ? 'future' : ''}" role="checkbox" aria-checked="${Boolean(o.done)}" ${future ? 'aria-disabled="true"' : ''} aria-label="${verb}: ${esc(o.name)}" data-cat="${esc(o.type)}" style="--dot:var(--cat-${esc(o.type)})" onclick="${onclick}">
+        <span class="check-dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg></span>
       </button>`;
   }
 
   // En rad i schemat. Klick på ringen bockar av, klick på resten öppnar ändra-arket.
-  function rowHtml(o, { editDate = o.date, showDate = false, showDeadline = false } = {}) {
+  function rowHtml(o, { editDate = o.date, showDate = false, showDeadline = false, next = false } = {}) {
     remember(o);
-    const chargeNow = !o.done && !isFuture(o) && o.date === today(); // på gamla dagar vet man inte vad det ger
-    return `<div class="item-row ${o.done ? 'done' : ''}">
+    return `<div class="item-row ${o.done ? 'done' : ''} ${next ? 'next' : ''}" data-key="${Number(o.id)}:${esc(o.date)}" style="--dot:var(--cat-${esc(o.type)})">
       ${checkHtml(o)}
       <button class="item-info" aria-label="Ändra ${esc(o.name)}" onclick="openEdit(${Number(o.id)}, ${editDate ? `'${esc(editDate)}'` : 'null'})">
         <span class="item-top">
           <span class="item-name">${esc(o.name)}</span>
-          ${chargeNow ? `<span class="item-charge">+${Number(o.charge)} %</span>` : ''}
+          ${next ? `<span class="item-charge">+${Number(o.charge)} %</span>` : ''}
         </span>
         ${metaHtml(o, { showDate, showDeadline })}
         ${o.desc ? `<span class="item-desc">${esc(o.desc)}</span>` : ''}
@@ -1076,26 +1635,27 @@
     document.getElementById('date-row').hidden = isWeek;
     document.getElementById('btn-week-prev').hidden = !isWeek;
     document.getElementById('btn-week-next').hidden = !isWeek;
+    document.getElementById('btn-calendar').hidden = isWeek; // pilarna tar platsen, annars bryts rubriken
     document.getElementById('btn-view-day').setAttribute('aria-pressed', !isWeek);
     document.getElementById('btn-view-week').setAttribute('aria-pressed', isWeek);
     document.getElementById('day-view').hidden = isWeek;
     document.getElementById('week-view').hidden = !isWeek;
     document.getElementById('btn-go-today').hidden = activeDate === today();
 
-    document.getElementById('day-title').textContent = isWeek ? `Vecka ${weekNumber(activeDate)}` : dayWord(activeDate);
+    swapText(document.getElementById('day-title'), isWeek ? `v. ${weekNumber(activeDate)}` : dayWord(activeDate));
     if (week) renderStrip();
     if (loadError) {
       document.getElementById('day-count').textContent = '';
-      document.getElementById('day-view').innerHTML = errorHtml();
-      document.getElementById('week-view').innerHTML = errorHtml();
+      patch(document.getElementById('day-view'), errorHtml());
+      patch(document.getElementById('week-view'), errorHtml());
       return;
     }
     if (!day || !week) return;
     const planned = week.days.reduce((n, d) => n + d.total, 0);
     const doneWeek = week.days.reduce((n, d) => n + d.done, 0);
     document.getElementById('day-count').textContent = isWeek
-      ? `${doneWeek} av ${planned} klara`
-      : day.total ? `${day.done} av ${day.total} klara` : fmtDay(activeDate);
+      ? `${doneWeek} av ${planned}`
+      : [dayWord(activeDate) !== fmtDay(activeDate) && fmtDay(activeDate), day.total ? `${day.done} av ${day.total}` : ''].filter(Boolean).join(' · ');
     isWeek ? renderWeekView() : renderDayView();
   }
 
@@ -1106,17 +1666,32 @@
     return 1 + Math.round(((d - jan4) / 864e5 - 3 + ((jan4.getDay() + 6) % 7)) / 7);
   }
 
+  const stripSpring = new Spring(0, { damping: 0.8, response: 0.36, onUpdate: x => { document.getElementById('strip-ind').style.transform = `translateX(${x}%)`; } });
+
   function renderStrip() {
-    document.getElementById('week-strip').innerHTML = week.days.map(d => {
-      const num = parseDay(d.date).getDate();
-      const wd = fmtWeekday(d.date);
-      const selected = d.date === activeDate;
-      return `<button class="day-cell ${selected ? 'active' : ''} ${d.date === today() ? 'today' : ''}" ${selected ? 'aria-current="date"' : ''} aria-label="${esc(wd)} ${num}, ${d.done} av ${d.total} klara" onclick="selectDate('${esc(d.date)}')">
-        <span class="dc-wd">${esc(wd.slice(0, 3))}</span>
-        <span class="dc-num">${num}</span>
-        <span class="dc-bar"><span style="width:${d.total ? Math.round((d.done / d.total) * 100) : 0}%"></span></span>
-      </button>`;
-    }).join('');
+    const selectedIndex = week.days.findIndex(d => d.date === activeDate);
+    document.getElementById('strip-ind').hidden = selectedIndex < 0;
+    if (selectedIndex >= 0) stripSpring.to(selectedIndex * 100);
+    const strip = document.getElementById('week-strip');
+    const fill = d => `${d.total ? Math.round((d.done / d.total) * 100) : 0}%`;
+    const label = d => `${fmtWeekday(d.date)} ${parseDay(d.date).getDate()}, ${d.done} av ${d.total} klara`;
+    // Samma vecka: cellerna står kvar, annars kan glaset inte stiga när något bockas av.
+    if (strip.dataset.week === week.days[0].date) {
+      week.days.forEach((d, i) => {
+        const cell = strip.children[i];
+        cell.style.setProperty('--f', fill(d));
+        cell.classList.toggle('today', d.date === today());
+        cell.setAttribute('aria-label', label(d));
+        if (d.date === activeDate) cell.setAttribute('aria-current', 'date'); else cell.removeAttribute('aria-current');
+      });
+      return;
+    }
+    strip.dataset.week = week.days[0].date;
+    strip.innerHTML = week.days.map(d => `<button class="day-cell ${d.date === today() ? 'today' : ''}" style="--f:${fill(d)}" ${d.date === activeDate ? 'aria-current="date"' : ''} aria-label="${esc(label(d))}" onclick="selectDate('${esc(d.date)}')">
+        <span class="dc-wd">${esc(fmtWeekday(d.date).slice(0, 3))}</span>
+        <span class="dc-num">${parseDay(d.date).getDate()}</span>
+      </button>`).join('');
+    cascade(strip.children, { x: navDir * 14, y: navDir ? 0 : 6, gap: 22 });
   }
 
   function renderDayView() {
@@ -1126,30 +1701,37 @@
     let html = '';
     if (!day.items.length) {
       const nothingYet = isToday && !overview?.routines.length && !overview?.todos.open.length && !overview?.hobbies.length;
-      html = `<p class="empty">${nothingYet
-        ? 'Här är tomt än. Börja med något du vill göra regelbundet, tryck på Lägg till.'
-        : activeDate < today() ? 'Inget var planerat den här dagen.' : 'Inget planerat. En vilodag är också bra.'}</p>`;
+      html = `<p class="empty">${nothingYet ? 'Tomt än. Tryck på + för att börja.' : activeDate < today() ? 'Inget planerat.' : 'Inget planerat. Vila är också bra.'}</p>`;
     }
-    if (open.length) html += `<div class="list">${open.map(o => rowHtml(o)).join('')}</div>`;
-    if (done.length) html += `<p class="list-label">Klart (${done.length})</p><div class="list">${done.map(o => rowHtml(o)).join('')}</div>`;
+    if (open.length) {
+      const isNext = o => isToday && day.next && o.id === day.next.id && o.date === day.next.date;
+      const rows = open.map(o => ({ o, html: rowHtml(o, { next: isNext(o) }) }));
+      // Nu-strecket hamnar där klockan är i dagens tidslinje. Bara för saker med klockslag.
+      const now = new Date().toTimeString().slice(0, 5);
+      const at = isToday ? rows.findIndex(r => r.o.time && r.o.time > now) : -1;
+      const earlier = at > 0 && rows.slice(0, at).some(r => r.o.time);
+      if (earlier) rows[at].html = `<div class="now-line" aria-hidden="true"><i></i><span>${now}</span></div>${rows[at].html}`;
+      html += `<div class="list rail">${rows.map(r => r.html).join('')}</div>`;
+    }
+    if (done.length) html += `<p class="list-label">Klart</p><div class="list rail">${done.map(o => rowHtml(o)).join('')}</div>`;
     if (day.upcoming.length) {
-      html += `<p class="list-label">Snart</p><div class="list">${day.upcoming.map(o => rowHtml(o, { showDeadline: true })).join('')}</div>`;
+      html += `<p class="list-label">Snart</p><div class="list rail">${day.upcoming.map(o => rowHtml(o, { showDeadline: true })).join('')}</div>`;
     }
-    document.getElementById('day-view').innerHTML = html;
+    patch(document.getElementById('day-view'), html);
   }
 
   const byClock = (a, b) => (a.time ?? '99:99').localeCompare(b.time ?? '99:99'); // veckan läses i tidsordning
 
   function renderWeekView() {
-    document.getElementById('week-view').innerHTML = week.days.map(d => `
-      <button class="week-day ${d.date === today() ? 'today' : ''}" onclick="openDay('${esc(d.date)}')">
-        <span class="week-head"><b>${esc(dayWord(d.date) === fmtDay(d.date) ? fmtDay(d.date) : `${dayWord(d.date)}, ${fmtDay(d.date)}`)}</b><span>${d.total ? `${d.done} av ${d.total}` : 'Inget planerat'}</span></span>
-        ${[...d.items].sort(byClock).map(o => `<span class="week-item ${o.done ? 'done' : ''}">
-          <span class="dot ${esc(o.type)}"></span>
+    patch(document.getElementById('week-view'), week.days.map(d => `
+      <button class="week-day ${d.date === today() ? 'today' : ''} ${d.total ? '' : 'rest'}" onclick="openDay('${esc(d.date)}')">
+        <span class="week-head"><b>${esc(dayWord(d.date) === fmtDay(d.date) ? fmtDay(d.date) : `${dayWord(d.date)}, ${fmtDay(d.date)}`)}</b><span>${d.total ? `${d.done} av ${d.total}` : '–'}</span></span>
+        ${[...d.items].sort(byClock).map(o => `<span class="week-item ${o.done ? 'done' : ''}" style="--c:var(--cat-${esc(o.type)})">
+          ${icon(esc(o.type))}
           ${o.time ? `<span class="wi-time">${esc(o.time)}</span>` : ''}
           <span class="wi-name">${esc(o.name)}</span>
         </span>`).join('')}
-      </button>`).join('');
+      </button>`).join(''));
   }
 
   function dotsHtml(progress, color) {
@@ -1161,8 +1743,8 @@
 
   // Gjort något en dag det inte var planerat? Då ska det gå att säga det.
   function offDayCheck(o) {
-    return `<button class="check-circle off-day" role="checkbox" aria-checked="false" aria-label="Gjorde det idag: ${esc(o.name)}" title="Gjorde det idag" style="--dot:var(--cat-${esc(o.type)})" onclick="toggleDone(${Number(o.id)}, '${today()}', this)">
-        <span class="check-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>
+    return `<button class="check-circle off-day" role="checkbox" aria-checked="false" aria-label="Gjorde det idag: ${esc(o.name)}" title="Gjorde det idag" data-cat="${esc(o.type)}" style="--dot:var(--cat-${esc(o.type)})" onclick="toggleDone(${Number(o.id)}, '${today()}', this)">
+        <span class="check-dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg></span>
       </button>`;
   }
 
@@ -1170,17 +1752,17 @@
 
   function renderRoutines() {
     const el = document.getElementById('list-routines');
-    if (loadError) { el.innerHTML = errorHtml(); return; }
+    if (loadError) { patch(el, errorHtml()); return; }
     if (!overview) return;
     if (!overview.routines.length && !overview.ended.length) {
-      el.innerHTML = `<p class="empty" style="padding-left:0">Inga rutiner än. Lägg in något du vill göra regelbundet, så följer det med dag för dag.</p>`;
+      patch(el, `<p class="empty">Inga rutiner än.</p>`);
       return;
     }
     const active = overview.routines.map(r => {
       known.set(r.id, r);
       if (r.today) remember(r.today);
-      const when = [repeatLabel(r.repeat), r.time && `kl ${r.time}`, r.minutes && `${r.minutes} min`].filter(Boolean).join(' · ');
-      return `<div class="item-row ${r.today?.done ? 'done' : ''}">
+      const when = [repeatLabel(r.repeat), r.time, r.minutes && `${r.minutes} min`].filter(Boolean).join(' · ');
+      return `<div class="item-row ${r.today?.done ? 'done' : ''}" data-key="r${Number(r.id)}" style="--dot:var(--cat-routine)">
         ${r.today ? checkHtml(r.today) : offDayCheck(r)}
         <button class="item-info" aria-label="Ändra ${esc(r.name)}" onclick="openEdit(${Number(r.id)}, ${r.today ? `'${esc(r.today.date)}'` : 'null'})">
           <span class="item-top">
@@ -1194,61 +1776,84 @@
     }).join('');
     const ended = overview.ended.map(r => {
       known.set(r.id, r);
-      return `<div class="item-row">
+      return `<div class="item-row" data-key="r${Number(r.id)}">
         <button class="item-info" style="padding-left:12px" aria-label="Ändra ${esc(r.name)}" onclick="openEdit(${Number(r.id)}, null)">
           <span class="item-name">${esc(r.name)}</span>
           <span class="item-meta">Klar ${esc(fmtDay(r.repeat.until))}: ${Number(r.sessionsDone)} av ${Number(r.sessions)} pass</span>
         </button>
       </div>`;
     }).join('');
-    el.innerHTML = active + (ended ? `<p class="list-label" style="padding-left:0">Avslutade</p>${ended}` : '');
+    patch(el, active + (ended ? `<p class="list-label" style="padding-left:12px">Avslutade</p>${ended}` : ''));
   }
 
   function renderTodos() {
     const el = document.getElementById('list-todos');
     const sub = document.getElementById('hdr-todos-sub');
-    if (loadError) { el.innerHTML = errorHtml(); return; }
+    if (loadError) { patch(el, errorHtml()); return; }
     if (!overview) return;
     const { open, done } = overview.todos;
     const late = open.filter(o => o.overdue);
     const rest = open.filter(o => !o.overdue);
-    sub.textContent = open.length ? `${open.length} kvar${late.length ? `, ${late.length} försenad${late.length > 1 ? 'e' : ''}` : ''}` : 'Allt är gjort';
+    sub.textContent = open.length ? `${open.length} kvar${late.length ? ` · ${late.length} försenad${late.length > 1 ? 'e' : ''}` : ''}` : '';
     const section = (title, list) => list.length
       ? `${title ? `<p class="list-label">${title}</p>` : ''}<div class="list">${list.map(o => rowHtml({ ...o, date: o.done ? o.date : today() }, { editDate: null, showDeadline: true })).join('')}</div>`
       : '';
-    el.innerHTML = (open.length || done.length)
+    patch(el, (open.length || done.length)
       ? section(late.length ? 'Försenade' : '', late) + section(late.length ? 'Kommande' : '', rest) + section('Klara', done)
-      : `<p class="empty">Inget att göra. Lägg till något med en deadline, så syns det här tills det är klart.</p>`;
+      : `<p class="empty">Inget att göra.</p>`);
   }
 
   function renderHobbies() {
     const el = document.getElementById('list-hobbies');
     const bonus = document.getElementById('list-bonus');
-    if (loadError) { el.innerHTML = errorHtml(); bonus.innerHTML = ''; return; }
+    if (loadError) { patch(el, errorHtml()); patch(bonus, ''); return; }
     if (!overview) return;
-    el.innerHTML = overview.hobbies.length
+    patch(el, overview.hobbies.length
       ? overview.hobbies.map(h => {
         const p = h.progress;
         return `<article class="hobby-card">
           <div class="hobby-head"><h2>${esc(h.name)}</h2><span class="streak">${streakText(p.streak)}</span></div>
-          <p class="hobby-sub">Den här veckan: ${p.weekDone} av ${p.weekPlanned} pass${p.weekMinutes ? `, ${p.weekMinutes} min` : ''}</p>
+          <p class="hobby-sub">${p.weekDone} av ${p.weekPlanned} pass${p.weekMinutes ? ` · ${p.weekMinutes} min` : ''}</p>
           ${dotsHtml(p, '--cat-hobby')}
           ${h.next ? `<div class="hobby-next">${rowHtml(h.next, { showDate: true })}</div>` : ''}
-          ${h.offDay ? `<div class="hobby-next"><div class="item-row">${offDayCheck(h.offDay)}<span class="item-info"><span class="item-meta">Gjorde det idag ändå</span></span></div></div>` : ''}
+          ${h.offDay ? `<div class="hobby-next"><div class="item-row" data-key="h${Number(h.offDay.id)}" style="--dot:var(--cat-hobby)">${offDayCheck(h.offDay)}<span class="item-info"><span class="item-meta">Gjorde det idag ändå</span></span></div></div>` : ''}
         </article>`;
       }).join('')
-      : `<p class="empty" style="padding-left:0">Ingen hobby än. Lägg in det du vill bli bättre på, så ser du här om du håller i det.</p>`;
-    bonus.innerHTML = overview.bonus.length
+      : `<p class="empty" style="padding-left:0">Ingen hobby än.</p>`);
+    patch(bonus, overview.bonus.length
       ? overview.bonus.map(o => rowHtml(o)).join('')
-      : `<p class="empty" style="padding:0 0 10px">Inget idag. Testa en promenad eller ett glas vatten.</p>`;
+      : `<p class="empty" style="padding:0 6px 10px">Inget idag.</p>`);
   }
 
   // ===== BOCKA AV =====
-  function chargeAnimation() {
-    const card = document.getElementById('battery-card-element');
-    card.classList.remove('charging');
-    void card.offsetWidth;
-    card.classList.add('charging');
+  function ringInView() {
+    if (activeScreen !== 'screen-home' || homeView !== 'day') return false;
+    const r = document.getElementById('ring').getBoundingClientRect();
+    return r.bottom > document.querySelector('.screen-container').getBoundingClientRect().top + 40;
+  }
+
+  // En liten komet från bocken till slutet av kategorins båge. Syns inte ringen säger ön vad som hände.
+  function flyToRing(btn) {
+    const color = getComputedStyle(btn).getPropertyValue('--dot');
+    if (calm.matches || !ringInView()) return;
+    const device = document.getElementById('device').getBoundingClientRect();
+    const from = btn.getBoundingClientRect();
+    const to = ringPoint(btn.dataset.cat);
+    const x0 = from.left + from.width / 2 - device.left, y0 = from.top + from.height / 2 - device.top;
+    const x1 = to.x - device.left, y1 = to.y - device.top;
+    renderHeldUntil = performance.now() + 520; // nivån stiger när färgen når fram, inte före
+    [1, 0.7, 0.45].forEach((size, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'fly';
+      dot.style.setProperty('--c', color);
+      document.getElementById('device').appendChild(dot);
+      const flight = dot.animate([
+        { transform: `translate(${x0}px, ${y0}px) scale(${0.6 * size})`, opacity: 0.4 },
+        { transform: `translate(${(x0 + x1) / 2 + 34}px, ${(y0 + y1) / 2 - 18}px) scale(${1.1 * size})`, opacity: 1, offset: 0.5 },
+        { transform: `translate(${x1}px, ${y1}px) scale(${0.5 * size})`, opacity: 1 }
+      ], { duration: 440, delay: i * 36, fill: 'backwards', easing: 'cubic-bezier(.45,0,.3,1)' });
+      flight.onfinish = () => { dot.remove(); if (i === 0) ringPulse(color); };
+    });
   }
 
   // Optimistisk uppdatering: UI ändras direkt, servern sparar i bakgrunden.
@@ -1261,12 +1866,26 @@
     const done = !row.classList.contains('done');
     row.classList.toggle('done', done);
     btn.setAttribute('aria-checked', done);
+    if (done) {
+      const color = getComputedStyle(btn).getPropertyValue('--dot');
+      play(btn.querySelector('.check-dot'), {
+        transform: ['scale(.7)', 'scale(1.18)', 'scale(1)'],
+        boxShadow: [`0 0 0 0 ${color}`, '0 0 0 12px transparent']
+      }, { duration: 420 });
+      flyToRing(btn);
+      navigator.vibrate?.(10);
+    }
     try {
       const { battery, gained, covered } = await api.setDone(id, date, done);
       if (done) {
-        chargeAnimation();
-        const swap = covered ? ` Räknas som passet ${dayWord(covered).toLowerCase()}.` : '';
-        toast(`${gained > 0 ? `+${gained} %.` : 'Klart!'} ${leftWords(battery).val}.${swap}`);
+        const swap = covered ? ` · passet ${dayWord(covered).toLowerCase()}` : '';
+        toast(`${gained > 0 ? `+${gained} %` : 'Klart'}${swap}`, {
+          label: 'Ångra',
+          run: async () => {
+            await api.setDone(id, date, false).catch(err => toast('Kunde inte ångra: ' + err.message, { error: true }));
+            refresh();
+          }
+        });
       }
     } catch (e) {
       row.classList.toggle('done', !done); // rulla tillbaka om servern misslyckas
@@ -1301,23 +1920,86 @@
 
   function renderBattery(b, next) {
     const words = leftWords(b);
-    document.getElementById('total-battery-pct').textContent = b.level;
-    document.getElementById('battery-time-left').textContent = words.val;
-    document.getElementById('battery-time-lab').textContent = words.lab;
-    for (const t of ['routine', 'todo', 'hobby', 'bonus']) {
-      document.getElementById(`seg-${t}`).style.flexBasis = `${b.byType[t]}%`;
-      document.getElementById(`leg-${t}`).textContent = b.byType[t];
-    }
+    const first = !document.getElementById('battery-time-left').textContent;
+    swapText(document.getElementById('battery-time-left'), words.val);
+    swapText(document.getElementById('battery-time-lab'), words.lab);
+    if (first) cascade(document.querySelectorAll('.t-val, .t-lab, .hero-cat'), { x: -8, y: 0, gap: 40, delay: 120 });
+    for (const t of CATS) document.getElementById(`bat-${t}`).textContent = b.byType[t];
+    setRing(b, first);
     let state;
     if (next) state = `Nästa: ${next.name}${next.time ? ` kl ${next.time}` : ''} ger +${next.charge} %`;
     else if (day?.todayTotal) state = 'Allt klart för idag. Bra jobbat!';
     else state = 'Inget planerat idag.';
-    document.getElementById('battery-state-text').textContent = state;
     document.getElementById('battery-card-element').setAttribute('aria-label', `Batteri ${b.level} procent. ${words.val} ${words.lab}. ${state}. Visa hur batteriet funkar.`);
   }
 
+  // ===== RINGEN: en båge per kategori i samma ordning som i batteriet, en procent är en procent av varvet =====
+  const RING_GAP = 1; // mellanrum mellan bågarna, i procent av varvet
+  const RING_CAP = 1.4; // de runda ändarna sticker ut så här långt
+  const ringSegs = Object.fromEntries(CATS.map(t => [t, new Spring(0, { damping: 0.9, response: 0.7, onUpdate: () => drawRing() })]));
+  const ringKick = new Spring(0, { damping: 0.42, response: 0.5, onUpdate: k => { document.getElementById('ring').style.transform = `scale(${1 + k * 0.001})`; } });
+
+  function drawRing() {
+    let at = 0;
+    for (const t of CATS) {
+      const value = Math.max(0, ringSegs[t].value);
+      const length = Math.max(0.01, value - RING_GAP - 2 * RING_CAP); // små bågar blir en rund prick
+      const seg = document.getElementById(`seg-${t}`);
+      seg.style.strokeDasharray = `${length} 100`;
+      seg.style.strokeDashoffset = -(at + (value - length) / 2);
+      seg.style.opacity = value < 0.3 ? 0 : 1;
+      document.getElementById(`leg-${t}`).textContent = Math.round(value);
+      at += value;
+    }
+    document.getElementById('ring-val').textContent = Math.round(at);
+  }
+
+  // Vid start ritas ringen långsamt, efter det är den snabb.
+  function setRing(b, first) {
+    const response = first ? 1.1 : 0.7;
+    for (const t of CATS) ringSegs[t].to(b.byType[t], { response });
+  }
+
+  // Var på skärmen kategorins båge slutar.
+  function ringPoint(cat) {
+    const ends = CATS.slice(0, CATS.indexOf(cat) + 1).reduce((sum, t) => sum + ringSegs[t].value, 0);
+    const r = document.getElementById('ring').getBoundingClientRect();
+    const angle = (ends / 100) * 2 * Math.PI;
+    const radius = (86 / 200) * r.width;
+    return { x: r.left + r.width / 2 + Math.sin(angle) * radius, y: r.top + r.height / 2 - Math.cos(angle) * radius };
+  }
+
+  // Ringen tar emot laddningen: en liten stöt och en våg som går ut från den.
+  function ringPulse(color) {
+    if (calm.matches) return;
+    ringKick.velocity += 700;
+    ringKick.to(0);
+    const halo = document.getElementById('ring-halo');
+    halo.style.stroke = color;
+    play(halo, { transform: ['scale(1)', 'scale(1.16)'], opacity: [0.55, 0] }, { duration: 620 });
+  }
+
+  const radarSpring = new Spring(0, { damping: 0.78, response: 0.55, onUpdate: () => drawRadar() });
+  let radarData = null;
+
   function renderRadar(b) {
-    const v = k => (b[k] ?? 0) / 100;
+    radarData = b;
+    radarSpring.stop();
+    radarSpring.value = 0;
+    radarSpring.to(1);
+    drawRadar();
+    const label = k => (b[k] === null ? '–' : `${b[k]}%`);
+    for (const k of CATS) {
+      document.getElementById(`radar-lbl-${k}`).textContent = label(k);
+      document.getElementById(`node-${k}`).style.display = b[k] === null ? 'none' : ''; // ingen plan, inget värde att visa
+    }
+    document.getElementById('balance-svg').setAttribute('aria-label',
+      `Livsbalans senaste 7 dagarna: rutiner ${label('routine')}, att göra ${label('todo')}, hobby ${label('hobby')}, bonus ${label('bonus')}`);
+  }
+
+  function drawRadar() {
+    const b = radarData;
+    const v = k => (b[k] ?? 0) / 100 * Math.max(0, radarSpring.value);
     const ry = 125 - v('routine') * 80;
     const tx = 140 + v('todo') * 88;
     const hy = 125 + v('hobby') * 80;
@@ -1327,42 +2009,71 @@
     document.getElementById('node-todo').setAttribute('cx', tx);
     document.getElementById('node-hobby').setAttribute('cy', hy);
     document.getElementById('node-bonus').setAttribute('cx', bx);
-    const label = k => (b[k] === null ? '–' : `${b[k]}%`);
-    for (const k of ['routine', 'todo', 'hobby', 'bonus']) document.getElementById(`radar-lbl-${k}`).textContent = label(k);
-    document.getElementById('balance-svg').setAttribute('aria-label',
-      `Livsbalans senaste 7 dagarna: rutiner ${label('routine')}, att göra ${label('todo')}, hobby ${label('hobby')}, bonus ${label('bonus')}`);
   }
 
   function openBatterySheet() {
     const rate = day?.battery.drainPerHour ?? 1;
     const fullDays = Math.round(100 / rate / 24);
-    const words = day ? leftWords(day.battery) : null;
     document.getElementById('battery-explain').innerHTML =
-      `Batteriet visar <b>hur bra du håller din egen plan</b>, inte hur du mår. Varje sak du bockar av laddar det med sin del av veckans plan, och längre pass väger mer. ` +
-      `Stor eller liten plan spelar ingen roll: håller du den laddas det snabbare än det sjunker. ` +
-      `Det <b>sjunker ${String(rate).replace('.', ',')} % i timmen</b>, så fullt batteri räcker ungefär ${fullDays} dygn. Tomt betyder bara att det var ett tag sedan, inget händer.` +
-      (words && day.battery.level ? ` Just nu: <b>${esc(words.val.toLowerCase())} ${esc(words.lab)}</b>.` : '');
-    if (overview) renderRadar(overview.balance);
+      `Visar <b>hur du håller din plan</b>, inte hur du mår. Längre pass laddar mer. Sjunker ${String(rate).replace('.', ',')} % i timmen, fullt räcker ca ${fullDays} dygn.`;
     showSheet('battery-modal');
+    if (overview) renderRadar(overview.balance);
   }
 
   // ===== ARK: fokus stannar i arket, Escape stänger och fokus går tillbaka efteråt =====
   let openSheetEl = null;
   let returnFocus = null;
 
-  function showSheet(id, focusId) {
-    openSheetEl = document.getElementById(id);
-    returnFocus = document.activeElement;
-    openSheetEl.classList.add('active');
-    const target = focusId ? document.getElementById(focusId) : openSheetEl.querySelector('button, input');
-    target?.focus();
+  // Varje ark har sin fjäder: öppnas det igen medan det stängs vänder det från där det är.
+  const sheetSprings = new Map();
+  function sheetSpring(overlay) {
+    if (!sheetSprings.has(overlay)) {
+      const sheet = overlay.querySelector('.modal-sheet');
+      sheetSprings.set(overlay, new Spring(1000, {
+        onUpdate: y => {
+          const p = Math.max(0, Math.min(1, 1 - y / (sheet.offsetHeight || 1)));
+          sheet.style.transform = `translateY(${y}px)`;
+          overlay.style.setProperty('--p', p);
+          if (!overlay.dataset.nested) document.getElementById('device').style.setProperty('--sheet', p);
+        }
+      }));
+    }
+    return sheetSprings.get(overlay);
   }
 
-  function closeSheet(force) {
+  // Kalendern kan öppnas ovanpå formuläret: det undre arket väntar och tar över när den stängs.
+  const sheetStack = [];
+
+  function showSheet(id, focusId) {
+    const next = document.getElementById(id);
+    if (openSheetEl && openSheetEl !== next) sheetStack.push({ el: openSheetEl, focus: returnFocus });
+    if (sheetStack.length) next.dataset.nested = '1'; else delete next.dataset.nested;
+    openSheetEl = next;
+    returnFocus = document.activeElement;
+    const spring = sheetSpring(openSheetEl);
+    if (!openSheetEl.classList.contains('active')) {
+      openSheetEl.classList.add('active');
+      spring.value = spring.target = openSheetEl.querySelector('.modal-sheet').offsetHeight;
+      spring.velocity = 0;
+      const parts = [...openSheetEl.querySelector('.modal-sheet').children].filter(el => !el.matches('.sheet-grip') && el.offsetParent);
+      cascade(parts, { y: 16, gap: 26, delay: 70 });
+    }
+    spring.to(0, { damping: 0.92, response: 0.38 });
+    const target = focusId ? document.getElementById(focusId) : openSheetEl.querySelector('button, input');
+    target?.focus({ preventScroll: true });
+  }
+
+  function closeSheet(force, velocity = 0) {
     if (!openSheetEl || (openSheetEl.dataset.locked && !force)) return;
-    openSheetEl.classList.remove('active');
-    openSheetEl = null;
-    returnFocus?.focus?.();
+    const overlay = openSheetEl;
+    const under = sheetStack.pop();
+    openSheetEl = under?.el ?? null;
+    sheetSpring(overlay).to(overlay.querySelector('.modal-sheet').offsetHeight, {
+      velocity, damping: 1, response: 0.3,
+      onRest: () => overlay.classList.remove('active')
+    });
+    returnFocus?.focus?.({ preventScroll: true });
+    returnFocus = under?.focus ?? null;
   }
 
   function closeSheetOnOverlay(e) { if (e.target.classList.contains('modal-overlay')) closeSheet(); }
@@ -1371,18 +2082,96 @@
     if (!openSheetEl) return;
     if (e.key === 'Escape') return closeSheet();
     if (e.key !== 'Tab') return;
-    const focusable = [...openSheetEl.querySelectorAll('button, input, textarea')].filter(el => !el.disabled && el.offsetParent !== null);
+    const focusable = [...openSheetEl.querySelectorAll('button, input, textarea, [tabindex="0"]')].filter(el => !el.disabled && el.offsetParent !== null);
     const first = focusable[0], last = focusable.at(-1);
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
 
+  // ===== GESTER: allt här går också med vanliga knappar =====
+  function initGestures() {
+    window.addEventListener('resize', () => moveTabIndicator(true));
+    initDial();
+
+    // Svep kalendern för att byta månad.
+    document.getElementById('cal-grid').addEventListener('pointerdown', e => {
+      if (e.button) return;
+      drag(e, { axis: 'x', move() {}, end(d, velocity, cancelled) {
+        if (!cancelled && Math.abs(d + project(velocity)) > 60) shiftMonth(d < 0 ? 1 : -1);
+      } });
+    });
+
+    // Svep en rad åt höger för att bocka av. Fingret bestämmer, släpper man med fart bakåt händer inget.
+    document.addEventListener('pointerdown', e => {
+      const row = e.target.closest('.item-row');
+      const check = row?.querySelector('.check-circle');
+      if (!check || e.button) return;
+      const tickable = !check.classList.contains('future');
+      const width = row.offsetWidth;
+      const spring = new Spring(0, { onUpdate: x => row.style.setProperty('--x', `${x}px`) });
+      drag(e, {
+        axis: 'x',
+        move(d) {
+          const x = d > 0 && tickable ? d : rubberband(d, width, 0.2);
+          spring.stop();
+          spring.value = x;
+          spring.onUpdate(x);
+        },
+        end(d, velocity, cancelled) {
+          const commit = tickable && !cancelled && velocity >= 0 && d + project(velocity) > width * 0.45;
+          renderHeldUntil = Math.max(renderHeldUntil, performance.now() + 420);
+          if (commit) check.click();
+          spring.to(0, { velocity, damping: 0.85, response: 0.32 });
+        }
+      });
+    });
+
+    // Svep veckoremsan för att byta vecka.
+    const wrap = document.getElementById('week-wrap');
+    const stripDrag = new Spring(0, { damping: 0.85, response: 0.32, onUpdate: x => { wrap.style.transform = `translateX(${x}px)`; } });
+    wrap.addEventListener('pointerdown', e => {
+      if (e.button) return;
+      drag(e, {
+        axis: 'x',
+        move(d) { stripDrag.stop(); stripDrag.value = rubberband(d, wrap.offsetWidth, 0.7); stripDrag.onUpdate(stripDrag.value); },
+        end(d, velocity, cancelled) {
+          const landing = d + project(velocity);
+          if (!cancelled && Math.abs(landing) > wrap.offsetWidth * 0.3 && Math.sign(velocity || d) === Math.sign(landing)) shiftWeek(landing < 0 ? 1 : -1);
+          stripDrag.to(0, { velocity });
+        }
+      });
+    });
+
+    // Dra ner ett ark i greppet. Farten avgör om det stängs, och den följer med in i rörelsen.
+    document.addEventListener('pointerdown', e => {
+      const grip = e.target.closest('.sheet-grip');
+      if (!grip || e.button || e.target.closest('button')) return;
+      const overlay = grip.closest('.modal-overlay');
+      const sheet = overlay.querySelector('.modal-sheet');
+      const spring = sheetSpring(overlay);
+      const from = spring.value;
+      drag(e, {
+        axis: 'y',
+        move(d) {
+          const y = from + d;
+          spring.stop();
+          spring.value = y > 0 && !overlay.dataset.locked ? y : rubberband(y, sheet.offsetHeight, 0.35);
+          spring.onUpdate(spring.value);
+        },
+        end(d, velocity) {
+          if (!overlay.dataset.locked && velocity >= 0 && spring.value + project(velocity) > sheet.offsetHeight * 0.5) closeSheet(false, velocity);
+          else spring.to(0, { velocity, damping: 0.8, response: 0.3 });
+        }
+      });
+    });
+  }
+
   // ===== LÄGG TILL / ÄNDRA: samma formulär, fälten följer vad som läggs till =====
   const FORM = {
-    routine: { placeholder: 't.ex. Gym', hint: 'Något du vill göra regelbundet, som träning eller stretch.' },
-    todo: { placeholder: 't.ex. Lämna in uppsats', hint: 'Något som ska bli klart, det följer med tills du bockat av det. Med klockslag blir det en tid att passa, som tandläkaren.' },
-    hobby: { placeholder: 't.ex. Gitarr', hint: 'Det du vill bli bättre på. Under Hobby ser du om du håller i det.' },
-    bonus: { placeholder: 't.ex. Promenad', hint: 'Något litet som ger lite extra energi.' }
+    routine: { placeholder: 'Gym' },
+    todo: { placeholder: 'Lämna in uppsats' },
+    hobby: { placeholder: 'Gitarr' },
+    bonus: { placeholder: 'Promenad' }
   };
 
   let form = { type: 'routine', repeating: true, days: [], prio: 'Medium', editing: null, occurrence: null };
@@ -1402,11 +2191,10 @@
 
   function syncForm() {
     const repeating = isRepeating();
-    const { placeholder, hint } = FORM[form.type];
+    const { placeholder } = FORM[form.type];
     document.querySelectorAll('.type-btn').forEach(b => b.setAttribute('aria-pressed', b.dataset.type === form.type));
     field('type-group').hidden = Boolean(form.editing);
-    field('type-hint').textContent = hint;
-    field('type-hint').hidden = Boolean(form.editing);
+    field('item-form').style.setProperty('--c', `var(--cat-${form.type})`);
     field('input-title').placeholder = placeholder;
     field('group-freq').hidden = form.type === 'routine' || form.type === 'todo';
     field('freq-once').setAttribute('aria-pressed', !repeating);
@@ -1450,11 +2238,11 @@
   function fillForm(values) {
     field('input-title').value = values.name ?? '';
     field('input-desc').value = values.desc ?? '';
-    field('input-time').value = values.time ?? '';
+    setTimeField(values.time);
     field('input-minutes').value = values.minutes ?? '';
-    field('input-date').value = values.date;
-    field('input-from').value = values.from;
-    field('input-until').value = values.until ?? '';
+    setDateField('input-date', values.date);
+    setDateField('input-from', values.from);
+    setDateField('input-until', values.until);
     field('input-period').checked = Boolean(values.until);
     field('session-box').hidden = true;
     field('edit-scope').hidden = true;
@@ -1505,7 +2293,7 @@
 
   function showMove() {
     field('move-row').hidden = false;
-    field('input-move').value = shiftDate(form.occurrence, 1);
+    setDateField('input-move', shiftDate(form.occurrence, 1));
     field('input-move').focus();
   }
 
@@ -1578,7 +2366,7 @@
     // Hamnar det på en annan dag än den som visas ska det inte se ut som att inget hände.
     const where = item.repeat ? repeatLabel(item.repeat) : dayWord(item.date).toLowerCase();
     const elsewhere = !item.repeat && activeScreen === 'screen-home' && item.date !== activeDate;
-    toast(`Sparat: ${item.name}, ${where}`, elsewhere ? { label: 'Visa', run: () => openDay(item.date) } : {});
+    toast(`${item.name} · ${where}`, elsewhere ? { label: 'Visa', run: () => openDay(item.date) } : {});
   }
 
   function renderDeleteArea(step) {
@@ -1614,6 +2402,17 @@
 
   // ===== TOAST: kort besked där man är =====
   let toastTimer = null;
+  const toastSpring = new Spring(0, { damping: 0.74, response: 0.42, onUpdate: p => {
+    const el = document.getElementById('toast');
+    el.style.opacity = Math.min(1, Math.max(0, p * 1.6));
+    el.style.transform = `translateX(-50%) scale(${0.5 + 0.5 * p})`;
+  } });
+
+  function hideToast() {
+    document.getElementById('toast').classList.remove('show');
+    toastSpring.to(0, { damping: 1, response: 0.28 });
+  }
+
   function toast(message, { label, run, error } = {}) {
     const el = document.getElementById('toast');
     el.textContent = message;
@@ -1621,12 +2420,13 @@
     if (label) {
       const btn = document.createElement('button');
       btn.textContent = label;
-      btn.onclick = () => { el.classList.remove('show'); run(); };
+      btn.onclick = () => { hideToast(); run(); };
       el.appendChild(btn);
     }
     el.classList.add('show');
+    toastSpring.to(1, { damping: 0.74, response: 0.42 });
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), label ? 6000 : 3500);
+    toastTimer = setTimeout(hideToast, label ? 5000 : 2800);
   }
 
   // ===== DREAM AI: riktig agent via /api/chat. Samtalet ligger på servern =====
@@ -1674,16 +2474,45 @@
     }
     chatBody.appendChild(wrap);
     scrollChat();
+    return wrap;
   }
 
   function renderChat(messages) {
     document.getElementById('ai-chat-body').innerHTML = '';
-    const name = profile?.name ? ` ${profile.name}` : '';
-    addBubble('assistant', `Hej${name}! Jag är Dream AI. Be mig lägga in saker, bocka av det du gjort eller göra en hobbyplan åt dig.`);
+    document.getElementById('btn-new-chat').hidden = !messages.length;
+    if (!messages.length) {
+      const empty = document.createElement('div');
+      empty.className = 'ai-empty';
+      empty.id = 'ai-empty';
+      document.getElementById('ai-chat-body').appendChild(empty);
+      renderSuggestions(true);
+    }
     for (const m of messages) {
       addActionCards(m.actions);
       addBubble(m.role, m.content);
     }
+  }
+
+  // Förslagen utgår från hur dagen ser ut just nu, så att första frågan bara är ett tryck bort.
+  function suggestions() {
+    const list = [];
+    if (day?.next) list.push(`Flytta ${day.next.name} till imorgon`);
+    const hobby = overview?.hobbies[0];
+    list.push(hobby ? `Gör en veckoplan för ${hobby.name.toLowerCase()}` : 'Hjälp mig planera veckan');
+    list.push('Hur går det den här veckan?');
+    return list;
+  }
+
+  function renderSuggestions(force) {
+    const empty = document.getElementById('ai-empty');
+    if (!empty) return;
+    const html = `<h2>${profile?.name ? `Hej ${esc(profile.name)}` : 'Hej'}</h2>` + suggestions().map(s => `<button class="suggest" onclick="askAi(this.textContent)">${esc(s)}</button>`).join('');
+    if (force || empty.dataset.html !== html) { empty.innerHTML = html; empty.dataset.html = html; }
+  }
+
+  function askAi(text) {
+    document.getElementById('ai-input').value = text;
+    sendAiMsg();
   }
 
   async function loadChat() {
@@ -1702,17 +2531,21 @@
     if (!text || aiBusy) return;
     aiBusy = true;
     input.value = '';
-    addBubble('user', text);
+    document.getElementById('ai-empty')?.remove();
+    document.getElementById('btn-new-chat').hidden = false;
+    addBubble('user', text).classList.add('fresh');
 
-    const typing = addBubble('assistant', 'Dream AI tänker…');
-    typing.classList.add('typing');
+    const typing = addBubble('assistant', '');
+    typing.classList.add('typing', 'fresh');
+    typing.setAttribute('aria-label', 'Dream AI tänker');
+    typing.innerHTML = '<i></i><i></i><i></i>';
 
     try {
       const { reply, actions } = await api.chat(text);
       typing.remove();
-      addActionCards(actions); // korten först: det är svaret man ska läsa sist
-      addBubble('assistant', reply);
-      if (actions?.length) { chargeAnimation(); refresh(); } // live-uppdatera batteri och listor
+      cascade(addActionCards(actions)?.children ?? [], { y: 8 }); // korten först: det är svaret man ska läsa sist
+      addBubble('assistant', reply).classList.add('fresh');
+      if (actions?.length) refresh(); // live-uppdatera batteri och listor
     } catch (e) {
       typing.remove();
       addBubble('assistant', 'Oj, något gick fel: ' + e.message);

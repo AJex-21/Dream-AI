@@ -130,3 +130,25 @@ Duschen gick 4/4 redan med engelska namn ("Cold Shower"), så det var promptänd
 - Livsbalans-radarn är kvar, eftersom den kommer från del 1, men flyttad från hemskärmen till batteriets förklaring. Det andra testet tyckte att den tillför lite. Det är ett designval för gruppen.
 - Inga riktiga telefoner eller skärmläsare är testade.
 
+
+## Iteration: ny design, Skymning (2026-11-02)
+
+Målet var en modernare design med så lite text som möjligt. Logiken och servern är orörda, bara `public/index.html` ändrades.
+
+**17. Batteriet är en kula med lager i kategorifärgerna, inte en stapel.** Alternativet var att behålla procenttalet ensamt. Kulan visar både hur mycket som är laddat och vad det kommer från, utan förklarande text. Paletten går från hav till sol och kontrollerades för färgblindhet med ett skript. I mörkt läge ligger färgerna något ljusare än skriptets rekommenderade band, vilket jag behöll eftersom de ska lysa mot mörk bakgrund. Färg bär aldrig betydelsen ensam, varje kategori har också en ikon.
+
+**18. Ljust och mörkt läge följer telefonens inställning.** Innan fanns bara mörkt.
+
+**19. Rörelse med fjädrar som går att avbryta, utan bibliotek.** Ark dras ned för att stängas och en rad sveps åt höger för att bockas av. Det är en genväg, ringen fungerar fortfarande. Med "minska rörelse" i telefonen stängs animationerna av.
+
+**20. Rubriken i veckovyn blev "v. 45".** "Vecka 45" fick inte plats bredvid pilarna och reglaget Dag/Vecka, så raden bröts och reglaget hoppade mellan vyerna. Knappen tillbaka till idag ligger nu under rubriken, av samma skäl.
+
+**21. Kulan blev en ring med en båge per kategori.** Ersätter kulan i beslut 17. En blank kula med vätska stack ut i en design som annars är platt och byggd av tunna ringar, och färgerna flöt ihop. Ringen använder samma form som bockarna och tidslinjen, och bågarnas längd går att jämföra direkt. Jämfört med kulan försvann också animationen som ritade om vågen varje bildruta. Ringen rör sig bara när något händer, vilket sparar på telefonens batteri.
+
+**22. Rörelsen har regissör: varje animation visar vad som hände.** Kategorins färg flyger till slutet av sin båge, ringen tar emot stöten och bågen växer. Listor kommer in en rad i taget och från det håll man bläddrade. Alternativet var ett animationsbibliotek, men det behövdes inte eftersom fjädrarna från beslut 19 redan fanns. Allt går via samma funktion så att "minska rörelse" stänger av det, och siffrorna stämmer även utan animation.
+
+**23. Egen kalender i stället för webbläsarens.** Webbläsarens datumruta går inte att styla och såg gammal ut bredvid resten. Kalendern är ett ark som följer kategorins färg och öppnas ovanpå formuläret, och samma ark används av kalenderknappen på Idag. Den har inga fler funktioner än den gamla, bara genvägarna Idag och Imorgon. För uppgifter går det inte att välja ett datum som redan varit. 
+
+**24. Tiden väljs på en klocka som snurras.** Först blev tiden rutor för timme och minut i samma layout som kalendern, men det kändes som ett formulär och togs bort. Nu är det två ringar i batteriets stil, timmar innanför och minuter utanför. Hela klockan är ett enda tal, minuter sedan midnatt, så ringarna hänger ihop som visarna på en riktig klocka. En svepning fortsätter snurra och landar med fjäder: snabbt på jämna fem minuter, lugnt på exakt minut, så att 18:07 fortfarande går. Tiden är valfri, därför finns knappen "Ingen tid". Piltangenter fungerar också.
+
+**Hittat när designen kördes i riktig webbläsare, inte i koden.** Rubriken ovan, ett tomt svepfält utan bock, en prick mitt i radarn för kategorier utan data, flikar som nådde kanten på 320 px och datumet som stod två gånger på andra dagar än idag.
