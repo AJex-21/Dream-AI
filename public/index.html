@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="dark" />
-<title>Pulse — Multi-Date Engine & Dream AI</title>
+<title>Pulse</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,8 +19,8 @@
     --border:rgba(255,255,255,.08);
     --border-strong:rgba(255,255,255,.14);
     --text-1:#f5f7fb;
-    --text-2:#9ca6c2;
-    --text-3:#67718c;
+    --text-2:#a7b0ca;
+    --text-3:#8b95b0;
 
     --cat-routine:#00e6a0;
     --cat-routine-dim:rgba(0,230,160,.14);
@@ -31,9 +31,9 @@
     --cat-bonus:#ffd23f;
     --cat-bonus-dim:rgba(255,210,63,.14);
 
-    --prio-high:#ff4d4d;
+    --prio-high:#ff6b6b;
     --prio-med:#ffb800;
-    --prio-low:#3b82f6;
+    --prio-low:#6aa6ff;
 
     --ai-purple:#a855f7;
     --ai-purple-dim:rgba(168,85,247,0.15);
@@ -43,7 +43,10 @@
     --font-b:'Inter',sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
+  [hidden]{display:none !important;}
   button, input, select, textarea{font-family:inherit;border:none;background:none;color:inherit;}
+  button{cursor:pointer;}
+  :focus-visible{outline:2px solid var(--cat-routine);outline-offset:2px;}
   html,body{min-height:100%;}
   body{
     background:var(--bg-page);
@@ -52,13 +55,16 @@
     display:flex;
     justify-content:center;
     align-items:center;
+    min-height:100vh;
+    min-height:100dvh;
     padding:20px 0;
   }
 
-  /* DEVICE FRAME */
+  /* DEVICE FRAME: telefonramen är bara till för datorskärm, se media query längst ner */
   .device{
     width:390px;
-    height:844px;
+    height:min(844px, calc(100vh - 40px));
+    height:min(844px, calc(100dvh - 40px));
     background:var(--bg-phone);
     border-radius:46px;
     border:1px solid var(--border-strong);
@@ -69,8 +75,7 @@
     position:relative;
   }
   .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:80px;height:22px;background:#000;border-radius:16px;z-index:30;}
-  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:38px 26px 6px;font-family:var(--font-d);font-size:13px;font-weight:600;flex-shrink:0;z-index:29;}
-  .statusbar .icons{display:flex;gap:5px;align-items:center;opacity:.9;}
+  .statusbar{padding:38px 26px 6px;font-family:var(--font-d);font-size:13px;font-weight:600;flex-shrink:0;z-index:29;}
 
   .screen-container{
     flex:1;
@@ -85,184 +90,163 @@
     display:none;
     flex-direction:column;
     overflow-y:auto;
-    padding-bottom:110px;
+    padding-bottom:170px;
     scrollbar-width:none;
   }
   .screen::-webkit-scrollbar{display:none;}
   .screen.active{display:flex;}
 
-  /* BRAND & FLEXIBLE DATE BAR */
-  .brandbar{display:flex;justify-content:space-between;align-items:center;padding:12px 22px 0;flex-shrink:0;}
-  .wordmark{font-family:var(--font-d);font-weight:700;font-size:16px;color:var(--cat-routine);letter-spacing:.02em;}
-  
-  .date-selector-wrap{
-    display:flex;
-    align-items:center;
-    background:var(--bg-surface);
-    border:1px solid var(--border);
-    padding:3px;
-    border-radius:var(--r-full);
-    gap:2px;
-  }
-  .date-btn{
-    padding:5px 10px;
-    font-size:11px;
-    font-weight:600;
-    border-radius:var(--r-full);
-    color:var(--text-3);
-    cursor:pointer;
-    transition:all 0.2s ease;
-  }
-  .date-btn.active{
-    background:var(--bg-surface-3);
-    color:var(--text-1);
-  }
-  .date-picker-icon-btn{
-    position:relative;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:26px;
-    height:26px;
-    border-radius:50%;
-    cursor:pointer;
-  }
-  .date-picker-icon-btn svg{width:14px;height:14px;stroke:var(--text-2);}
-  .date-picker-icon-btn input[type="date"]{
-    position:absolute;
-    inset:0;
-    opacity:0;
-    cursor:pointer;
-  }
+  /* BRAND */
+  .brandbar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 22px 14px;flex-shrink:0;}
+  .wordmark{font-family:var(--font-d);font-weight:700;font-size:14px;color:var(--cat-routine);letter-spacing:.02em;display:block;}
+  .hello{font-family:var(--font-d);font-size:22px;font-weight:600;margin-top:1px;overflow-wrap:anywhere;}
 
-  .hello{padding:14px 22px 10px;}
-  .hello h1{font-family:var(--font-d);font-size:22px;font-weight:600;}
-  .hello p{font-size:12.5px;color:var(--text-2);margin-top:2px;}
+  .seg-toggle{display:flex;align-items:center;background:var(--bg-surface);border:1px solid var(--border);padding:3px;border-radius:var(--r-full);gap:2px;flex-shrink:0;}
+  .seg-toggle button{min-height:36px;padding:0 14px;font-size:12.5px;font-weight:600;border-radius:var(--r-full);color:var(--text-2);transition:all 0.2s ease;}
+  .seg-toggle button[aria-pressed="true"]{background:var(--bg-surface-3);color:var(--text-1);}
+  .seg-toggle.wide button{flex:1;}
 
-  .screen-header{padding:16px 22px 14px;flex-shrink:0;}
+  .screen-header{padding:16px 22px 14px;flex-shrink:0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
   .title-group h1{font-family:var(--font-d);font-size:22px;font-weight:600;}
   .title-group p{font-size:12.5px;color:var(--text-2);margin-top:3px;}
 
   /* BATTERY CARD */
   .battery-card{
-    margin:0 22px 16px;
+    display:block;
+    width:calc(100% - 44px);
+    flex-shrink:0;
+    text-align:left;
+    margin:0 22px 14px;
     background:linear-gradient(180deg,var(--bg-surface-2),var(--bg-surface));
     border:1px solid var(--border);
     border-radius:var(--r-xl);
-    padding:20px;
+    padding:18px 20px;
     transition:box-shadow 0.3s ease, border-color 0.3s ease;
   }
-  .battery-card.charging{
-    animation:pulse-charge 0.8s ease;
-    border-color:var(--cat-routine);
-    box-shadow:0 0 20px rgba(0,230,160,0.25);
-  }
+  .battery-card.charging{animation:pulse-charge 0.8s ease;}
   @keyframes pulse-charge {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
+    0% { transform:scale(1); border-color:var(--border); }
+    50% { transform:scale(1.02); border-color:var(--cat-routine); box-shadow:0 0 20px rgba(0,230,160,0.25); }
+    100% { transform:scale(1); border-color:var(--border); }
   }
 
-  .battery-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:4px;}
+  .battery-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
   .battery-pct-wrap{display:flex;align-items:baseline;gap:2px;}
   .battery-pct{font-family:var(--font-d);font-size:42px;font-weight:700;line-height:1;}
-  .battery-pct .pct-sign{font-size:18px;font-weight:600;margin-left:1px;color:var(--text-2);}
-  .battery-timer{text-align:right;}
-  .battery-timer .t-val{font-family:var(--font-d);font-size:16px;font-weight:600;line-height:1.1;color:var(--cat-routine);}
-  .battery-timer .t-lab{font-size:10px;color:var(--text-3);margin-top:2px;}
-  .battery-state{font-size:12px;color:var(--text-2);margin-bottom:14px;}
-  
-  .segbar{position:relative;height:18px;border-radius:9px;background:var(--bg-surface-3);overflow:hidden;display:flex;gap:2px;padding:2px;}
-  .segbar .seg{height:100%;border-radius:6px;transition:all 0.5s ease-in-out;}
+  .pct-sign{font-size:18px;font-weight:600;margin-left:1px;color:var(--text-2);}
+  .battery-timer{text-align:right;min-width:0;}
+  .battery-timer .t-val{display:block;font-family:var(--font-d);font-size:16px;font-weight:600;line-height:1.2;color:var(--cat-routine);}
+  .battery-timer .t-lab{display:block;font-size:12px;color:var(--text-2);margin-top:2px;}
+  .battery-state{display:block;font-size:12.5px;color:var(--text-2);margin-top:12px;line-height:1.4;}
+
+  .segbar{height:14px;border-radius:7px;background:var(--bg-surface-3);overflow:hidden;display:flex;}
+  .segbar .seg{height:100%;flex:0 0 0;transition:flex-basis 0.5s ease-in-out;}
   .seg-routine{background:var(--cat-routine);}
   .seg-todo{background:var(--cat-todo);}
   .seg-hobby{background:var(--cat-hobby);}
   .seg-bonus{background:var(--cat-bonus);}
-  
-  .seg-legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;}
+
+  .seg-legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;}
   .seg-legend-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text-2);}
-  .seg-legend-item .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-  .seg-legend-item .dot.routine{background:var(--cat-routine);}
-  .seg-legend-item .dot.todo{background:var(--cat-todo);}
-  .seg-legend-item .dot.hobby{background:var(--cat-hobby);}
-  .seg-legend-item .dot.bonus{background:var(--cat-bonus);}
+  .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;}
+  .dot.routine{background:var(--cat-routine);}
+  .dot.todo{background:var(--cat-todo);}
+  .dot.hobby{background:var(--cat-hobby);}
+  .dot.bonus{background:var(--cat-bonus);}
   .seg-legend-item b{color:var(--text-1);font-weight:600;}
 
-  /* LIFE BALANCE RADAR CARD */
-  .balance-card{
-    margin:0 22px 18px;
-    background:var(--bg-surface);
-    border:1px solid var(--border);
-    border-radius:var(--r-xl);
-    padding:18px 18px 20px;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
-  .balance-header{display:flex;align-items:center;gap:12px;width:100%;}
-  .balance-header .ic{width:38px;height:38px;border-radius:12px;background:rgba(140,123,255,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .balance-header .ic svg{width:20px;height:20px;stroke:var(--cat-todo);}
-  .balance-header .body{flex:1;min-width:0;}
-  .balance-header h3{font-family:var(--font-d);font-size:16px;font-weight:600;}
-  .balance-header p{font-size:11.5px;color:var(--text-2);margin-top:1px;}
+  /* VECKOREMSA */
+  .date-row{display:flex;align-items:center;gap:2px;padding:0 12px;flex-shrink:0;}
+  .icon-btn{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-2);}
+  .icon-btn svg{width:18px;height:18px;stroke:currentColor;}
+  .week-strip{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:2px;min-width:0;}
+  .week-arrow{width:24px;height:52px;display:flex;align-items:center;justify-content:center;color:var(--text-3);flex-shrink:0;}
+  .week-arrow svg{width:16px;height:16px;stroke:currentColor;}
+  .day-cell{display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 0 6px;border-radius:12px;min-height:52px;color:var(--text-2);}
+  .dc-wd{font-size:10.5px;font-weight:500;}
+  .dc-num{font-family:var(--font-d);font-size:15px;font-weight:600;color:var(--text-1);}
+  .dc-bar{width:20px;height:3px;border-radius:2px;background:var(--bg-surface-3);overflow:hidden;margin-top:2px;}
+  .dc-bar span{display:block;height:100%;background:var(--cat-routine);}
+  .day-cell.today .dc-num{color:var(--cat-routine);}
+  .day-cell.active{background:var(--bg-surface-3);}
 
-  .balance-body{display:flex;flex-direction:column;align-items:center;width:100%;}
-  .balance-svg{width:100%;max-width:270px;height:auto;display:block;}
-  .balance-axis-label{font-family:var(--font-b);font-size:10px;font-weight:700;letter-spacing:0.05em;fill:var(--text-2);}
-  .balance-axis-pct{font-family:var(--font-d);font-size:11px;font-weight:700;}
-  .balance-grid-ring{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:1;}
-  .balance-spoke{stroke:rgba(255,255,255,0.08);stroke-width:1;}
-  .balance-fill{fill:rgba(140,123,255,0.22);stroke:var(--cat-todo);stroke-width:2;stroke-linejoin:round;transition:all 0.5s ease-in-out;}
-  .balance-node{stroke:var(--bg-surface);stroke-width:2;transition:all 0.5s ease-in-out;}
-
-  /* NAV CARDS */
-  .nav-cards{display:flex;flex-direction:column;gap:10px;padding:0 22px 22px;}
-  .nav-card{display:flex;align-items:center;gap:12px;width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;text-align:left;border-left:4px solid var(--accent,var(--border));cursor:pointer;}
-  .nav-card:active{transform:scale(0.98);background:var(--bg-surface-2);}
-  .nav-card .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .nav-card .ic svg{width:18px;height:18px;}
-  .nav-card .body{flex:1;min-width:0;}
-  .nav-card h3{font-family:var(--font-d);font-size:15px;font-weight:600;}
-  .nav-card p{font-size:12px;color:var(--text-2);margin-top:2px;}
-  .nav-card .chev{width:16px;height:16px;stroke:var(--text-3);flex-shrink:0;}
+  /* DAGEN */
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 22px 8px;}
+  .section-head h2{font-family:var(--font-d);font-size:16px;font-weight:600;}
+  .section-head .count{font-size:12px;color:var(--text-2);margin-top:1px;}
+  .section-tools{display:flex;align-items:center;gap:2px;flex-shrink:0;}
+  .link-btn{min-height:44px;padding:0 10px;font-size:12.5px;font-weight:600;color:var(--cat-routine);flex-shrink:0;}
+  .list-label{font-size:12px;font-weight:600;color:var(--text-2);padding:12px 22px 6px;}
+  .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+  .date-input-hidden{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;}
 
   /* LIST ITEMS */
-  .list{display:flex;flex-direction:column;gap:10px;padding:0 22px;}
-  .item-row{display:flex;gap:12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;align-items:flex-start;transition:border-color 0.2s, opacity 0.2s, transform 0.15s ease;}
-  .item-row:active{transform:scale(0.99);}
-  .check-circle{width:24px;height:24px;border-radius:50%;border:2px solid var(--dot, var(--cat-routine));display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;cursor:pointer;background:transparent;transition:all 0.2s ease;}
-  .check-circle svg{width:12px;height:12px;stroke:var(--bg-phone);stroke-width:3;display:none;}
-  .item-row.done{opacity:0.65;border-color:transparent;}
-  .item-row.done .check-circle{background:var(--dot, var(--cat-routine));}
-  .item-row.done .check-circle svg{display:block;}
-  .item-info{flex:1;min-width:0;}
+  .list{display:flex;flex-direction:column;gap:8px;padding:0 22px;}
+  .item-row{display:flex;gap:2px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:4px 12px 4px 4px;align-items:flex-start;transition:border-color 0.2s;}
+  .check-circle{width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:50%;}
+  .check-dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--dot, var(--cat-routine));display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;}
+  .check-dot svg{width:13px;height:13px;stroke:var(--bg-phone);stroke-width:3;display:none;}
+  .check-circle.future{cursor:not-allowed;}
+  .check-circle.future .check-dot{border-style:dashed;opacity:.55;}
+  .check-circle.off-day .check-dot{border-style:dashed;opacity:.7;}
+  .item-row.done{background:transparent;border-color:var(--border);}
+  .item-row.done .check-dot{background:var(--dot, var(--cat-routine));}
+  .item-row.done .check-dot svg{display:block;}
+  .item-info{flex:1;min-width:0;display:block;text-align:left;padding:9px 0 9px 4px;min-height:44px;border-radius:12px;}
   .item-top{display:flex;justify-content:space-between;gap:8px;align-items:baseline;}
-  .item-name{font-family:var(--font-d);font-size:14.5px;font-weight:600;}
-  .item-row.done .item-name{text-decoration:line-through;color:var(--text-3);}
-  .item-time{font-size:11px;color:var(--text-3);flex-shrink:0;white-space:nowrap;}
-  .item-desc{font-size:12.5px;color:var(--text-2);margin-top:3px;line-height:1.4;}
-  
-  .item-prio-badge{
-    display:inline-block;
-    padding:2px 6px;
-    border-radius:4px;
-    font-size:10px;
-    font-weight:700;
-    text-transform:uppercase;
-    margin-right:6px;
-  }
-  .badge-high{background:rgba(255,77,77,0.2);color:var(--prio-high);}
-  .badge-medium{background:rgba(255,184,0,0.2);color:var(--prio-med);}
-  .badge-low{background:rgba(59,130,246,0.2);color:var(--prio-low);}
+  .item-name{font-family:var(--font-d);font-size:14.5px;font-weight:600;overflow-wrap:anywhere;}
+  .item-row.done .item-name{text-decoration:line-through;color:var(--text-2);}
+  .item-charge{font-size:11.5px;font-weight:600;color:var(--cat-routine);flex-shrink:0;white-space:nowrap;}
+  .item-meta{display:block;font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4;}
+  .item-meta.late{color:var(--prio-high);font-weight:600;}
+  .item-desc{display:block;font-size:12.5px;color:var(--text-2);margin-top:3px;line-height:1.4;overflow-wrap:anywhere;}
+  .item-prio-badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:700;margin-right:6px;background:rgba(255,107,107,0.2);color:var(--prio-high);}
 
-  .fab{position:absolute;right:22px;bottom:100px;display:flex;align-items:center;gap:8px;background:var(--accent-fab,var(--cat-routine));color:#04140e;font-weight:600;font-size:13.5px;padding:13px 18px;border-radius:var(--r-full);box-shadow:0 12px 24px -8px rgba(0,230,160,.5);z-index:15;cursor:pointer;}
+  .empty{font-size:13px;line-height:1.5;color:var(--text-2);padding:10px 22px;}
+  .load-error{margin:0 22px;padding:14px;border-radius:var(--r-md);background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);font-size:13px;line-height:1.5;}
+  .load-error button{display:block;min-height:44px;font-weight:600;color:var(--prio-high);}
+
+  /* VECKA */
+  .week-view{display:flex;flex-direction:column;gap:8px;padding:12px 22px 0;}
+  .week-day{display:block;width:100%;text-align:left;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;}
+  .week-day.today{border-color:var(--cat-routine);}
+  .week-head{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--text-2);}
+  .week-head b{font-family:var(--font-d);font-size:14px;font-weight:600;color:var(--text-1);}
+  .week-item{display:flex;align-items:center;gap:7px;font-size:12.5px;margin-top:6px;min-width:0;}
+  .week-item .wi-time{color:var(--text-2);flex-shrink:0;font-variant-numeric:tabular-nums;}
+  .week-item .wi-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .week-item.done .wi-name{text-decoration:line-through;color:var(--text-2);}
+
+  /* FRAMSTEG */
+  .dots{display:flex;gap:4px;margin-top:8px;}
+  .day-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--text-3);}
+  .day-dot.done{background:var(--c);color:#0a0e17;}
+  .day-dot.missed{border:1.5px solid var(--text-3);color:var(--text-2);}
+  .day-dot.pending{border:1.5px dashed var(--c);color:var(--text-1);}
+  .day-dot.planned{border:1.5px dotted var(--text-3);color:var(--text-2);}
+  .dots-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11.5px;color:var(--text-2);padding:0 22px 12px;}
+  .dots-legend .day-dot{width:12px;height:12px;display:inline-block;margin-right:5px;vertical-align:-2px;--c:var(--cat-routine);}
+  .streak{font-size:11.5px;font-weight:600;color:var(--c);flex-shrink:0;white-space:nowrap;}
+  .hobby-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;--c:var(--cat-hobby);}
+  .hobby-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .hobby-head h2{font-family:var(--font-d);font-size:16px;font-weight:600;overflow-wrap:anywhere;}
+  .hobby-sub{font-size:12px;color:var(--text-2);margin-top:3px;}
+  .hobby-next{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+  .hobby-next .item-row{background:var(--bg-surface-2);}
+
+  .fab{position:absolute;right:22px;bottom:96px;display:flex;align-items:center;gap:8px;min-height:44px;background:var(--accent-fab,var(--cat-routine));color:#04140e;font-weight:600;font-size:13.5px;padding:13px 18px;border-radius:var(--r-full);box-shadow:0 12px 24px -8px rgba(0,0,0,.6);z-index:15;}
   .fab svg{width:16px;height:16px;stroke:#04140e;stroke-width:2.4;}
 
+  .toast{position:absolute;left:16px;right:16px;bottom:150px;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--bg-surface-3);border:1px solid var(--border-strong);border-radius:var(--r-md);padding:12px 14px;font-size:13px;line-height:1.4;box-shadow:0 12px 24px -8px rgba(0,0,0,.6);opacity:0;transform:translateY(8px);transition:all .2s ease;pointer-events:none;}
+  .toast.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+  .toast.error{border-color:var(--prio-high);}
+  .toast button{font-weight:700;color:var(--cat-routine);flex-shrink:0;min-height:32px;}
+
   /* TAB BAR WITH DREAM AI */
-  .tabbar{position:absolute;left:0;right:0;bottom:0;display:flex;background:rgba(10,14,23,.94);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:10px 4px 24px;z-index:20;}
-  .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;border-radius:14px;cursor:pointer;}
-  .tab-btn svg{width:19px;height:19px;stroke:var(--text-3);transition:stroke 0.2s;}
-  .tab-btn span{font-size:8.5px;color:var(--text-3);font-weight:500;transition:color 0.2s;white-space:nowrap;}
+  .tabbar{position:absolute;left:0;right:0;bottom:0;display:flex;background:rgba(10,14,23,.94);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:8px 4px 20px;z-index:20;}
+  .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;min-height:44px;border-radius:14px;}
+  .tab-btn svg{width:20px;height:20px;stroke:var(--text-2);transition:stroke 0.2s;}
+  .tab-btn span{font-size:11px;color:var(--text-2);font-weight:500;transition:color 0.2s;white-space:nowrap;}
   .tab-btn.active svg{stroke:var(--tab-accent,var(--cat-routine));}
   .tab-btn.active span{color:var(--tab-accent,var(--cat-routine));}
 
@@ -271,18 +255,18 @@
     display:none;
     flex-direction:column;
     height:100%;
-    padding-bottom:100px;
+    padding-bottom:84px;
     overflow:hidden;
   }
   #screen-ai.active{display:flex;}
-  
+
   .ai-container{
     flex:1;
     display:flex;
     flex-direction:column;
     padding:0 22px 10px;
     gap:14px;
-    height:100%;
+    min-height:0;
     overflow:hidden;
   }
   .ai-chat-body{
@@ -295,7 +279,7 @@
     scrollbar-width:none;
   }
   .ai-chat-body::-webkit-scrollbar{display:none;}
-  .chat-msg{font-size:13.5px;line-height:1.45;padding:14px 16px;border-radius:18px;}
+  .chat-msg{font-size:13.5px;line-height:1.45;padding:14px 16px;border-radius:18px;overflow-wrap:anywhere;flex-shrink:0;}
   .chat-msg.assistant{background:rgba(168,85,247,0.12);border:1px solid rgba(168,85,247,0.22);color:var(--text-1);align-self:flex-start;max-width:88%;}
   .chat-msg.user{background:var(--bg-surface-3);color:var(--text-1);align-self:flex-end;max-width:85%;}
 
@@ -303,13 +287,15 @@
     display:flex;
     gap:8px;
     background:var(--bg-surface);
-    padding:8px 8px 8px 16px;
+    padding:6px 6px 6px 16px;
     border-radius:var(--r-full);
     border:1px solid rgba(168,85,247,0.3);
-    margin-top:auto;
+    flex-shrink:0;
   }
-  .ai-input-wrap input{flex:1;font-size:13.5px;outline:none;}
-  .ai-send-btn{width:36px;height:36px;border-radius:50%;background:var(--ai-purple);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+  .ai-input-wrap:focus-within{border-color:var(--ai-purple);}
+  .ai-input-wrap input{flex:1;font-size:16px;outline:none;min-width:0;}
+  .ai-input-wrap input::placeholder{color:var(--text-3);}
+  .ai-send-btn{width:44px;height:44px;border-radius:50%;background:var(--ai-purple);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .ai-send-btn svg{width:16px;height:16px;stroke:#fff;}
 
   /* POPUP MODAL */
@@ -331,329 +317,454 @@
     background:#0f1522;
     border-top:1px solid var(--border-strong);
     border-radius:32px 32px 0 0;
-    padding:16px 22px 30px;
+    padding:16px 22px 0;
     display:flex;
     flex-direction:column;
     gap:14px;
-    max-height:90%;
+    max-height:92%;
     overflow-y:auto;
     animation:slideUp 0.25s cubic-bezier(0.16,1,0.3,1);
   }
   @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
 
-  .modal-handle{width:38px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;align-self:center;margin-bottom:2px;}
-  .modal-header{display:flex;justify-content:space-between;align-items:center;}
+  .modal-handle{width:38px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;align-self:center;margin-bottom:2px;flex-shrink:0;}
+  .modal-header{display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
   .modal-header h2{font-family:var(--font-d);font-size:20px;font-weight:700;}
-  .modal-close{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;cursor:pointer;}
-  .modal-close svg{width:16px;height:16px;stroke:var(--text-2);}
+  .modal-close{width:44px;height:44px;margin-right:-6px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .modal-close svg{width:18px;height:18px;stroke:var(--text-2);}
 
-  .form-group{display:flex;flex-direction:column;gap:5px;}
+  .form-group{display:flex;flex-direction:column;gap:5px;min-width:0;}
   .form-label{font-size:12px;font-weight:600;color:var(--text-2);}
-  .form-input, .form-textarea, .form-select{
+  .form-hint{font-size:12.5px;line-height:1.45;color:var(--text-2);}
+  .form-error{font-size:13px;font-weight:600;color:var(--prio-high);}
+  .form-input, .form-textarea{
     width:100%;
     background:var(--input-bg);
     border:1px solid var(--border-strong);
     border-radius:14px;
     padding:12px 14px;
-    font-size:13.5px;
+    font-size:16px;
     color:var(--text-1);
-    outline:none;
+    min-height:46px;
   }
+  .form-input:focus, .form-textarea:focus{outline:2px solid var(--cat-routine);outline-offset:0;}
   .form-input::placeholder, .form-textarea::placeholder{color:var(--text-3);}
-  .form-textarea{resize:none;height:65px;}
+  .form-input::-webkit-calendar-picker-indicator{filter:invert(.8);}
+  .form-textarea{resize:none;height:70px;}
 
   .prio-group{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-  .prio-btn{
-    padding:10px;
+  .type-group{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex-shrink:0;}
+  .prio-btn, .type-btn{
+    min-height:44px;
+    padding:0 4px;
     border-radius:12px;
     background:var(--input-bg);
     border:1px solid var(--border);
     font-size:12.5px;
     font-weight:600;
     color:var(--text-2);
-    cursor:pointer;
     text-align:center;
     transition:all 0.2s ease;
   }
-  .prio-btn.active[data-prio="High"]{background:var(--prio-high);color:#fff;border-color:transparent;}
-  .prio-btn.active[data-prio="Medium"]{background:var(--prio-med);color:#0a0e17;border-color:transparent;}
-  .prio-btn.active[data-prio="Low"]{background:var(--prio-low);color:#fff;border-color:transparent;}
+  .prio-btn[aria-pressed="true"]{background:var(--bg-surface-3);color:var(--text-1);border-color:var(--text-2);}
+  .type-btn[aria-pressed="true"]{background:var(--c);color:#0a0e17;border-color:transparent;}
+
+  .day-pills{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+  .day-pill{height:44px;border-radius:12px;background:var(--input-bg);border:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text-2);}
+  .day-pill[aria-pressed="true"]{background:var(--cat-routine);color:#04140e;border-color:transparent;}
+  .day-presets{display:flex;gap:6px;margin-top:2px;}
+  .day-presets button{min-height:36px;padding:0 10px;font-size:12.5px;font-weight:600;color:var(--cat-routine);}
+  .switch-row{display:flex;align-items:center;gap:10px;min-height:44px;font-size:13.5px;cursor:pointer;}
+  .switch-row input{width:20px;height:20px;accent-color:var(--cat-routine);flex-shrink:0;}
+  .more-toggle{align-self:flex-start;min-height:44px;font-size:13px;font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:6px;}
+  .more-toggle svg{width:14px;height:14px;stroke:currentColor;transition:transform .2s;}
+  .more-toggle[aria-expanded="true"] svg{transform:rotate(90deg);}
+  .more-fields{display:flex;flex-direction:column;gap:14px;}
 
   .time-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
+  .session-box{background:var(--input-bg);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+  .session-actions{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip-btn{min-height:44px;padding:0 12px;border-radius:12px;background:var(--bg-surface-2);font-size:13px;font-weight:600;color:var(--text-1);}
+  .chip-btn.solid{background:var(--cat-routine);color:#04140e;flex-shrink:0;}
+  .move-row{display:flex;gap:8px;align-items:center;}
+  .link-row{padding:10px 0 0;}
+
+  .modal-actions{position:sticky;bottom:0;background:#0f1522;padding:8px 0 22px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;margin-top:auto;}
   .btn-save-modal{
     width:100%;
+    min-height:50px;
     padding:15px;
     border-radius:16px;
     background:var(--cat-routine);
     color:#04140e;
     font-weight:700;
     font-size:14.5px;
-    cursor:pointer;
-    margin-top:6px;
     text-align:center;
   }
+  .btn-secondary{width:100%;min-height:44px;font-size:13.5px;font-weight:600;color:var(--text-2);border-radius:12px;}
+  .btn-danger{color:var(--prio-high);}
+  .delete-ask{display:flex;flex-direction:column;gap:2px;}
+  .delete-ask p{font-size:13px;color:var(--text-2);text-align:center;padding:4px 0;}
+
+  .explain{font-size:13px;line-height:1.5;color:var(--text-2);}
+  .explain b{color:var(--text-1);font-weight:600;}
+  .balance-title{font-family:var(--font-d);font-size:15px;font-weight:600;}
+  .balance-body{display:flex;flex-direction:column;align-items:center;width:100%;flex-shrink:0;}
+  .balance-svg{width:100%;max-width:310px;height:auto;display:block;}
+  .balance-axis-label{font-family:var(--font-b);font-size:10px;font-weight:700;letter-spacing:0.05em;fill:var(--text-2);}
+  .balance-axis-pct{font-family:var(--font-d);font-size:11px;font-weight:700;}
+  .balance-grid-ring{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:1;}
+  .balance-spoke{stroke:rgba(255,255,255,0.08);stroke-width:1;}
+  .balance-fill{fill:rgba(140,123,255,0.22);stroke:var(--cat-todo);stroke-width:2;stroke-linejoin:round;transition:all 0.5s ease-in-out;}
+  .balance-node{stroke:var(--bg-surface);stroke-width:2;transition:all 0.5s ease-in-out;}
+
   /* Dream AI 2.0: action-kort + "tänker"-bubbla */
   .chat-msg.typing{opacity:.6;font-style:italic;}
-  .action-list{display:flex;flex-direction:column;gap:6px;align-self:flex-start;width:88%;}
-  .action-card{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:var(--bg-surface-2);border:1px solid var(--border);border-left:3px solid var(--c);font-size:12.5px;cursor:pointer;text-align:left;}
-  .action-card.delete{opacity:.7;}
-  .action-card.delete .action-txt{text-decoration:line-through;}
+  .action-list{display:flex;flex-direction:column;gap:6px;align-self:flex-start;width:88%;flex-shrink:0;}
+  .action-card{display:flex;align-items:center;gap:10px;min-height:44px;padding:9px 12px;border-radius:12px;background:var(--bg-surface-2);border:1px solid var(--border);border-left:3px solid var(--c);font-size:12.5px;text-align:left;width:100%;}
+  .action-card.delete, .action-card.skip{opacity:.8;}
+  .action-card.delete .action-txt, .action-card.skip .action-txt{text-decoration:line-through;}
   .action-ic{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:#0a0e17;font-weight:700;font-size:12px;flex-shrink:0;}
   .action-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .action-date{color:var(--text-3);font-size:11px;flex-shrink:0;}
+  .action-date{color:var(--text-2);font-size:11px;flex-shrink:0;}
+
+  /* På en riktig telefon är appen hela skärmen, utan påhittad ram, notch och klocka */
+  @media (max-width:500px){
+    html,body{height:100%;overflow:hidden;}
+    body{display:block;padding:0;}
+    .device{width:100%;height:100vh;height:100dvh;border:none;border-radius:0;box-shadow:none;}
+    .notch,.statusbar{display:none;}
+    .brandbar{padding-top:16px;}
+    .tabbar{padding-bottom:calc(8px + env(safe-area-inset-bottom));}
+    .modal-actions{padding-bottom:calc(14px + env(safe-area-inset-bottom));}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important;}
+  }
 </style>
 </head>
 <body>
 
 <div class="device">
   <div class="notch"></div>
-  <div class="statusbar">
-    <span id="current-time">09:41</span>
-    <span class="icons">
-      <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M1 8l1.5-2 1.5 3 2-6 2 4 1.5-2L11 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x="1" y="1" width="18" height="9" rx="2.5" stroke="currentColor" stroke-width="1.2"/><rect x="2.5" y="2.5" width="12" height="6" rx="1.2" fill="currentColor"/><rect x="20" y="3.5" width="1.5" height="4" rx="0.7" fill="currentColor"/></svg>
-    </span>
-  </div>
+  <div class="statusbar"><span id="current-time">09:41</span></div>
 
-  <div class="screen-container">
-    
-    <!-- HOME SCREEN -->
-    <div id="screen-home" class="screen active">
+  <main class="screen-container">
+
+    <!-- IDAG: dagen i tidsordning, batteriet är alltid läget just nu -->
+    <section id="screen-home" class="screen active" aria-label="Idag">
       <div class="brandbar">
-        <span class="wordmark">Pulse</span>
-        
-        <!-- FLEXIBLE DATE BAR WITH CALENDAR PICKER -->
-        <div class="date-selector-wrap">
-          <button class="date-btn active" id="btn-date-today" onclick="selectQuickDate('today')">Idag</button>
-          <button class="date-btn" id="btn-date-tomorrow" onclick="selectQuickDate('tomorrow')">Imorgon</button>
-          <div class="date-picker-icon-btn" title="Välj datum i kalendern">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <input type="date" id="nav-date-picker" onchange="selectCustomDate(this.value)" />
-          </div>
+        <div>
+          <span class="wordmark">Pulse</span>
+          <h1 class="hello" id="hello">Hej!</h1>
+        </div>
+        <div class="seg-toggle" role="group" aria-label="Visa dag eller vecka">
+          <button id="btn-view-day" aria-pressed="true" onclick="setHomeView('day')">Dag</button>
+          <button id="btn-view-week" aria-pressed="false" onclick="setHomeView('week')">Vecka</button>
         </div>
       </div>
 
-      <div class="hello">
-        <h1>Welcome back, Oscar</h1>
-        <p id="view-date-subtitle">Visar dagens energipott och framsteg.</p>
+      <button class="battery-card" id="battery-card-element" onclick="openBatterySheet()">
+        <span class="battery-top">
+          <span class="battery-pct-wrap"><span class="battery-pct" id="total-battery-pct">0</span><span class="pct-sign">%</span></span>
+          <span class="battery-timer">
+            <span class="t-val" id="battery-time-left"></span>
+            <span class="t-lab" id="battery-time-lab"></span>
+          </span>
+        </span>
+        <span class="segbar" aria-hidden="true">
+          <span class="seg seg-routine" id="seg-routine"></span>
+          <span class="seg seg-todo" id="seg-todo"></span>
+          <span class="seg seg-hobby" id="seg-hobby"></span>
+          <span class="seg seg-bonus" id="seg-bonus"></span>
+        </span>
+        <span class="seg-legend">
+          <span class="seg-legend-item"><span class="dot routine"></span>Rutiner <b id="leg-routine">0</b></span>
+          <span class="seg-legend-item"><span class="dot todo"></span>Att göra <b id="leg-todo">0</b></span>
+          <span class="seg-legend-item"><span class="dot hobby"></span>Hobby <b id="leg-hobby">0</b></span>
+          <span class="seg-legend-item"><span class="dot bonus"></span>Bonus <b id="leg-bonus">0</b></span>
+        </span>
+        <span class="battery-state" id="battery-state-text"></span>
+      </button>
+
+      <div class="date-row" id="date-row">
+        <button class="week-arrow" aria-label="Föregående vecka" onclick="shiftWeek(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <div class="week-strip" id="week-strip"></div>
+        <button class="week-arrow" aria-label="Nästa vecka" onclick="shiftWeek(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
       </div>
 
-      <!-- BATTERY CARD -->
-      <div class="battery-card" id="battery-card-element">
-        <div class="battery-top">
-          <div class="battery-pct-wrap"><span class="battery-pct" id="total-battery-pct">54</span><span class="pct-sign">%</span></div>
-          <div class="battery-timer">
-            <div class="t-val" id="battery-time-left">12:57:36</div>
-            <div class="t-lab" id="battery-time-lab">until empty</div>
-          </div>
+      <div class="section-head">
+        <div>
+          <h2 id="day-title">Idag</h2>
+          <p class="count" id="day-count"></p>
         </div>
-        <div class="battery-state" id="battery-state-text">Building momentum</div>
-        <div class="segbar">
-          <div class="seg seg-routine" id="seg-routine" style="flex:0 0 25%"></div>
-          <div class="seg seg-todo" id="seg-todo" style="flex:0 0 25%"></div>
-          <div class="seg seg-hobby" id="seg-hobby" style="flex:0 0 25%"></div>
-          <div class="seg seg-bonus" id="seg-bonus" style="flex:0 0 25%"></div>
-        </div>
-        <div class="seg-legend">
-          <div class="seg-legend-item"><span class="dot routine"></span>Routines <b id="leg-routine">0%</b></div>
-          <div class="seg-legend-item"><span class="dot todo"></span>To-dos <b id="leg-todo">0%</b></div>
-          <div class="seg-legend-item"><span class="dot hobby"></span>Hobbies <b id="leg-hobby">0%</b></div>
-          <div class="seg-legend-item"><span class="dot bonus"></span>Bonus <b id="leg-bonus">0%</b></div>
-        </div>
-      </div>
-
-      <!-- RADAR CARD -->
-      <div class="balance-card">
-        <div class="balance-header">
-          <div class="ic">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>
-          </div>
-          <div class="body">
-            <h3>Life balance</h3>
-            <p>Aktivitetsbalans för valt datum</p>
-          </div>
-        </div>
-        
-        <div class="balance-body">
-          <svg class="balance-svg" viewBox="0 0 280 250" xmlns="http://www.w3.org/2000/svg">
-            <g transform="translate(0, 5)">
-              <polygon class="balance-grid-ring" points="140,105 162,125 140,145 118,125" />
-              <polygon class="balance-grid-ring" points="140,85 184,125 140,165 96,125" />
-              <polygon class="balance-grid-ring" points="140,65 206,125 140,185 74,125" />
-              <polygon class="balance-grid-ring" points="140,45 228,125 140,205 52,125" />
-              
-              <line class="balance-spoke" x1="140" y1="125" x2="140" y2="45" />
-              <line class="balance-spoke" x1="140" y1="125" x2="228" y2="125" />
-              <line class="balance-spoke" x1="140" y1="125" x2="140" y2="205" />
-              <line class="balance-spoke" x1="140" y1="125" x2="52" y2="125" />
-              
-              <polygon class="balance-fill" id="radar-polygon" points="140,77 169,125 140,178.6 101.2,125" />
-              
-              <circle class="balance-node" id="node-routine" cx="140" cy="77" r="4.5" fill="#00e6a0" />
-              <circle class="balance-node" id="node-todo" cx="169" cy="125" r="4.5" fill="#8c7bff" />
-              <circle class="balance-node" id="node-hobby" cx="140" cy="178.6" r="4.5" fill="#ff7a59" />
-              <circle class="balance-node" id="node-bonus" cx="101.2" cy="125" r="4.5" fill="#ffd23f" />
-
-              <text class="balance-axis-label" x="140" y="20" text-anchor="middle">ROUTINES</text>
-              <text class="balance-axis-pct" id="radar-lbl-routine" x="140" y="33" text-anchor="middle" fill="#00e6a0">0%</text>
-              
-              <text class="balance-axis-label" x="236" y="121" text-anchor="start">TO-DOS</text>
-              <text class="balance-axis-pct" id="radar-lbl-todo" x="236" y="134" text-anchor="start" fill="#8c7bff">0%</text>
-              
-              <text class="balance-axis-label" x="140" y="224" text-anchor="middle">HOBBIES</text>
-              <text class="balance-axis-pct" id="radar-lbl-hobby" x="140" y="237" text-anchor="middle" fill="#ff7a59">0%</text>
-              
-              <text class="balance-axis-label" x="44" y="121" text-anchor="end">BONUS</text>
-              <text class="balance-axis-pct" id="radar-lbl-bonus" x="44" y="134" text-anchor="end" fill="#ffd23f">0%</text>
-            </g>
-          </svg>
+        <div class="section-tools">
+          <button class="link-btn" id="btn-go-today" onclick="selectDate(today())" hidden>Till idag</button>
+          <button class="icon-btn" id="btn-week-prev" aria-label="Föregående vecka" onclick="shiftWeek(-1)" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <button class="icon-btn" id="btn-week-next" aria-label="Nästa vecka" onclick="shiftWeek(1)" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          <button class="icon-btn" aria-label="Välj datum i kalendern" onclick="openDatePicker()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+          <input type="date" class="date-input-hidden" id="nav-date-picker" tabindex="-1" aria-hidden="true" onchange="selectDate(this.value)" />
         </div>
       </div>
 
-      <!-- NAV CARDS -->
-      <div class="nav-cards">
-        <button class="nav-card" style="--accent:var(--cat-routine)" onclick="switchTab('screen-routines')">
-          <span class="ic" style="background:var(--cat-routine-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cat-routine)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="1.4"/><circle cx="5" cy="12" r="1.4"/><circle cx="5" cy="18" r="1.4"/><path d="M9 6h11M9 12h11M9 18h11"/></svg></span>
-          <span class="body"><h3>Daily routines</h3><p id="nav-routines-sub">0 of 0 done</p></span>
-          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-        </button>
+      <div id="day-view"></div>
+      <div id="week-view" class="week-view" hidden></div>
+    </section>
 
-        <button class="nav-card" style="--accent:var(--cat-todo)" onclick="switchTab('screen-todos')">
-          <span class="ic" style="background:var(--cat-todo-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cat-todo)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
-          <span class="body"><h3>To-dos</h3><p id="nav-todos-sub">0 of 0 complete</p></span>
-          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-        </button>
-
-        <button class="nav-card" style="--accent:var(--cat-hobby)" onclick="switchTab('screen-hobbies')">
-          <span class="ic" style="background:var(--cat-hobby-dim)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cat-hobby)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
-          <span class="body"><h3>Hobbies & Activities</h3><p id="nav-hobbies-sub">0 of 0 logged</p></span>
-          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-        </button>
+    <!-- RUTINER -->
+    <section id="screen-routines" class="screen" aria-label="Rutiner">
+      <div class="screen-header"><div class="title-group"><h1>Rutiner</h1><p>Det du gör regelbundet, och hur det går den här veckan</p></div></div>
+      <div class="dots-legend" aria-hidden="true">
+        <span><span class="day-dot done"></span>Klart</span>
+        <span><span class="day-dot missed"></span>Missat</span>
+        <span><span class="day-dot pending"></span>Kvar idag</span>
+        <span><span class="day-dot planned"></span>Kommer</span>
       </div>
-    </div>
-
-    <!-- ROUTINES SCREEN -->
-    <div id="screen-routines" class="screen">
-      <div class="screen-header"><div class="title-group"><h1>Daily routines</h1><p id="hdr-routines-sub">Schema</p></div></div>
       <div class="list" id="list-routines"></div>
-      <button class="fab" style="--accent-fab:var(--cat-routine)" onclick="openModal('routine')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>New routine
-      </button>
-    </div>
+    </section>
 
-    <!-- TODOS SCREEN -->
-    <div id="screen-todos" class="screen">
-      <div class="screen-header"><div class="title-group"><h1>To-dos</h1><p id="hdr-todos-sub">Schema</p></div></div>
-      <div class="list" id="list-todos"></div>
-      <button class="fab" style="--accent-fab:var(--cat-todo)" onclick="openModal('todo')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>New task
-      </button>
-    </div>
+    <!-- ATT GÖRA -->
+    <section id="screen-todos" class="screen" aria-label="Att göra">
+      <div class="screen-header"><div class="title-group"><h1>Att göra</h1><p id="hdr-todos-sub"></p></div></div>
+      <div id="list-todos"></div>
+    </section>
 
-    <!-- HOBBIES SCREEN -->
-    <div id="screen-hobbies" class="screen">
-      <div class="screen-header"><div class="title-group"><h1>Hobbies & Bonus</h1><p id="hdr-hobbies-sub">Schema</p></div></div>
+    <!-- HOBBY -->
+    <section id="screen-hobbies" class="screen" aria-label="Hobby">
+      <div class="screen-header"><div class="title-group"><h1>Hobby</h1><p>Håller du i det? Så här går det den här veckan</p></div></div>
       <div class="list" id="list-hobbies"></div>
-      <button class="fab" style="--accent-fab:var(--cat-hobby)" onclick="openModal('hobby')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Add activity
-      </button>
-    </div>
+      <div class="section-head">
+        <div><h2>Bonus idag</h2><p class="count">Små saker som ger lite extra energi</p></div>
+        <button class="link-btn" style="color:var(--cat-bonus)" onclick="openModal('bonus')">Lägg till</button>
+      </div>
+      <div class="list" id="list-bonus"></div>
+    </section>
 
     <!-- DREAM AI SCREEN -->
-    <div id="screen-ai" class="screen">
+    <section id="screen-ai" class="screen" aria-label="Dream AI">
       <div class="screen-header">
-        <div class="title-group" style="display:flex;align-items:center;gap:8px;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ai-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>
-          <h1 style="color:var(--ai-purple)">Dream AI</h1>
+        <div class="title-group">
+          <h1 style="color:var(--ai-purple);display:flex;align-items:center;gap:8px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="22" height="22"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>Dream AI</h1>
+          <p>Din personliga energi- och vaneassistent</p>
         </div>
-        <p>Din personliga energi- och vaneassistent</p>
+        <button class="link-btn" style="color:var(--text-2)" onclick="clearChat()">Ny chatt</button>
       </div>
 
       <div class="ai-container">
-        <div class="ai-chat-body" id="ai-chat-body">
-          <div class="chat-msg assistant">Hej Oscar! Jag är Dream AI. Batteriet ligger på <strong id="ai-chat-pct">0%</strong>. Be mig lägga in uppgifter, bocka av saker eller göra en hobbyplan åt dig.</div>
-        </div>
+        <div class="ai-chat-body" id="ai-chat-body" aria-live="polite"></div>
         <div class="ai-input-wrap">
-          <input type="text" id="ai-input" placeholder="t.ex. Gör en gitarrplan för veckan" onkeydown="if(event.key==='Enter') sendAiMsg()" />
-          <button class="ai-send-btn" onclick="sendAiMsg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+          <label for="ai-input" class="visually-hidden">Skriv till Dream AI</label>
+          <input type="text" id="ai-input" maxlength="2000" autocomplete="off" placeholder="t.ex. Gör en gitarrplan för veckan" onkeydown="if(event.key==='Enter') sendAiMsg()" />
+          <button class="ai-send-btn" aria-label="Skicka" onclick="sendAiMsg()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
         </div>
       </div>
-    </div>
+    </section>
 
-  </div>
+  </main>
+
+  <button class="fab" id="fab" onclick="openModal(fabType)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span id="fab-label">Lägg till</span>
+  </button>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- TAB BAR -->
-  <div class="tabbar">
-    <button class="tab-btn active" id="tab-home" style="--tab-accent:var(--cat-routine)" onclick="switchTab('screen-home')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg>
-      <span>Home</span>
+  <nav class="tabbar" aria-label="Huvudmeny">
+    <button class="tab-btn" id="tab-home" style="--tab-accent:var(--cat-routine)" onclick="goToday()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg>
+      <span>Idag</span>
     </button>
     <button class="tab-btn" id="tab-routines" style="--tab-accent:var(--cat-routine)" onclick="switchTab('screen-routines')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="1.4"/><circle cx="5" cy="12" r="1.4"/><circle cx="5" cy="18" r="1.4"/><path d="M9 6h11M9 12h11M9 18h11"/></svg>
-      <span>Routines</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="6" r="1.4"/><circle cx="5" cy="12" r="1.4"/><circle cx="5" cy="18" r="1.4"/><path d="M9 6h11M9 12h11M9 18h11"/></svg>
+      <span>Rutiner</span>
     </button>
     <button class="tab-btn" id="tab-todos" style="--tab-accent:var(--cat-todo)" onclick="switchTab('screen-todos')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <span>To-dos</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>Att göra</span>
     </button>
     <button class="tab-btn" id="tab-hobbies" style="--tab-accent:var(--cat-hobby)" onclick="switchTab('screen-hobbies')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      <span>Hobbies</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>
+      <span>Hobby</span>
     </button>
     <button class="tab-btn" id="tab-ai" style="--tab-accent:var(--ai-purple)" onclick="switchTab('screen-ai')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>
       <span>Dream AI</span>
     </button>
-  </div>
+  </nav>
 
-  <!-- POPUP MODAL -->
-  <div class="modal-overlay" id="add-modal" onclick="closeModalOnOverlay(event)">
-    <div class="modal-sheet">
+  <!-- LÄGG TILL / ÄNDRA -->
+  <div class="modal-overlay" id="add-modal" onclick="closeSheetOnOverlay(event)">
+    <form class="modal-sheet" id="item-form" role="dialog" aria-modal="true" aria-labelledby="modal-title" onsubmit="saveItem(event)" novalidate>
       <div class="modal-handle"></div>
       <div class="modal-header">
-        <h2 id="modal-title">New routine</h2>
-        <button class="modal-close" onclick="closeModal()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
+        <h2 id="modal-title">Lägg till</h2>
+        <button type="button" class="modal-close" aria-label="Stäng" onclick="closeSheet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       </div>
 
-      <div class="form-group">
-        <input type="text" class="form-input" id="input-title" placeholder="t.ex. Tandläkare / Studera" />
+      <div class="type-group" id="type-group" role="group" aria-label="Vad vill du lägga till?">
+        <button type="button" class="type-btn" style="--c:var(--cat-routine)" data-type="routine" onclick="setType('routine')">Rutin</button>
+        <button type="button" class="type-btn" style="--c:var(--cat-todo)" data-type="todo" onclick="setType('todo')">Att göra</button>
+        <button type="button" class="type-btn" style="--c:var(--cat-hobby)" data-type="hobby" onclick="setType('hobby')">Hobby</button>
+        <button type="button" class="type-btn" style="--c:var(--cat-bonus)" data-type="bonus" onclick="setType('bonus')">Bonus</button>
       </div>
+      <p class="form-hint" id="type-hint"></p>
 
       <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea class="form-textarea" id="input-desc" placeholder="t.ex. Årskontroll hos Tandläkarna i Centrum"></textarea>
+        <label class="form-label" for="input-title">Namn</label>
+        <input type="text" class="form-input" id="input-title" maxlength="80" autocomplete="off" />
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Datum då detta ska göras</label>
+      <div class="session-box" id="session-box" hidden>
+        <p class="form-label" id="session-title"></p>
+        <div class="session-actions">
+          <button type="button" class="chip-btn" onclick="showMove()">Flytta till en annan dag</button>
+          <button type="button" class="chip-btn" onclick="skipSession()">Hoppa över</button>
+        </div>
+        <div class="move-row" id="move-row" hidden>
+          <label class="visually-hidden" for="input-move">Ny dag</label>
+          <input type="date" class="form-input" id="input-move" />
+          <button type="button" class="chip-btn solid" onclick="moveSession()">Flytta</button>
+        </div>
+      </div>
+      <p class="form-hint" id="edit-scope" hidden>Det du ändrar nedan gäller alla pass. Pass du redan bockat behåller sin tid.</p>
+
+      <div class="form-group" id="group-freq">
+        <span class="form-label">Hur ofta?</span>
+        <div class="seg-toggle wide" role="group" aria-label="Hur ofta?">
+          <button type="button" id="freq-once" onclick="setRepeating(false)">En gång</button>
+          <button type="button" id="freq-repeat" onclick="setRepeating(true)">Upprepas</button>
+        </div>
+      </div>
+
+      <div class="form-group" id="group-date">
+        <label class="form-label" for="input-date" id="label-date">Datum</label>
         <input type="date" class="form-input" id="input-date" />
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Priority</label>
-        <div class="prio-group">
-          <button class="prio-btn" data-prio="High" onclick="setPrio(this)">High</button>
-          <button class="prio-btn active" data-prio="Medium" onclick="setPrio(this)">Medium</button>
-          <button class="prio-btn" data-prio="Low" onclick="setPrio(this)">Low</button>
+      <div class="form-group" id="group-repeat">
+        <span class="form-label" id="label-days">Vilka dagar?</span>
+        <div class="day-pills" id="day-pills" role="group" aria-labelledby="label-days"></div>
+        <div class="day-presets">
+          <button type="button" onclick="setDays([0, 1, 2, 3, 4, 5, 6])">Varje dag</button>
+          <button type="button" onclick="setDays([1, 2, 3, 4, 5])">Vardagar</button>
+          <button type="button" onclick="setDays([0, 6])">Helger</button>
+        </div>
+        <label class="switch-row"><input type="checkbox" id="input-period" onchange="syncForm()" /><span>Bara under en period</span></label>
+        <div class="time-grid" id="group-period">
+          <div class="form-group">
+            <label class="form-label" for="input-from">Från</label>
+            <input type="date" class="form-input" id="input-from" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="input-until">Till och med</label>
+            <input type="date" class="form-input" id="input-until" />
+          </div>
         </div>
       </div>
 
       <div class="time-grid">
         <div class="form-group">
-          <label class="form-label">Min time (min)</label>
-          <input type="number" class="form-input" id="input-min" value="30" />
+          <label class="form-label" for="input-time">Klockslag (valfritt)</label>
+          <input type="time" class="form-input" id="input-time" oninput="syncForm()" />
         </div>
         <div class="form-group">
-          <label class="form-label">Max time (min)</label>
-          <input type="number" class="form-input" id="input-max" value="60" />
+          <label class="form-label" for="input-minutes">Minuter (valfritt)</label>
+          <input type="number" class="form-input" id="input-minutes" min="1" max="600" step="1" inputmode="numeric" />
         </div>
       </div>
 
-      <button class="btn-save-modal" id="btn-save" onclick="saveItem()">Save routine</button>
+      <button type="button" class="more-toggle" id="btn-more" aria-expanded="false" aria-controls="group-more" onclick="toggleMore()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>Fler val</button>
+      <div class="more-fields" id="group-more" hidden>
+        <div class="form-group">
+          <span class="form-label">Prioritet</span>
+          <div class="prio-group" role="group" aria-label="Prioritet">
+            <button type="button" class="prio-btn" data-prio="High" onclick="setPrio('High')">Viktig</button>
+            <button type="button" class="prio-btn" data-prio="Medium" onclick="setPrio('Medium')">Normal</button>
+            <button type="button" class="prio-btn" data-prio="Low" onclick="setPrio('Low')">Låg</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-desc">Beskrivning</label>
+          <textarea class="form-textarea" id="input-desc" maxlength="200"></textarea>
+        </div>
+      </div>
+
+      <p class="form-error" id="form-error" role="alert" hidden></p>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn-save-modal" id="btn-save">Spara</button>
+        <div id="delete-area"></div>
+      </div>
+    </form>
+  </div>
+
+  <!-- BATTERIET FÖRKLARAT -->
+  <div class="modal-overlay" id="battery-modal" onclick="closeSheetOnOverlay(event)">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="battery-sheet-title">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h2 id="battery-sheet-title">Så funkar batteriet</h2>
+        <button type="button" class="modal-close" aria-label="Stäng" onclick="closeSheet()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </div>
+      <p class="explain" id="battery-explain"></p>
+
+      <h3 class="balance-title">Livsbalans, senaste 7 dagarna</h3>
+      <div class="balance-body">
+        <svg class="balance-svg" id="balance-svg" viewBox="-20 0 320 250" role="img" aria-label="Livsbalans" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(0, 5)">
+            <polygon class="balance-grid-ring" points="140,105 162,125 140,145 118,125" />
+            <polygon class="balance-grid-ring" points="140,85 184,125 140,165 96,125" />
+            <polygon class="balance-grid-ring" points="140,65 206,125 140,185 74,125" />
+            <polygon class="balance-grid-ring" points="140,45 228,125 140,205 52,125" />
+
+            <line class="balance-spoke" x1="140" y1="125" x2="140" y2="45" />
+            <line class="balance-spoke" x1="140" y1="125" x2="228" y2="125" />
+            <line class="balance-spoke" x1="140" y1="125" x2="140" y2="205" />
+            <line class="balance-spoke" x1="140" y1="125" x2="52" y2="125" />
+
+            <polygon class="balance-fill" id="radar-polygon" points="140,125 140,125 140,125 140,125" />
+
+            <circle class="balance-node" id="node-routine" cx="140" cy="125" r="4.5" fill="#00e6a0" />
+            <circle class="balance-node" id="node-todo" cx="140" cy="125" r="4.5" fill="#8c7bff" />
+            <circle class="balance-node" id="node-hobby" cx="140" cy="125" r="4.5" fill="#ff7a59" />
+            <circle class="balance-node" id="node-bonus" cx="140" cy="125" r="4.5" fill="#ffd23f" />
+
+            <text class="balance-axis-label" x="140" y="20" text-anchor="middle">RUTINER</text>
+            <text class="balance-axis-pct" id="radar-lbl-routine" x="140" y="33" text-anchor="middle" fill="#00e6a0">–</text>
+
+            <text class="balance-axis-label" x="236" y="121" text-anchor="start">ATT GÖRA</text>
+            <text class="balance-axis-pct" id="radar-lbl-todo" x="236" y="134" text-anchor="start" fill="#8c7bff">–</text>
+
+            <text class="balance-axis-label" x="140" y="224" text-anchor="middle">HOBBY</text>
+            <text class="balance-axis-pct" id="radar-lbl-hobby" x="140" y="237" text-anchor="middle" fill="#ff7a59">–</text>
+
+            <text class="balance-axis-label" x="44" y="121" text-anchor="end">BONUS</text>
+            <text class="balance-axis-pct" id="radar-lbl-bonus" x="44" y="134" text-anchor="end" fill="#ffd23f">–</text>
+          </g>
+        </svg>
+      </div>
+      <p class="explain">Andelen av det du planerat som blev gjort. Ett streck betyder att inget var planerat.</p>
+      <div class="modal-actions"></div>
     </div>
+  </div>
+
+  <!-- FÖRSTA START -->
+  <div class="modal-overlay" id="setup-modal" data-locked="1">
+    <form class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="setup-title" onsubmit="finishSetup(event, false)" novalidate>
+      <div class="modal-handle"></div>
+      <h2 id="setup-title" class="hello">Välkommen till Pulse</h2>
+      <p class="explain">Samla rutiner, att göra och hobbyer på ett ställe. Ditt batteri laddas när du gör dem.</p>
+      <div class="form-group">
+        <label class="form-label" for="setup-name">Vad heter du?</label>
+        <input type="text" class="form-input" id="setup-name" maxlength="30" autocomplete="given-name" />
+      </div>
+      <p class="form-error" id="setup-error" role="alert" hidden></p>
+      <div class="modal-actions">
+        <button type="submit" class="btn-save-modal">Börja</button>
+        <button type="button" class="btn-secondary" onclick="finishSetup(event, true)">Prova med exempeldata</button>
+      </div>
+    </form>
   </div>
 
 </div>
@@ -671,126 +782,468 @@
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       return data;
     },
-    list: date => api.req('GET', `/api/items?date=${date}`),
+    day: date => api.req('GET', `/api/day?date=${date}&today=${today()}`),
+    week: date => api.req('GET', `/api/week?date=${date}&today=${today()}`),
+    overview: () => api.req('GET', `/api/overview?today=${today()}`),
     add: item => api.req('POST', '/api/items', item),
     update: (id, patch) => api.req('PATCH', `/api/items/${id}`, patch),
-    chat: (history, today) => api.req('POST', '/api/chat', { history, today })
+    remove: (id, date) => api.req('DELETE', `/api/items/${id}?today=${today()}${date ? `&date=${date}` : ''}`),
+    setDone: (id, date, done) => api.req('POST', `/api/items/${id}/done`, { date, done, today: today() }),
+    move: (id, from, to) => api.req('POST', `/api/items/${id}/move`, { from, to, today: today() }),
+    profile: () => api.req('GET', '/api/profile'),
+    setup: (name, demo) => api.req('POST', '/api/setup', { name, demo, today: today() }),
+    chatLog: () => api.req('GET', '/api/chat'),
+    chat: message => api.req('POST', '/api/chat', { message, today: today() }),
+    clearChat: () => api.req('DELETE', '/api/chat')
   };
 
   // ===== DATUM (lokal tid, inte UTC) =====
-  function localDate(offset = 0) {
-    const d = new Date();
+  function localDate(offset = 0, from = new Date()) {
+    const d = new Date(from);
     d.setDate(d.getDate() + offset);
     const p = n => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
   }
-  const todayStr = localDate(0);
-  const tomorrowStr = localDate(1);
+  const today = () => localDate(0); // en funktion: appen kan stå öppen över midnatt
+  const parseDay = date => new Date(date + 'T12:00:00');
+  const shiftDate = (date, n) => localDate(n, parseDay(date));
+  const daysBetween = (a, b) => Math.round((parseDay(b) - parseDay(a)) / 864e5);
+  function fmtDay(date) {
+    const d = parseDay(date);
+    const label = `${DAY_SHORT[d.getDay()].toLowerCase()} ${d.getDate()} ${d.toLocaleDateString('sv-SE', { month: 'short' }).replace('.', '')}`;
+    return d.getFullYear() === new Date().getFullYear() ? label : `${label} ${d.getFullYear()}`;
+  }
+  const fmtWeekday = date => parseDay(date).toLocaleDateString('sv-SE', { weekday: 'long' });
 
-  let activeSelectedDate = todayStr;
-  let currentCategory = 'routine';
-  let selectedPriority = 'Medium';
-  let items = [];        // items för valt datum, hämtade från servern
-  let chatHistory = [];  // [{role, content}] skickas till /api/chat
+  function dayWord(date) {
+    const diff = daysBetween(today(), date);
+    return { '-1': 'Igår', 0: 'Idag', 1: 'Imorgon' }[diff] ?? fmtDay(date);
+  }
+
+  const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // 0 = söndag, veckan börjar på måndag
+  const DAY_SHORT = ['Sön', 'Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör'];
+  const DAY_LETTER = ['S', 'M', 'T', 'O', 'T', 'F', 'L'];
+
+  function repeatLabel(repeat) {
+    const key = [...repeat.days].sort().join('');
+    const base = { '0123456': 'Varje dag', '12345': 'Vardagar', '06': 'Helger' }[key]
+      ?? DAY_ORDER.filter(d => repeat.days.includes(d)).map(d => DAY_SHORT[d]).join(', ');
+    return repeat.until ? `${base}, t.o.m. ${fmtDay(repeat.until)}` : base;
+  }
+
+  // ===== TILLSTÅND =====
+  const TYPE_NAME = { routine: 'rutin', todo: 'uppgift', hobby: 'hobby', bonus: 'bonus' };
+  const SLUGS = { 'screen-home': 'idag', 'screen-routines': 'rutiner', 'screen-todos': 'att-gora', 'screen-hobbies': 'hobby', 'screen-ai': 'ai' };
+  const TAB_IDS = { 'screen-home': 'tab-home', 'screen-routines': 'tab-routines', 'screen-todos': 'tab-todos', 'screen-hobbies': 'tab-hobbies', 'screen-ai': 'tab-ai' };
+  const FAB = {
+    'screen-home': ['Lägg till', 'routine'],
+    'screen-routines': ['Ny rutin', 'routine'],
+    'screen-todos': ['Ny uppgift', 'todo'],
+    'screen-hobbies': ['Ny hobby', 'hobby']
+  };
+
+  let knownToday = today();
+  let activeDate = knownToday;
+  let activeScreen = 'screen-home';
+  let homeView = 'day';
+  let fabType = 'routine';
+  let profile = null;
+  let day = null, week = null, overview = null; // senaste svaren från servern
+  let loadError = false;
+  const known = new Map(); // id → senast visade data, ändra-arket fylls i från den
 
   // Skydd mot HTML-injektion: namn kan nu komma från AI:n
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   // ===== INIT =====
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('nav-date-picker').value = activeSelectedDate;
-    document.getElementById('input-date').value = activeSelectedDate;
-    updateClock();
-    setInterval(updateClock, 1000);
-    loadItems();
+  document.addEventListener('DOMContentLoaded', async () => {
+    buildDayPills();
+    document.getElementById('battery-card-element').addEventListener('animationend', e => e.currentTarget.classList.remove('charging'));
+    readRoute();
+    tick();
+    setInterval(tick, 1000);
+    window.addEventListener('hashchange', readRoute);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+
+    profile = await api.profile().catch(() => undefined); // undefined = servern svarar inte, inte "ny användare"
+    if (profile === null) showSheet('setup-modal', 'setup-name');
+    renderProfile();
+    await Promise.all([refresh(), loadChat()]);
   });
 
-  function updateClock() {
-    const now = new Date();
-    document.getElementById('current-time').textContent =
-      `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  function renderProfile() {
+    document.getElementById('hello').textContent = profile?.name ? `Hej, ${profile.name}` : 'Hej!';
   }
 
-  async function loadItems() {
+  async function finishSetup(e, demo) {
+    e.preventDefault();
+    const error = document.getElementById('setup-error');
     try {
-      items = await api.list(activeSelectedDate);
+      profile = await api.setup(document.getElementById('setup-name').value, demo);
+      closeSheet(true);
+      renderProfile();
+      renderChat([]);
+      refresh();
+    } catch (err) {
+      error.textContent = err.message;
+      error.hidden = false;
+    }
+  }
+
+  // Körs varje sekund: klockan, midnatt och batteriet håller sig aktuella utan omladdning.
+  let lastMinute = null;
+  function tick() {
+    const now = new Date();
+    const hhmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    document.getElementById('current-time').textContent = hhmm;
+
+    const current = today();
+    if (current !== knownToday) {
+      if (activeDate === knownToday) activeDate = current; // "Idag" följer med över midnatt
+      knownToday = current;
+      history.replaceState(null, '', routeHash());
+      refresh();
+    } else if (lastMinute && hhmm !== lastMinute && !document.hidden) {
+      refresh();
+    }
+    lastMinute = hhmm;
+  }
+
+  // Bara det senaste anropet får synas, annars kan ett långsamt svar skriva över rätt dag.
+  let loadSeq = 0;
+  async function refresh() {
+    const seq = ++loadSeq;
+    try {
+      const [d, w, o] = await Promise.all([api.day(activeDate), api.week(activeDate), api.overview()]);
+      if (seq !== loadSeq) return;
+      day = d; week = w; overview = o;
+      loadError = false;
     } catch (e) {
-      items = [];
+      if (seq !== loadSeq) return;
+      loadError = true;
       console.error(e);
     }
     renderAll();
   }
 
-  // ===== NAVIGATION =====
-  function selectQuickDate(type) {
-    activeSelectedDate = type === 'tomorrow' ? tomorrowStr : todayStr;
-    document.getElementById('btn-date-today').classList.toggle('active', type === 'today');
-    document.getElementById('btn-date-tomorrow').classList.toggle('active', type === 'tomorrow');
-    document.getElementById('nav-date-picker').value = activeSelectedDate;
-    loadItems();
+  // ===== NAVIGATION: skärm och dag står i adressen, så omladdning och bakåt fungerar =====
+  function routeHash() {
+    if (activeScreen !== 'screen-home') return '#' + SLUGS[activeScreen];
+    const view = homeView === 'week' ? 'vecka' : 'idag';
+    return activeDate === today() ? `#${view}` : `#${view}/${activeDate}`;
   }
 
-  function selectCustomDate(val) {
-    if (!val) return;
-    activeSelectedDate = val;
-    document.getElementById('btn-date-today').classList.toggle('active', val === todayStr);
-    document.getElementById('btn-date-tomorrow').classList.toggle('active', val === tomorrowStr);
-    loadItems();
+  function readRoute() {
+    const [slug, date] = location.hash.slice(1).split('/');
+    const screen = Object.keys(SLUGS).find(k => SLUGS[k] === slug) ?? 'screen-home';
+    if (screen === 'screen-home') {
+      homeView = slug === 'vecka' ? 'week' : 'day';
+      activeDate = /^\d{4}-\d{2}-\d{2}$/.test(date ?? '') && !isNaN(parseDay(date)) ? date : today();
+    }
+    showScreen(screen);
+    if (day && day.date !== activeDate) refresh(); else renderAll();
+  }
+
+  function showScreen(screenId) {
+    activeScreen = screenId;
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
+    const tab = document.getElementById(TAB_IDS[screenId]);
+    tab.classList.add('active');
+    tab.setAttribute('aria-current', 'page');
+
+    const fab = document.getElementById('fab');
+    fab.hidden = !FAB[screenId];
+    if (FAB[screenId]) {
+      document.getElementById('fab-label').textContent = FAB[screenId][0];
+      fabType = FAB[screenId][1];
+      fab.style.setProperty('--accent-fab', `var(--cat-${fabType})`);
+    }
+    if (screenId === 'screen-ai') scrollChat();
   }
 
   function switchTab(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    const map = { 'screen-home': 'tab-home', 'screen-routines': 'tab-routines', 'screen-todos': 'tab-todos', 'screen-hobbies': 'tab-hobbies', 'screen-ai': 'tab-ai' };
-    if (map[screenId]) document.getElementById(map[screenId]).classList.add('active');
+    activeScreen = screenId;
+    location.hash = routeHash();
+    showScreen(screenId);
+  }
+
+  // Idag-fliken betyder alltid idag, även om man senast tittade på en annan dag.
+  function goToday() {
+    activeDate = today();
+    switchTab('screen-home');
+    refresh();
+  }
+
+  function selectDate(date) {
+    if (!date) return;
+    activeDate = date;
+    history.replaceState(null, '', routeHash());
+    document.getElementById('screen-home').scrollTop = 0;
+    refresh();
+  }
+
+  function shiftWeek(dir) { selectDate(shiftDate(activeDate, dir * 7)); }
+
+  function setHomeView(view) {
+    homeView = view;
+    history.replaceState(null, '', routeHash());
+    renderHome();
+  }
+
+  function openDay(date) {
+    homeView = 'day';
+    activeDate = date;
+    switchTab('screen-home');
+    refresh();
+  }
+
+  // Den riktiga datumväljaren öppnas från knappen, så att den funkar även med tangentbord.
+  function openDatePicker() {
+    const input = document.getElementById('nav-date-picker');
+    input.value = activeDate;
+    try { input.showPicker(); } catch { input.focus(); }
   }
 
   // ===== RENDER =====
   function renderAll() {
-    const dateFormatted = new Date(activeSelectedDate + 'T12:00:00').toLocaleDateString('sv-SE', { weekday: 'short', day: 'numeric', month: 'short' });
-    document.getElementById('view-date-subtitle').textContent = `Visar energipott för ${dateFormatted}`;
-    for (const k of ['routines', 'todos', 'hobbies']) document.getElementById(`hdr-${k}-sub`).textContent = `Schema för ${dateFormatted}`;
-
-    renderList('routine', 'list-routines');
-    renderList('todo', 'list-todos');
-    renderList(['hobby', 'bonus'], 'list-hobbies');
-    calculateStats(items);
+    if (day) renderBattery(day.battery, day.next);
+    renderHome();
+    renderRoutines();
+    renderTodos();
+    renderHobbies();
   }
 
-  function renderList(types, containerId) {
-    const container = document.getElementById(containerId);
-    const typeArr = Array.isArray(types) ? types : [types];
-    const list = items.filter(item => typeArr.includes(item.type));
+  const errorHtml = () => `<div class="load-error" role="alert">Kunde inte hämta dina saker. De är kvar, men servern svarar inte just nu.<button onclick="refresh()">Försök igen</button></div>`;
 
-    if (list.length === 0) {
-      container.innerHTML = `<p style="font-size:13px;color:var(--text-3);padding:10px 0;">Inga aktiviteter för detta datum.</p>`;
+  function isFuture(o) {
+    if (o.type === 'todo') return Boolean(o.appointment) && o.deadline > today();
+    return o.date > today();
+  }
+
+  // Texten bredvid namnet: när det ska göras, inte hur datan ser ut.
+  function metaHtml(o, { showDate, showDeadline }) {
+    const parts = [];
+    if (showDate) parts.push(dayWord(o.date));
+    if (o.overdue) return `<span class="item-meta late">Försenad, skulle vara klar ${esc(fmtDay(o.deadline))}</span>`;
+    if (o.type === 'todo' && !o.done) {
+      const diff = daysBetween(today(), o.deadline);
+      if (o.appointment) { if (showDeadline) parts.push(dayWord(o.deadline)); }
+      else parts.push(diff === 0 ? 'Klart senast idag' : diff === 1 ? 'Klart senast imorgon' : `Klart senast ${fmtDay(o.deadline)} (om ${diff} dagar)`);
+    }
+    if (o.time) parts.push(`kl ${o.time}`);
+    if (o.minutes) parts.push(`${o.minutes} min`);
+    const badge = o.prio === 'High' && !o.done ? '<span class="item-prio-badge">Viktig</span>' : '';
+    return parts.length || badge ? `<span class="item-meta">${badge}${esc(parts.join(' · '))}</span>` : '';
+  }
+
+  function checkHtml(o) {
+    const future = isFuture(o);
+    const verb = o.done ? 'Ångra' : 'Bocka av';
+    const onclick = future ? `toast('Det ligger i framtiden. Bocka av det på dagen.')` : `toggleDone(${Number(o.id)}, '${esc(o.date)}', this)`;
+    return `<button class="check-circle ${future ? 'future' : ''}" role="checkbox" aria-checked="${Boolean(o.done)}" ${future ? 'aria-disabled="true"' : ''} aria-label="${verb}: ${esc(o.name)}" style="--dot:var(--cat-${esc(o.type)})" onclick="${onclick}">
+        <span class="check-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>
+      </button>`;
+  }
+
+  // En rad i schemat. Klick på ringen bockar av, klick på resten öppnar ändra-arket.
+  function rowHtml(o, { editDate = o.date, showDate = false, showDeadline = false } = {}) {
+    remember(o);
+    const chargeNow = !o.done && !isFuture(o) && o.date === today(); // på gamla dagar vet man inte vad det ger
+    return `<div class="item-row ${o.done ? 'done' : ''}">
+      ${checkHtml(o)}
+      <button class="item-info" aria-label="Ändra ${esc(o.name)}" onclick="openEdit(${Number(o.id)}, ${editDate ? `'${esc(editDate)}'` : 'null'})">
+        <span class="item-top">
+          <span class="item-name">${esc(o.name)}</span>
+          ${chargeNow ? `<span class="item-charge">+${Number(o.charge)} %</span>` : ''}
+        </span>
+        ${metaHtml(o, { showDate, showDeadline })}
+        ${o.desc ? `<span class="item-desc">${esc(o.desc)}</span>` : ''}
+      </button>
+    </div>`;
+  }
+
+  function remember(o) {
+    known.set(o.id, o);
+    known.set(`${o.id}:${o.date}`, o);
+  }
+
+  function renderHome() {
+    const isWeek = homeView === 'week';
+    // Veckan handlar om planen, inte om läget just nu: den får hela skärmen.
+    document.getElementById('battery-card-element').hidden = isWeek;
+    document.getElementById('date-row').hidden = isWeek;
+    document.getElementById('btn-week-prev').hidden = !isWeek;
+    document.getElementById('btn-week-next').hidden = !isWeek;
+    document.getElementById('btn-view-day').setAttribute('aria-pressed', !isWeek);
+    document.getElementById('btn-view-week').setAttribute('aria-pressed', isWeek);
+    document.getElementById('day-view').hidden = isWeek;
+    document.getElementById('week-view').hidden = !isWeek;
+    document.getElementById('btn-go-today').hidden = activeDate === today();
+
+    document.getElementById('day-title').textContent = isWeek ? `Vecka ${weekNumber(activeDate)}` : dayWord(activeDate);
+    if (week) renderStrip();
+    if (loadError) {
+      document.getElementById('day-count').textContent = '';
+      document.getElementById('day-view').innerHTML = errorHtml();
+      document.getElementById('week-view').innerHTML = errorHtml();
       return;
     }
-    container.innerHTML = '';
-    list.forEach(item => {
-      const colorVar = `--cat-${item.type}`;
-      const prioClass = item.prio === 'High' ? 'badge-high' : item.prio === 'Medium' ? 'badge-medium' : 'badge-low';
-      const row = document.createElement('div');
-      row.className = `item-row ${item.done ? 'done' : ''}`;
-      row.innerHTML = `
-        <button class="check-circle" style="--dot:var(${colorVar})" onclick="toggleDone(${Number(item.id)})">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg>
-        </button>
-        <div class="item-info">
-          <div class="item-top">
-            <span class="item-name">${esc(item.name)}</span>
-            <span class="item-time">${Number(item.minTime)}-${Number(item.maxTime)} min</span>
-          </div>
-          <div class="item-desc">
-            <span class="item-prio-badge ${prioClass}">${esc(item.prio)}</span>
-            ${esc(item.desc)}
-          </div>
-        </div>`;
-      container.appendChild(row);
-    });
+    if (!day || !week) return;
+    const planned = week.days.reduce((n, d) => n + d.total, 0);
+    const doneWeek = week.days.reduce((n, d) => n + d.done, 0);
+    document.getElementById('day-count').textContent = isWeek
+      ? `${doneWeek} av ${planned} klara`
+      : day.total ? `${day.done} av ${day.total} klara` : fmtDay(activeDate);
+    isWeek ? renderWeekView() : renderDayView();
   }
 
+  function weekNumber(date) {
+    const d = parseDay(date);
+    d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7)); // veckans torsdag avgör året
+    const jan4 = new Date(d.getFullYear(), 0, 4);
+    return 1 + Math.round(((d - jan4) / 864e5 - 3 + ((jan4.getDay() + 6) % 7)) / 7);
+  }
+
+  function renderStrip() {
+    document.getElementById('week-strip').innerHTML = week.days.map(d => {
+      const num = parseDay(d.date).getDate();
+      const wd = fmtWeekday(d.date);
+      const selected = d.date === activeDate;
+      return `<button class="day-cell ${selected ? 'active' : ''} ${d.date === today() ? 'today' : ''}" ${selected ? 'aria-current="date"' : ''} aria-label="${esc(wd)} ${num}, ${d.done} av ${d.total} klara" onclick="selectDate('${esc(d.date)}')">
+        <span class="dc-wd">${esc(wd.slice(0, 3))}</span>
+        <span class="dc-num">${num}</span>
+        <span class="dc-bar"><span style="width:${d.total ? Math.round((d.done / d.total) * 100) : 0}%"></span></span>
+      </button>`;
+    }).join('');
+  }
+
+  function renderDayView() {
+    const open = day.items.filter(o => !o.done);
+    const done = day.items.filter(o => o.done);
+    const isToday = activeDate === today();
+    let html = '';
+    if (!day.items.length) {
+      const nothingYet = isToday && !overview?.routines.length && !overview?.todos.open.length && !overview?.hobbies.length;
+      html = `<p class="empty">${nothingYet
+        ? 'Här är tomt än. Börja med något du vill göra regelbundet, tryck på Lägg till.'
+        : activeDate < today() ? 'Inget var planerat den här dagen.' : 'Inget planerat. En vilodag är också bra.'}</p>`;
+    }
+    if (open.length) html += `<div class="list">${open.map(o => rowHtml(o)).join('')}</div>`;
+    if (done.length) html += `<p class="list-label">Klart (${done.length})</p><div class="list">${done.map(o => rowHtml(o)).join('')}</div>`;
+    if (day.upcoming.length) {
+      html += `<p class="list-label">Snart</p><div class="list">${day.upcoming.map(o => rowHtml(o, { showDeadline: true })).join('')}</div>`;
+    }
+    document.getElementById('day-view').innerHTML = html;
+  }
+
+  const byClock = (a, b) => (a.time ?? '99:99').localeCompare(b.time ?? '99:99'); // veckan läses i tidsordning
+
+  function renderWeekView() {
+    document.getElementById('week-view').innerHTML = week.days.map(d => `
+      <button class="week-day ${d.date === today() ? 'today' : ''}" onclick="openDay('${esc(d.date)}')">
+        <span class="week-head"><b>${esc(dayWord(d.date) === fmtDay(d.date) ? fmtDay(d.date) : `${dayWord(d.date)}, ${fmtDay(d.date)}`)}</b><span>${d.total ? `${d.done} av ${d.total}` : 'Inget planerat'}</span></span>
+        ${[...d.items].sort(byClock).map(o => `<span class="week-item ${o.done ? 'done' : ''}">
+          <span class="dot ${esc(o.type)}"></span>
+          ${o.time ? `<span class="wi-time">${esc(o.time)}</span>` : ''}
+          <span class="wi-name">${esc(o.name)}</span>
+        </span>`).join('')}
+      </button>`).join('');
+  }
+
+  function dotsHtml(progress, color) {
+    const words = { done: 'klart', missed: 'missat', pending: 'kvar idag', planned: 'kommer', none: 'inget planerat' };
+    const summary = progress.week.map(d => `${fmtWeekday(d.date)}: ${words[d.state]}`).join(', ');
+    return `<span class="dots" role="img" aria-label="Den här veckan. ${esc(summary)}" style="--c:var(${color})">${progress.week.map(d =>
+      `<span class="day-dot ${esc(d.state)}">${DAY_LETTER[parseDay(d.date).getDay()]}</span>`).join('')}</span>`;
+  }
+
+  // Gjort något en dag det inte var planerat? Då ska det gå att säga det.
+  function offDayCheck(o) {
+    return `<button class="check-circle off-day" role="checkbox" aria-checked="false" aria-label="Gjorde det idag: ${esc(o.name)}" title="Gjorde det idag" style="--dot:var(--cat-${esc(o.type)})" onclick="toggleDone(${Number(o.id)}, '${today()}', this)">
+        <span class="check-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>
+      </button>`;
+  }
+
+  const streakText = n => (n >= 2 ? `${n} i rad` : '');
+
+  function renderRoutines() {
+    const el = document.getElementById('list-routines');
+    if (loadError) { el.innerHTML = errorHtml(); return; }
+    if (!overview) return;
+    if (!overview.routines.length && !overview.ended.length) {
+      el.innerHTML = `<p class="empty" style="padding-left:0">Inga rutiner än. Lägg in något du vill göra regelbundet, så följer det med dag för dag.</p>`;
+      return;
+    }
+    const active = overview.routines.map(r => {
+      known.set(r.id, r);
+      if (r.today) remember(r.today);
+      const when = [repeatLabel(r.repeat), r.time && `kl ${r.time}`, r.minutes && `${r.minutes} min`].filter(Boolean).join(' · ');
+      return `<div class="item-row ${r.today?.done ? 'done' : ''}">
+        ${r.today ? checkHtml(r.today) : offDayCheck(r)}
+        <button class="item-info" aria-label="Ändra ${esc(r.name)}" onclick="openEdit(${Number(r.id)}, ${r.today ? `'${esc(r.today.date)}'` : 'null'})">
+          <span class="item-top">
+            <span class="item-name">${esc(r.name)}</span>
+            <span class="streak" style="--c:var(--cat-routine)">${streakText(r.progress.streak)}</span>
+          </span>
+          <span class="item-meta">${esc(when)}</span>
+          ${dotsHtml(r.progress, '--cat-routine')}
+        </button>
+      </div>`;
+    }).join('');
+    const ended = overview.ended.map(r => {
+      known.set(r.id, r);
+      return `<div class="item-row">
+        <button class="item-info" style="padding-left:12px" aria-label="Ändra ${esc(r.name)}" onclick="openEdit(${Number(r.id)}, null)">
+          <span class="item-name">${esc(r.name)}</span>
+          <span class="item-meta">Klar ${esc(fmtDay(r.repeat.until))}: ${Number(r.sessionsDone)} av ${Number(r.sessions)} pass</span>
+        </button>
+      </div>`;
+    }).join('');
+    el.innerHTML = active + (ended ? `<p class="list-label" style="padding-left:0">Avslutade</p>${ended}` : '');
+  }
+
+  function renderTodos() {
+    const el = document.getElementById('list-todos');
+    const sub = document.getElementById('hdr-todos-sub');
+    if (loadError) { el.innerHTML = errorHtml(); return; }
+    if (!overview) return;
+    const { open, done } = overview.todos;
+    const late = open.filter(o => o.overdue);
+    const rest = open.filter(o => !o.overdue);
+    sub.textContent = open.length ? `${open.length} kvar${late.length ? `, ${late.length} försenad${late.length > 1 ? 'e' : ''}` : ''}` : 'Allt är gjort';
+    const section = (title, list) => list.length
+      ? `${title ? `<p class="list-label">${title}</p>` : ''}<div class="list">${list.map(o => rowHtml({ ...o, date: o.done ? o.date : today() }, { editDate: null, showDeadline: true })).join('')}</div>`
+      : '';
+    el.innerHTML = (open.length || done.length)
+      ? section(late.length ? 'Försenade' : '', late) + section(late.length ? 'Kommande' : '', rest) + section('Klara', done)
+      : `<p class="empty">Inget att göra. Lägg till något med en deadline, så syns det här tills det är klart.</p>`;
+  }
+
+  function renderHobbies() {
+    const el = document.getElementById('list-hobbies');
+    const bonus = document.getElementById('list-bonus');
+    if (loadError) { el.innerHTML = errorHtml(); bonus.innerHTML = ''; return; }
+    if (!overview) return;
+    el.innerHTML = overview.hobbies.length
+      ? overview.hobbies.map(h => {
+        const p = h.progress;
+        return `<article class="hobby-card">
+          <div class="hobby-head"><h2>${esc(h.name)}</h2><span class="streak">${streakText(p.streak)}</span></div>
+          <p class="hobby-sub">Den här veckan: ${p.weekDone} av ${p.weekPlanned} pass${p.weekMinutes ? `, ${p.weekMinutes} min` : ''}</p>
+          ${dotsHtml(p, '--cat-hobby')}
+          ${h.next ? `<div class="hobby-next">${rowHtml(h.next, { showDate: true })}</div>` : ''}
+          ${h.offDay ? `<div class="hobby-next"><div class="item-row">${offDayCheck(h.offDay)}<span class="item-info"><span class="item-meta">Gjorde det idag ändå</span></span></div></div>` : ''}
+        </article>`;
+      }).join('')
+      : `<p class="empty" style="padding-left:0">Ingen hobby än. Lägg in det du vill bli bättre på, så ser du här om du håller i det.</p>`;
+    bonus.innerHTML = overview.bonus.length
+      ? overview.bonus.map(o => rowHtml(o)).join('')
+      : `<p class="empty" style="padding:0 0 10px">Inget idag. Testa en promenad eller ett glas vatten.</p>`;
+  }
+
+  // ===== BOCKA AV =====
   function chargeAnimation() {
     const card = document.getElementById('battery-card-element');
     card.classList.remove('charging');
@@ -799,151 +1252,447 @@
   }
 
   // Optimistisk uppdatering: UI ändras direkt, servern sparar i bakgrunden.
-  async function toggleDone(id) {
-    const item = items.find(i => i.id === id);
-    if (!item) return;
-    item.done = !item.done;
-    chargeAnimation();
-    renderAll();
+  const pendingTicks = new Set();
+  async function toggleDone(id, date, btn) {
+    const key = `${id}:${date}`;
+    if (pendingTicks.has(key)) return;
+    pendingTicks.add(key);
+    const row = btn.closest('.item-row');
+    const done = !row.classList.contains('done');
+    row.classList.toggle('done', done);
+    btn.setAttribute('aria-checked', done);
     try {
-      await api.update(id, { done: item.done });
+      const { battery, gained, covered } = await api.setDone(id, date, done);
+      if (done) {
+        chargeAnimation();
+        const swap = covered ? ` Räknas som passet ${dayWord(covered).toLowerCase()}.` : '';
+        toast(`${gained > 0 ? `+${gained} %.` : 'Klart!'} ${leftWords(battery).val}.${swap}`);
+      }
     } catch (e) {
-      item.done = !item.done; // rulla tillbaka om servern misslyckas
-      renderAll();
-      alert('Kunde inte spara: ' + e.message);
+      row.classList.toggle('done', !done); // rulla tillbaka om servern misslyckas
+      btn.setAttribute('aria-checked', !done);
+      toast('Kunde inte spara: ' + e.message, { error: true });
     }
+    pendingTicks.delete(key);
+    refresh();
   }
 
-  // ===== BATTERI & RADAR =====
-  function calculateStats(items) {
-    const stats = { routine: { total: 0, done: 0 }, todo: { total: 0, done: 0 }, hobby: { total: 0, done: 0 }, bonus: { total: 0, done: 0 } };
-    items.forEach(i => {
-      if (stats[i.type]) {
-        stats[i.type].total++;
-        if (i.done) stats[i.type].done++;
-      }
-    });
-    const getPct = cat => stats[cat].total > 0 ? Math.round((stats[cat].done / stats[cat].total) * 100) : 0;
-    const rPct = getPct('routine'), tPct = getPct('todo'), hPct = getPct('hobby'), bPct = getPct('bonus');
+  // ===== BATTERI =====
+  // När tar det slut, i ord. "Tisdag kväll" går att förstå direkt, det gör inte 12:57:36.
+  function emptyWords(iso) {
+    const at = new Date(iso);
+    const diff = daysBetween(today(), localDate(0, at));
+    const hour = at.getHours();
+    if (hour < 5) return diff <= 1 ? 'i natt' : `natten mot ${fmtWeekday(localDate(0, at))}`;
+    const part = hour < 10 ? 'morgon' : hour < 13 ? 'förmiddag' : hour < 18 ? 'eftermiddag' : 'kväll';
+    if (diff === 0) return { eftermiddag: 'i eftermiddag', kväll: 'ikväll' }[part] ?? `ca kl ${String(hour).padStart(2, '0')}`;
+    if (diff === 1) return part === 'morgon' ? 'imorgon bitti' : `imorgon ${part}`;
+    return `${fmtWeekday(localDate(0, at))} ${part}`;
+  }
 
-    document.getElementById('nav-routines-sub').textContent = `${stats.routine.done} of ${stats.routine.total} done`;
-    document.getElementById('nav-todos-sub').textContent = `${stats.todo.done} of ${stats.todo.total} complete`;
-    document.getElementById('nav-hobbies-sub').textContent = `${stats.hobby.done + stats.bonus.done} of ${stats.hobby.total + stats.bonus.total} logged`;
+  function leftWords(b) {
+    if (!b.level) return { val: 'Tomt', lab: 'Bocka av något för att ladda' };
+    const h = b.hoursLeft;
+    const val = h < 1 ? 'Räcker under en timme'
+      : h < 24 ? `Räcker ca ${Math.round(h)} h`
+      : `Räcker ca ${String(Math.round(h / 12) / 2).replace('.', ',')} dygn`;
+    return { val, lab: `till ${emptyWords(b.emptyAt)}` };
+  }
 
-    const overallDone = items.filter(i => i.done).length;
-    const totalBattery = items.length > 0 ? Math.round((overallDone / items.length) * 100) : 0;
-    document.getElementById('total-battery-pct').textContent = totalBattery;
-    const chatPct = document.getElementById('ai-chat-pct');
-    if (chatPct) chatPct.textContent = totalBattery + '%';
+  function renderBattery(b, next) {
+    const words = leftWords(b);
+    document.getElementById('total-battery-pct').textContent = b.level;
+    document.getElementById('battery-time-left').textContent = words.val;
+    document.getElementById('battery-time-lab').textContent = words.lab;
+    for (const t of ['routine', 'todo', 'hobby', 'bonus']) {
+      document.getElementById(`seg-${t}`).style.flexBasis = `${b.byType[t]}%`;
+      document.getElementById(`leg-${t}`).textContent = b.byType[t];
+    }
+    let state;
+    if (next) state = `Nästa: ${next.name}${next.time ? ` kl ${next.time}` : ''} ger +${next.charge} %`;
+    else if (day?.todayTotal) state = 'Allt klart för idag. Bra jobbat!';
+    else state = 'Inget planerat idag.';
+    document.getElementById('battery-state-text').textContent = state;
+    document.getElementById('battery-card-element').setAttribute('aria-label', `Batteri ${b.level} procent. ${words.val} ${words.lab}. ${state}. Visa hur batteriet funkar.`);
+  }
 
-    const stateElem = document.getElementById('battery-state-text');
-    if (totalBattery === 100) stateElem.textContent = 'Fully Charged! Max energy';
-    else if (totalBattery >= 60) stateElem.textContent = 'Building great momentum';
-    else if (totalBattery >= 30) stateElem.textContent = 'Steady progress';
-    else stateElem.textContent = 'Low charge — start your routines';
-
-    document.getElementById('seg-routine').style.flex = `0 0 ${rPct}%`;
-    document.getElementById('seg-todo').style.flex = `0 0 ${tPct}%`;
-    document.getElementById('seg-hobby').style.flex = `0 0 ${hPct}%`;
-    document.getElementById('seg-bonus').style.flex = `0 0 ${bPct}%`;
-
-    document.getElementById('leg-routine').textContent = rPct + '%';
-    document.getElementById('leg-todo').textContent = tPct + '%';
-    document.getElementById('leg-hobby').textContent = hPct + '%';
-    document.getElementById('leg-bonus').textContent = bPct + '%';
-
-    // Radar: centrum (140,125), radie 80 vertikalt / 88 horisontellt
-    const ry = 125 - (rPct / 100) * 80;
-    const tx = 140 + (tPct / 100) * 88;
-    const hy = 125 + (hPct / 100) * 80;
-    const bx = 140 - (bPct / 100) * 88;
+  function renderRadar(b) {
+    const v = k => (b[k] ?? 0) / 100;
+    const ry = 125 - v('routine') * 80;
+    const tx = 140 + v('todo') * 88;
+    const hy = 125 + v('hobby') * 80;
+    const bx = 140 - v('bonus') * 88;
     document.getElementById('radar-polygon').setAttribute('points', `140,${ry} ${tx},125 140,${hy} ${bx},125`);
     document.getElementById('node-routine').setAttribute('cy', ry);
     document.getElementById('node-todo').setAttribute('cx', tx);
     document.getElementById('node-hobby').setAttribute('cy', hy);
     document.getElementById('node-bonus').setAttribute('cx', bx);
-    document.getElementById('radar-lbl-routine').textContent = rPct + '%';
-    document.getElementById('radar-lbl-todo').textContent = tPct + '%';
-    document.getElementById('radar-lbl-hobby').textContent = hPct + '%';
-    document.getElementById('radar-lbl-bonus').textContent = bPct + '%';
+    const label = k => (b[k] === null ? '–' : `${b[k]}%`);
+    for (const k of ['routine', 'todo', 'hobby', 'bonus']) document.getElementById(`radar-lbl-${k}`).textContent = label(k);
+    document.getElementById('balance-svg').setAttribute('aria-label',
+      `Livsbalans senaste 7 dagarna: rutiner ${label('routine')}, att göra ${label('todo')}, hobby ${label('hobby')}, bonus ${label('bonus')}`);
   }
 
-  // ===== MODAL =====
+  function openBatterySheet() {
+    const rate = day?.battery.drainPerHour ?? 1;
+    const fullDays = Math.round(100 / rate / 24);
+    const words = day ? leftWords(day.battery) : null;
+    document.getElementById('battery-explain').innerHTML =
+      `Batteriet visar <b>hur bra du håller din egen plan</b>, inte hur du mår. Varje sak du bockar av laddar det med sin del av veckans plan, och längre pass väger mer. ` +
+      `Stor eller liten plan spelar ingen roll: håller du den laddas det snabbare än det sjunker. ` +
+      `Det <b>sjunker ${String(rate).replace('.', ',')} % i timmen</b>, så fullt batteri räcker ungefär ${fullDays} dygn. Tomt betyder bara att det var ett tag sedan, inget händer.` +
+      (words && day.battery.level ? ` Just nu: <b>${esc(words.val.toLowerCase())} ${esc(words.lab)}</b>.` : '');
+    if (overview) renderRadar(overview.balance);
+    showSheet('battery-modal');
+  }
+
+  // ===== ARK: fokus stannar i arket, Escape stänger och fokus går tillbaka efteråt =====
+  let openSheetEl = null;
+  let returnFocus = null;
+
+  function showSheet(id, focusId) {
+    openSheetEl = document.getElementById(id);
+    returnFocus = document.activeElement;
+    openSheetEl.classList.add('active');
+    const target = focusId ? document.getElementById(focusId) : openSheetEl.querySelector('button, input');
+    target?.focus();
+  }
+
+  function closeSheet(force) {
+    if (!openSheetEl || (openSheetEl.dataset.locked && !force)) return;
+    openSheetEl.classList.remove('active');
+    openSheetEl = null;
+    returnFocus?.focus?.();
+  }
+
+  function closeSheetOnOverlay(e) { if (e.target.classList.contains('modal-overlay')) closeSheet(); }
+
+  document.addEventListener('keydown', e => {
+    if (!openSheetEl) return;
+    if (e.key === 'Escape') return closeSheet();
+    if (e.key !== 'Tab') return;
+    const focusable = [...openSheetEl.querySelectorAll('button, input, textarea')].filter(el => !el.disabled && el.offsetParent !== null);
+    const first = focusable[0], last = focusable.at(-1);
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  // ===== LÄGG TILL / ÄNDRA: samma formulär, fälten följer vad som läggs till =====
+  const FORM = {
+    routine: { placeholder: 't.ex. Gym', hint: 'Något du vill göra regelbundet, som träning eller stretch.' },
+    todo: { placeholder: 't.ex. Lämna in uppsats', hint: 'Något som ska bli klart, det följer med tills du bockat av det. Med klockslag blir det en tid att passa, som tandläkaren.' },
+    hobby: { placeholder: 't.ex. Gitarr', hint: 'Det du vill bli bättre på. Under Hobby ser du om du håller i det.' },
+    bonus: { placeholder: 't.ex. Promenad', hint: 'Något litet som ger lite extra energi.' }
+  };
+
+  let form = { type: 'routine', repeating: true, days: [], prio: 'Medium', editing: null, occurrence: null };
+
+  function buildDayPills() {
+    document.getElementById('day-pills').innerHTML = DAY_ORDER.map(d =>
+      `<button type="button" class="day-pill" data-day="${d}" aria-label="${DAY_SHORT[d]}" onclick="toggleDay(${d})">${DAY_LETTER[d]}</button>`).join('');
+  }
+
+  const field = id => document.getElementById(id);
+  const startDate = () => (activeScreen === 'screen-home' && activeDate > today() ? activeDate : today());
+
+  function isRepeating() {
+    if (form.type === 'routine') return true;
+    return form.type !== 'todo' && form.repeating;
+  }
+
+  function syncForm() {
+    const repeating = isRepeating();
+    const { placeholder, hint } = FORM[form.type];
+    document.querySelectorAll('.type-btn').forEach(b => b.setAttribute('aria-pressed', b.dataset.type === form.type));
+    field('type-group').hidden = Boolean(form.editing);
+    field('type-hint').textContent = hint;
+    field('type-hint').hidden = Boolean(form.editing);
+    field('input-title').placeholder = placeholder;
+    field('group-freq').hidden = form.type === 'routine' || form.type === 'todo';
+    field('freq-once').setAttribute('aria-pressed', !repeating);
+    field('freq-repeat').setAttribute('aria-pressed', repeating);
+    field('group-date').hidden = repeating;
+    field('label-date').textContent = form.type === 'todo' && !field('input-time').value ? 'Klart senast' : 'Datum';
+    field('group-repeat').hidden = !repeating;
+    field('group-period').hidden = !field('input-period').checked;
+    document.querySelectorAll('.day-pill').forEach(b => b.setAttribute('aria-pressed', form.days.includes(Number(b.dataset.day))));
+    document.querySelectorAll('.prio-btn').forEach(b => b.setAttribute('aria-pressed', b.dataset.prio === form.prio));
+  }
+
+  function setType(type) {
+    form.type = type;
+    if (!form.editing) form.repeating = type === 'routine' || type === 'hobby';
+    syncForm();
+  }
+  function setRepeating(on) { form.repeating = on; syncForm(); }
+  function setDays(days) { form.days = [...days]; syncForm(); }
+  // Är alla på väljer första trycket just den dagen, annars skulle "gym måndag" stänga av måndagen.
+  function toggleDay(d) {
+    if (form.days.length === 7) form.days = [d];
+    else form.days = form.days.includes(d) ? form.days.filter(x => x !== d) : [...form.days, d];
+    syncForm();
+  }
+  function setPrio(prio) { form.prio = prio; syncForm(); }
+
+  function toggleMore(open) {
+    const group = field('group-more');
+    group.hidden = open === undefined ? !group.hidden : !open;
+    field('btn-more').setAttribute('aria-expanded', !group.hidden);
+  }
+
+  function showFormError(message, focusId) {
+    const el = field('form-error');
+    el.textContent = message;
+    el.hidden = !message;
+    if (focusId) field(focusId).focus();
+  }
+
+  function fillForm(values) {
+    field('input-title').value = values.name ?? '';
+    field('input-desc').value = values.desc ?? '';
+    field('input-time').value = values.time ?? '';
+    field('input-minutes').value = values.minutes ?? '';
+    field('input-date').value = values.date;
+    field('input-from').value = values.from;
+    field('input-until').value = values.until ?? '';
+    field('input-period').checked = Boolean(values.until);
+    field('session-box').hidden = true;
+    field('edit-scope').hidden = true;
+    field('move-row').hidden = true;
+    showFormError('');
+  }
+
   function openModal(type) {
-    currentCategory = type;
-    selectedPriority = 'Medium';
-    const titles = { routine: 'New routine', todo: 'New task', hobby: 'Add activity' };
-    const btnTexts = { routine: 'Save routine', todo: 'Save task', hobby: 'Save activity' };
-    document.getElementById('modal-title').textContent = titles[type] || 'New item';
-    document.getElementById('btn-save').textContent = btnTexts[type] || 'Save';
-    document.getElementById('input-title').value = '';
-    document.getElementById('input-desc').value = '';
-    document.getElementById('input-min').value = '30';
-    document.getElementById('input-max').value = '60';
-    document.getElementById('input-date').value = activeSelectedDate;
-    document.querySelectorAll('.prio-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.prio === 'Medium'));
-    document.getElementById('add-modal').classList.add('active');
-  }
-  function closeModal() { document.getElementById('add-modal').classList.remove('active'); }
-  function closeModalOnOverlay(e) { if (e.target.classList.contains('modal-overlay')) closeModal(); }
-  function setPrio(btn) {
-    selectedPriority = btn.dataset.prio;
-    document.querySelectorAll('.prio-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    form = { type, repeating: type === 'routine' || type === 'hobby', days: [0, 1, 2, 3, 4, 5, 6], prio: 'Medium', editing: null, occurrence: null };
+    const date = activeDate >= today() ? activeDate : today();
+    fillForm({ date, from: startDate() });
+    field('modal-title').textContent = 'Lägg till';
+    field('btn-save').textContent = 'Spara';
+    toggleMore(false);
+    renderDeleteArea();
+    syncForm();
+    showSheet('add-modal', 'input-title');
   }
 
-  async function saveItem() {
-    const name = document.getElementById('input-title').value.trim();
-    if (!name) return alert('Vänligen ange en titel.');
-    try {
-      await api.add({
-        date: document.getElementById('input-date').value || activeSelectedDate,
-        type: currentCategory,
-        name,
-        desc: document.getElementById('input-desc').value.trim(),
-        minTime: parseInt(document.getElementById('input-min').value) || 15,
-        maxTime: parseInt(document.getElementById('input-max').value) || 30,
-        prio: selectedPriority
-      });
-      closeModal();
-      loadItems();
-    } catch (e) {
-      alert('Kunde inte spara: ' + e.message);
+  function openEdit(id, occurrenceDate) {
+    const o = known.get(`${id}:${occurrenceDate}`) ?? known.get(id);
+    if (!o) return;
+    const start = o.start ?? o.date;
+    form = {
+      type: o.type,
+      repeating: Boolean(o.repeat),
+      days: o.repeat?.days ?? [0, 1, 2, 3, 4, 5, 6],
+      prio: o.prio,
+      editing: { id, start, name: o.name, type: o.type, repeat: o.repeat },
+      occurrence: occurrenceDate
+    };
+    fillForm({ ...o, date: o.deadline ?? start, from: start, until: o.repeat?.until });
+    field('modal-title').textContent = `Ändra ${TYPE_NAME[o.type]}`;
+    field('btn-save').textContent = 'Spara ändringar';
+    toggleMore(Boolean(o.desc) || o.prio !== 'Medium');
+    renderDeleteArea();
+    syncForm();
+    if (o.repeat) {
+      field('edit-scope').hidden = false;
+      // Bara ett pass som inte är gjort än går att flytta eller hoppa över.
+      if (occurrenceDate && !o.done) {
+        field('session-box').hidden = false;
+        field('session-title').textContent = `Bara passet ${dayWord(occurrenceDate).toLowerCase()}:`;
+      }
     }
+    showSheet('add-modal', 'input-title');
   }
 
-  // ===== DREAM AI: riktig agent via /api/chat =====
+  function showMove() {
+    field('move-row').hidden = false;
+    field('input-move').value = shiftDate(form.occurrence, 1);
+    field('input-move').focus();
+  }
+
+  async function moveSession() {
+    const to = field('input-move').value;
+    if (!to) return showFormError('Välj en dag.', 'input-move');
+    const { id, name } = form.editing;
+    try {
+      await api.move(id, form.occurrence, to);
+    } catch (err) {
+      return showFormError(err.message);
+    }
+    closeSheet();
+    await refresh();
+    toast(`${name} flyttad till ${dayWord(to).toLowerCase()}`, to === activeDate ? {} : { label: 'Visa', run: () => openDay(to) });
+  }
+
+  function readForm() {
+    const name = field('input-title').value.trim();
+    if (!name) return showFormError('Skriv ett namn.', 'input-title');
+
+    const minutesRaw = field('input-minutes').value.trim();
+    const minutes = minutesRaw === '' ? null : Number(minutesRaw);
+    if (field('input-minutes').validity.badInput || (minutes !== null && (!Number.isInteger(minutes) || minutes < 1 || minutes > 600))) {
+      return showFormError('Minuter ska vara ett heltal mellan 1 och 600.', 'input-minutes');
+    }
+
+    const repeating = isRepeating();
+    let date = field('input-date').value;
+    let repeat = null;
+    if (repeating) {
+      if (!form.days.length) return showFormError('Välj minst en dag.');
+      const period = field('input-period').checked;
+      const until = period ? field('input-until').value : '';
+      date = period ? field('input-from').value : (form.editing?.start ?? startDate());
+      if (period && !date) return showFormError('Välj när perioden börjar.', 'input-from');
+      if (period && !until) return showFormError('Välj när perioden slutar.', 'input-until');
+      if (period && until < date) return showFormError('Perioden kan inte sluta innan den börjar.', 'input-until');
+      repeat = { days: form.days, until: until || null };
+    } else if (!date) {
+      return showFormError(form.type === 'todo' ? 'Välj när det ska vara klart.' : 'Välj ett datum.', 'input-date');
+    } else if (form.type === 'todo' && !form.editing && date < today()) {
+      return showFormError('Det datumet har redan varit.', 'input-date');
+    }
+
+    return {
+      name,
+      desc: field('input-desc').value.trim(),
+      date,
+      time: field('input-time').value || null,
+      minutes,
+      prio: form.prio,
+      repeat
+    };
+  }
+
+  async function saveItem(e) {
+    e.preventDefault();
+    const item = readForm();
+    if (!item) return;
+    const editing = form.editing;
+    try {
+      if (editing) await api.update(editing.id, item);
+      else await api.add({ ...item, type: form.type });
+    } catch (err) {
+      return showFormError('Kunde inte spara: ' + err.message);
+    }
+    closeSheet();
+    await refresh();
+    // Hamnar det på en annan dag än den som visas ska det inte se ut som att inget hände.
+    const where = item.repeat ? repeatLabel(item.repeat) : dayWord(item.date).toLowerCase();
+    const elsewhere = !item.repeat && activeScreen === 'screen-home' && item.date !== activeDate;
+    toast(`Sparat: ${item.name}, ${where}`, elsewhere ? { label: 'Visa', run: () => openDay(item.date) } : {});
+  }
+
+  function renderDeleteArea(step) {
+    const area = field('delete-area');
+    const editing = form.editing;
+    if (!editing) { area.innerHTML = ''; return; }
+    if (step !== 'ask') {
+      area.innerHTML = `<button type="button" class="btn-secondary btn-danger" onclick="renderDeleteArea('ask')">Ta bort</button>`;
+      return;
+    }
+    area.innerHTML = `<div class="delete-ask">
+      <p>Ta bort ${esc(editing.name)}${editing.repeat ? ' helt, alla pass framåt' : ''}? Det du redan gjort räknas fortfarande.</p>
+      <button type="button" class="btn-secondary btn-danger" onclick="confirmDelete(null)">Ja, ta bort</button>
+      <button type="button" class="btn-secondary" onclick="renderDeleteArea()">Avbryt</button>
+    </div>`;
+    area.querySelector('button').focus();
+  }
+
+  // Eget funktionsnamn: i en onclick inne i ett <form> betyder "form" formulärelementet, inte variabeln.
+  function skipSession() { confirmDelete(form.occurrence); }
+
+  async function confirmDelete(date) {
+    const { id, name } = form.editing;
+    try {
+      await api.remove(id, date);
+    } catch (err) {
+      return showFormError('Kunde inte ta bort: ' + err.message);
+    }
+    closeSheet();
+    refresh();
+    toast(date ? `${name} borttagen ${dayWord(date).toLowerCase()}` : `${name} borttagen`);
+  }
+
+  // ===== TOAST: kort besked där man är =====
+  let toastTimer = null;
+  function toast(message, { label, run, error } = {}) {
+    const el = document.getElementById('toast');
+    el.textContent = message;
+    el.classList.toggle('error', Boolean(error));
+    if (label) {
+      const btn = document.createElement('button');
+      btn.textContent = label;
+      btn.onclick = () => { el.classList.remove('show'); run(); };
+      el.appendChild(btn);
+    }
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), label ? 6000 : 3500);
+  }
+
+  // ===== DREAM AI: riktig agent via /api/chat. Samtalet ligger på servern =====
   function addBubble(role, text) {
     const chatBody = document.getElementById('ai-chat-body');
     const el = document.createElement('div');
     el.className = `chat-msg ${role}`;
     el.textContent = text;
     chatBody.appendChild(el);
-    chatBody.scrollTop = chatBody.scrollHeight;
+    scrollChat();
     return el;
   }
 
+  function scrollChat() {
+    const chatBody = document.getElementById('ai-chat-body');
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+
   // Varje handling agenten gjorde visas som ett kort → användaren ser exakt vad som ändrats.
+  // Samma sak flera gånger blir ett kort, så att svaret inte drunknar.
   function addActionCards(actions) {
     if (!actions?.length) return;
-    const labels = { add: 'La till', done: 'Bockade av', update: 'Ändrade', delete: 'Tog bort' };
-    const icons = { add: '+', done: '✓', update: '✎', delete: '×' };
+    const labels = { add: 'La till', done: 'Bockade av', undone: 'Ångrade', update: 'Ändrade', delete: 'Tog bort', skip: 'Tog bort en dag', move: 'Flyttade', notes: 'Planerade' };
+    const icons = { add: '+', done: '✓', undone: '↺', update: '✎', delete: '×', skip: '×', move: '→', notes: '✎' };
+    const groups = new Map();
+    for (const a of actions) {
+      const key = `${a.kind}:${a.item.name}`;
+      if (!groups.has(key)) groups.set(key, { ...a, count: 0 });
+      groups.get(key).count++;
+    }
     const chatBody = document.getElementById('ai-chat-body');
     const wrap = document.createElement('div');
     wrap.className = 'action-list';
-    actions.forEach(a => {
-      const d = new Date(a.item.date + 'T12:00:00').toLocaleDateString('sv-SE', { weekday: 'short', day: 'numeric', month: 'short' });
-      const card = document.createElement('div');
+    for (const a of groups.values()) {
+      const oneDay = ['done', 'undone', 'skip', 'move'].includes(a.kind);
+      const when = a.item.repeat && !oneDay ? repeatLabel(a.item.repeat) : a.count > 1 ? `${a.count} dagar` : fmtDay(a.item.date);
+      const card = document.createElement('button');
       card.className = `action-card ${a.kind}`;
       card.style.setProperty('--c', `var(--cat-${a.item.type})`);
       card.innerHTML = `<span class="action-ic">${icons[a.kind]}</span>
         <span class="action-txt"><b>${labels[a.kind]}:</b> ${esc(a.item.name)}</span>
-        <span class="action-date">${esc(d)}</span>`;
-      card.onclick = () => { selectCustomDate(a.item.date); document.getElementById('nav-date-picker').value = a.item.date; switchTab('screen-home'); };
+        <span class="action-date">${esc(when)}</span>`;
+      card.onclick = () => openDay(a.item.repeat && a.kind !== 'move' ? today() : a.item.date);
       wrap.appendChild(card);
-    });
+    }
     chatBody.appendChild(wrap);
-    chatBody.scrollTop = chatBody.scrollHeight;
+    scrollChat();
+  }
+
+  function renderChat(messages) {
+    document.getElementById('ai-chat-body').innerHTML = '';
+    const name = profile?.name ? ` ${profile.name}` : '';
+    addBubble('assistant', `Hej${name}! Jag är Dream AI. Be mig lägga in saker, bocka av det du gjort eller göra en hobbyplan åt dig.`);
+    for (const m of messages) {
+      addActionCards(m.actions);
+      addBubble(m.role, m.content);
+    }
+  }
+
+  async function loadChat() {
+    renderChat(await api.chatLog().catch(() => []));
+  }
+
+  async function clearChat() {
+    await api.clearChat();
+    renderChat([]);
   }
 
   let aiBusy = false;
@@ -954,22 +1703,20 @@
     aiBusy = true;
     input.value = '';
     addBubble('user', text);
-    chatHistory.push({ role: 'user', content: text });
 
     const typing = addBubble('assistant', 'Dream AI tänker…');
     typing.classList.add('typing');
 
     try {
-      const { reply, actions } = await api.chat(chatHistory, todayStr);
+      const { reply, actions } = await api.chat(text);
       typing.remove();
+      addActionCards(actions); // korten först: det är svaret man ska läsa sist
       addBubble('assistant', reply);
-      addActionCards(actions);
-      chatHistory.push({ role: 'assistant', content: reply });
-      if (actions?.length) { chargeAnimation(); loadItems(); } // live-uppdatera batteri, radar, listor
+      if (actions?.length) { chargeAnimation(); refresh(); } // live-uppdatera batteri och listor
     } catch (e) {
       typing.remove();
       addBubble('assistant', 'Oj, något gick fel: ' + e.message);
-      chatHistory.pop(); // låt användaren försöka igen
+      input.value = text; // låt användaren försöka igen
     } finally {
       aiBusy = false;
     }
