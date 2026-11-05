@@ -5,9 +5,12 @@ import { rmSync } from 'node:fs';
 
 process.env.DB_PATH = './test/test-db.json';
 const db = await import('../db.js');
-const { runAgent } = await import('../agent.js');
+const { runAgent, toModelMessages } = await import('../agent.js');
 
-before(() => rmSync(process.env.DB_PATH, { force: true }));
+before(async () => {
+  rmSync(process.env.DB_PATH, { force: true });
+  await db.setup({ name: 'Oscar', demo: true });
+});
 
 // Mock: returnerar förinspelade svar i ordning och sparar vad agenten skickade.
 function mockClient(script) {
@@ -24,8 +27,8 @@ test('hobbyplan: agenten lägger till flera pass', async () => {
   const today = db.localDate();
   const client = mockClient([
     toolUse('t1', 'add_items', { items: [
-      { date: today, type: 'hobby', name: 'Gitarr: skalor', minTime: 20, maxTime: 30 },
-      { date: db.localDate(1), type: 'hobby', name: 'Gitarr: improvisation', minTime: 20, maxTime: 30 }
+      { date: today, type: 'hobby', name: 'Gitarr: skalor', minutes: 20 },
+      { date: db.localDate(1), type: 'hobby', name: 'Gitarr: improvisation', minutes: 20 }
     ] }),
     text('Klart! Två gitarrpass inlagda.')
   ]);
@@ -41,18 +44,52 @@ test('hobbyplan: agenten lägger till flera pass', async () => {
   assert.equal(last.content[0].tool_use_id, 't1');
 });
 
-test('bocka av: list_items → update_item, batteriet stiger', async () => {
+test('bocka av: list_items → set_done, batteriet stiger', async () => {
   const today = db.localDate();
-  const before = (await db.getBattery(today)).total;
+  const before = (await db.getBattery()).level;
   const target = (await db.listItems({ date: today })).find(i => !i.done);
   const client = mockClient([
     toolUse('a', 'list_items', { date: today }),
-    toolUse('b', 'update_item', { id: target.id, done: true }),
+    toolUse('b', 'set_done', { id: target.id, date: today }),
     text('Bra jobbat!')
   ]);
   const out = await runAgent(client, [{ role: 'user', content: `jag har gjort ${target.name}` }], today);
   assert.equal(out.actions[0].kind, 'done');
-  assert.ok((await db.getBattery(today)).total > before);
+  assert.ok((await db.getBattery()).level > before);
+});
+
+test('återkommande: en post med repeat syns varje dag utan kopior', async () => {
+  const today = db.localDate();
+  const client = mockClient([
+    toolUse('r', 'add_items', { items: [{ date: today, type: 'routine', name: 'Vattna', repeat: { days: [0, 1, 2, 3, 4, 5, 6] } }] }),
+    text('Inlagt!')
+  ]);
+  await runAgent(client, [{ role: 'user', content: 'vattna blommorna varje dag' }], today);
+  assert.equal((await db.listItems({ query: 'vattna' })).length, 1);
+  assert.equal((await db.listItems({ from: today, to: db.localDate(29), query: 'vattna' })).length, 30);
+});
+
+test('list_items hittar saker på namn utan datum', async () => {
+  const client = mockClient([toolUse('q', 'list_items', { query: 'dusch' }), text('Hittade den.')]);
+  await runAgent(client, [{ role: 'user', content: 'ta bort kall dusch' }], db.localDate());
+  const found = JSON.parse(client.calls[1].messages.at(-1).content[0].content);
+  assert.equal(found.length, 1);
+  assert.equal(found[0].name, 'Kall dusch');
+});
+
+test('flytta ett pass: en post, ingen kopia', async () => {
+  const today = db.localDate();
+  const weekday = new Date(db.localDate(2) + 'T12:00:00').getDay();
+  const r = await db.addItem({ date: today, type: 'routine', name: 'Simning', repeat: { days: [weekday] } });
+  const before = (await db.listItems()).length;
+  const client = mockClient([
+    toolUse('m', 'move_session', { id: r.id, from: db.localDate(2), to: db.localDate(3) }),
+    text('Flyttat!')
+  ]);
+  const out = await runAgent(client, [{ role: 'user', content: 'flytta simningen' }], today);
+  assert.equal(out.actions[0].kind, 'move');
+  assert.equal(out.actions[0].item.date, db.localDate(3));
+  assert.equal((await db.listItems()).length, before);
 });
 
 test('fel i verktyg skickas tillbaka till modellen (is_error)', async () => {
@@ -67,13 +104,22 @@ test('fel i verktyg skickas tillbaka till modellen (is_error)', async () => {
   assert.equal(out.actions.length, 0);
 });
 
-test('validering stoppar ogiltig data', async () => {
-  await assert.rejects(db.addItem({ date: 'imorgon', type: 'hobby', name: 'x' }), /YYYY-MM-DD/);
-  await assert.rejects(db.addItem({ date: '2026-11-02', type: 'sport', name: 'x' }), /type/);
+test('ett ogiltigt item i add_items sparar ingenting', async () => {
+  const before = (await db.listItems()).length;
+  const client = mockClient([
+    toolUse('v', 'add_items', { items: [
+      { date: db.localDate(), type: 'hobby', name: 'Giltigt pass' },
+      { date: '2026-13-45', type: 'hobby', name: 'Trasigt pass' }
+    ] }),
+    text('Det gick inte.')
+  ]);
+  const out = await runAgent(client, [{ role: 'user', content: 'lägg in två pass' }], db.localDate());
+  assert.equal(out.actions.length, 0);
+  assert.equal((await db.listItems()).length, before);
 });
 
 test('loopen stannar efter MAX_STEPS', async () => {
-  const script = Array.from({ length: 10 }, (_, i) => toolUse('l' + i, 'get_battery', { date: db.localDate() }));
+  const script = Array.from({ length: 10 }, (_, i) => toolUse('l' + i, 'get_battery', {}));
   const out = await runAgent(mockClient(script), [{ role: 'user', content: 'loop' }], db.localDate());
   assert.match(out.reply, /hann inte/);
 });
@@ -90,4 +136,33 @@ test('max_tokens: avklippt tool_use körs inte', async () => {
   assert.equal(out.actions.length, 0);
   assert.equal((await db.listItems()).length, before);
   assert.equal(client.calls.length, 1); // inget tool_result skickades tillbaka
+});
+
+test('max_tokens efter en sparad ändring: svaret säger inte att allt misslyckades', async () => {
+  const client = mockClient([
+    toolUse('p', 'add_items', { items: [{ date: db.localDate(), type: 'bonus', name: 'Promenad' }] }),
+    { stop_reason: 'max_tokens', content: [{ type: 'text', text: 'Och sen' }] }
+  ]);
+  const out = await runAgent(client, [{ role: 'user', content: 'lägg in en promenad och mer' }], db.localDate());
+  assert.equal(out.actions.length, 1);
+  assert.match(out.reply, /hann bara med en del/);
+});
+
+test('API-fel efter en sparad ändring: det som gjorts går inte förlorat', async () => {
+  const script = [toolUse('e', 'add_items', { items: [{ date: db.localDate(), type: 'bonus', name: 'Vatten' }] })];
+  const client = { messages: { create: async () => { if (script.length) return script.shift(); throw new Error('overloaded'); } } };
+  const out = await runAgent(client, [{ role: 'user', content: 'lägg in vatten' }], db.localDate());
+  assert.equal(out.actions.length, 1);
+  assert.match(out.reply, /hann bara med en del/);
+});
+
+test('historiken bär med sig vad agenten faktiskt gjorde', () => {
+  const msgs = toModelMessages([
+    { role: 'user', content: 'flytta tandläkaren' },
+    { role: 'assistant', content: 'Fixat!', actions: [{ kind: 'update', item: { id: 6, name: 'Tandläkarbesök', date: '2026-11-05' } }] },
+    { role: 'user', content: 'tack' }
+  ]);
+  assert.match(msgs[1].content, /^Fixat!/);
+  assert.match(msgs[1].content, /\[Utfört: Ändrade "Tandläkarbesök" \(2026-11-05, id 6\)\]/);
+  assert.equal(msgs[2].content, 'tack');
 });

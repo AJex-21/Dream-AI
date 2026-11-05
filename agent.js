@@ -2,17 +2,29 @@
 import * as db from './db.js';
 
 const MAX_STEPS = 6; // skydd mot oändlig loop
+const PARTIAL_REPLY = 'Jag hann bara med en del, se korten ovanför. Säg till om jag ska fortsätta.';
+
+const repeatSchema = {
+  type: 'object',
+  description: 'Bara för det som återkommer. Utelämna för engångssaker.',
+  properties: {
+    days: { type: 'array', items: { type: 'integer', minimum: 0, maximum: 6 }, description: 'Veckodagar: 0=sön, 1=mån, 2=tis, 3=ons, 4=tor, 5=fre, 6=lör' },
+    until: { type: 'string', description: 'Sista dag, YYYY-MM-DD. Utelämna om det gäller tills vidare.' }
+  },
+  required: ['days']
+};
 
 const itemSchema = {
   type: 'object',
   properties: {
-    date: { type: 'string', description: 'YYYY-MM-DD' },
-    type: { type: 'string', enum: db.TYPES, description: 'routine = återkommande vana, todo = engångsuppgift, hobby = hobbyträning, bonus = hälsoboost (vatten, promenad, paus)' },
-    name: { type: 'string', description: 'Kort titel, max ca 4 ord' },
+    date: { type: 'string', description: 'YYYY-MM-DD. Engångssak: dagen. todo: deadline. Med repeat: första dagen.' },
+    type: { type: 'string', enum: db.TYPES, description: 'routine = rutin som upprepas, todo = att göra: uppgift med deadline, eller en tid att passa om time anges, hobby = det användaren vill bli bättre på, bonus = litet extra (vatten, promenad, paus)' },
+    name: { type: 'string', description: 'Kort titel, max ca 4 ord. Hobbypass skrivs "Hobby: moment", t.ex. "Gitarr: skalor".' },
     desc: { type: 'string', description: 'En mening om vad som ska göras' },
-    minTime: { type: 'integer', description: 'Minsta tid i minuter' },
-    maxTime: { type: 'integer', description: 'Max tid i minuter' },
-    prio: { type: 'string', enum: db.PRIOS }
+    time: { type: 'string', description: 'Klockslag HH:MM, bara om det finns en bestämd tid. En todo med time är en tid att passa, som tandläkaren.' },
+    minutes: { type: 'integer', description: 'Längd i minuter' },
+    prio: { type: 'string', enum: db.PRIOS },
+    repeat: repeatSchema
   },
   required: ['date', 'type', 'name']
 };
@@ -20,20 +32,21 @@ const itemSchema = {
 export const tools = [
   {
     name: 'list_items',
-    description: 'Lista användarens rutiner/uppgifter/hobbyer. Använd innan du ändrar eller tar bort något, så du har rätt id. Ange date ELLER from+to.',
+    description: 'Lista användarens rutiner/uppgifter/hobbyer. Med date eller from+to: det som är planerat de dagarna, med done per dag. Utan datum: alla sparade poster, oavsett dag. Använd query för att hitta något på namn. Kör detta innan du ändrar eller tar bort något, så du har rätt id.',
     input_schema: {
       type: 'object',
       properties: {
         date: { type: 'string', description: 'YYYY-MM-DD' },
         from: { type: 'string', description: 'YYYY-MM-DD, start (inklusive)' },
         to: { type: 'string', description: 'YYYY-MM-DD, slut (inklusive)' },
-        type: { type: 'string', enum: db.TYPES }
+        type: { type: 'string', enum: db.TYPES },
+        query: { type: 'string', description: 'Del av namnet, t.ex. "dusch". Ange utan datum för att söka överallt.' }
       }
     }
   },
   {
     name: 'add_items',
-    description: 'Lägg till en eller flera aktiviteter. Använd för enstaka uppgifter och för hela hobbyplaner över flera dagar (ett item per pass).',
+    description: 'Lägg till en eller flera aktiviteter. Allt som återkommer läggs som EN post med repeat, aldrig en post per dag. Flera poster används bara för pass som skiljer sig åt, som en hobbyplan med stegrande svårighet.',
     input_schema: {
       type: 'object',
       properties: { items: { type: 'array', items: itemSchema, minItems: 1, maxItems: 30 } },
@@ -42,46 +55,111 @@ export const tools = [
   },
   {
     name: 'update_item',
-    description: 'Ändra ett item via id. Sätt done=true för att bocka av. Skicka bara fälten som ändras.',
+    description: 'Ändra en post via id. Skicka bara fälten som ändras. På en återkommande post gäller ändringen alla dagar.',
     input_schema: {
       type: 'object',
-      properties: { id: { type: 'integer' }, ...itemSchema.properties, done: { type: 'boolean' } },
+      properties: { id: { type: 'integer' }, ...itemSchema.properties },
+      required: ['id']
+    }
+  },
+  {
+    name: 'move_session',
+    description: 'Flytta ETT pass i något som upprepas till en annan dag. Resten av schemat och sviten är kvar. Använd alltid detta, lägg aldrig till en ny post för att flytta ett pass.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'integer' },
+        from: { type: 'string', description: 'Dagen passet ligger på, YYYY-MM-DD' },
+        to: { type: 'string', description: 'Dagen det ska flyttas till, YYYY-MM-DD' }
+      },
+      required: ['id', 'from', 'to']
+    }
+  },
+  {
+    name: 'set_session_notes',
+    description: 'Ge enskilda dagar i ett återkommande pass eget innehåll. Används för en stegrande plan ovanpå ett pass som redan finns: posten är kvar, men varje dag visar sitt moment.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'integer' },
+        notes: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: { date: { type: 'string', description: 'YYYY-MM-DD' }, text: { type: 'string', description: 'Vad passet handlar om den dagen, en mening' } },
+            required: ['date', 'text']
+          },
+          minItems: 1,
+          maxItems: 31
+        }
+      },
+      required: ['id', 'notes']
+    }
+  },
+  {
+    name: 'set_done',
+    description: 'Bocka av eller ångra. Ange date för vilken dag det gäller, det behövs för återkommande poster.',
+    input_schema: {
+      type: 'object',
+      properties: { id: { type: 'integer' }, date: { type: 'string', description: 'YYYY-MM-DD, som standard idag' }, done: { type: 'boolean', description: 'false ångrar en avbockning' } },
       required: ['id']
     }
   },
   {
     name: 'delete_item',
-    description: 'Ta bort ett item via id.',
-    input_schema: { type: 'object', properties: { id: { type: 'integer' } }, required: ['id'] }
+    description: 'Ta bort en post via id. Med date tas bara den dagen bort från en återkommande post. Utan date försvinner hela posten.',
+    input_schema: {
+      type: 'object',
+      properties: { id: { type: 'integer' }, date: { type: 'string', description: 'YYYY-MM-DD, bara för återkommande poster' } },
+      required: ['id']
+    }
   },
   {
     name: 'get_battery',
-    description: 'Hämta hälsobatteriet för ett datum: total % och % per kategori.',
-    input_schema: { type: 'object', properties: { date: { type: 'string' } }, required: ['date'] }
+    description: 'Hämta hälsobatteriet just nu: nivå i %, hur många timmar det räcker och vad som laddat det.',
+    input_schema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'get_progress',
+    description: 'Hur det går över tid för rutiner och hobbyer: svit, antal pass denna vecka, minuter, och klart av planerat senaste 30 dagarna. Använd när användaren frågar om hen håller i något.',
+    input_schema: { type: 'object', properties: { query: { type: 'string', description: 'Del av namnet, t.ex. "gitarr". Utelämna för allt.' } } }
   }
 ];
 
 // Kör ett verktyg. Returnerar { result, actions } – actions visas som kort i chatten.
-async function runTool(name, input) {
+async function runTool(name, input, today) {
   switch (name) {
     case 'list_items':
-      return { result: await db.listItems(input), actions: [] };
+      return { result: await db.listItems({ ...input, today }), actions: [] };
     case 'add_items': {
-      const added = [];
-      for (const it of input.items) added.push(await db.addItem(it));
+      const added = await db.addItems(input.items);
       return { result: added, actions: added.map(i => ({ kind: 'add', item: i })) };
     }
     case 'update_item': {
       const { id, ...patch } = input;
       const item = await db.updateItem(id, patch);
-      return { result: item, actions: [{ kind: patch.done === true ? 'done' : 'update', item }] };
+      return { result: item, actions: [{ kind: 'update', item }] };
+    }
+    case 'move_session': {
+      const item = await db.moveSession(input.id, { from: input.from, to: input.to, today });
+      return { result: item, actions: [{ kind: 'move', item }] };
+    }
+    case 'set_session_notes': {
+      const item = await db.setNotes(input.id, input.notes);
+      return { result: item, actions: [{ kind: 'notes', item }] };
+    }
+    case 'set_done': {
+      const out = await db.setDone(input.id, { date: input.date, done: input.done ?? true, today });
+      return { result: out, actions: [{ kind: input.done === false ? 'undone' : 'done', item: out.item }] };
     }
     case 'delete_item': {
-      const item = await db.deleteItem(input.id);
-      return { result: item, actions: [{ kind: 'delete', item }] };
+      const item = await db.deleteItem(input.id, { date: input.date, today });
+      return { result: item, actions: [{ kind: input.date ? 'skip' : 'delete', item }] };
     }
     case 'get_battery':
-      return { result: await db.getBattery(input.date), actions: [] };
+      return { result: await db.getBattery(), actions: [] };
+    case 'get_progress':
+      return { result: await db.getProgress({ query: input.query, today }), actions: [] };
     default:
       throw new Error(`Okänt verktyg: ${name}`);
   }
@@ -89,17 +167,44 @@ async function runTool(name, input) {
 
 function systemPrompt(today) {
   const weekday = new Date(today + 'T12:00:00').toLocaleDateString('sv-SE', { weekday: 'long' });
-  return `Du är Dream AI, en personlig assistent i appen Dream Assistent för unga (17–23 år).
+  return `Du är Dream AI, assistenten i appen Pulse för unga (17–23 år).
 Appen har tre delar: hälsa (hälsobatteri), vardagsrutiner och hobbystöd.
 Idag är ${weekday} ${today}. Räkna ut datum som "imorgon" eller "på fredag" utifrån det.
 
+Så fungerar appen:
+- Det som återkommer är EN post med repeat (veckodagar och ev. sista dag). Det gäller hur långt fram som helst, och man bockar av dag för dag.
+- En todo har en deadline i date. Är den inte klar när dagen passerat följer den med till idag.
+- Batteriet visar hur väl användaren håller sin egen plan, inte hur hen mår eller hur mycket energi hen har. Det laddas när något bockas av, med sin andel av veckans plan, och sjunker 1 % i timmen. Att planera in saker påverkar det inte. Tomt betyder bara att det var ett tag sedan, inget händer.
+- En todo med klockslag är en tid att passa, som tandläkaren. Den kan inte bli försenad.
+- Appen har inga notiser. Lova aldrig att påminna, säg i stället att det ligger i schemat.
+
 Du kan läsa och ändra användarens schema med verktygen. Regler:
 - Agera hellre än fråga. Fråga bara om du inte kan göra en rimlig gissning.
-- När användaren säger att hen gjort något: kör list_items för idag, hitta det item som matchar bäst (även om språket skiljer, t.ex. "kall dusch" = "Cold Shower") och bocka av med update_item done=true. Finns inget som matchar, fråga om du ska lägga till det.
-- Hobbyplan: om hobby och tid per dag finns, skapa planen direkt med add_items (7 dagar från idag om inget annat sägs, type "hobby", ett pass per dag, stegrande svårighet). Fråga bara om hobbyn saknas.
+- Det viktigaste: så fort användaren säger att hen gjort, är klar med eller hunnit något ("pluggat klart", "var på gymmet", "klar med gitarren") ska du bocka av det. Kör list_items för idag, hitta det som matchar bäst (även om språket eller ordformen skiljer, t.ex. "pluggat" = "Plugga", "kall dusch" = "Cold Shower") och kör set_done. Gäller även mitt i ett annat samtal. Beröm aldrig utan att ha bockat av först. Finns inget som matchar, fråga om du ska lägga till det.
+- När något ska hittas, ändras eller tas bort: sök med list_items och query utan datum, så hittar du det oavsett vilken dag det ligger på.
+- Innan du lägger till något: kolla med list_items och query om det redan finns, så att inget blir dubbelt.
+- Använd exakt den tid användaren anger. Saknas tid, utgå från det som redan finns för samma sak, annars 20 minuter.
+- Ett enstaka pass som ska byta dag: move_session. Lägg aldrig till en ny post för det.
+- Frågar användaren om hen håller i något eller hur det går: kör get_progress och svara med siffrorna.
+- Hobbyplan: skapa planen direkt, utan motfrågor, 7 dagar från idag om inget annat sägs och med stegrande svårighet. Finns redan ett återkommande pass för hobbyn: behåll det och ge varje dag sitt moment med set_session_notes. Annars: lägg ett pass per dag med add_items (type "hobby", namn som "Gitarr: skalor"). Fråga bara om hobbyn saknas.
 - Hälsotips (vatten, promenad, mikropaus) läggs som type "bonus".
 - Hämta id med list_items innan du ändrar eller tar bort. Ta bort flera saker bara om användaren tydligt bett om det.
+- Rader i historiken som börjar med [Utfört: är appens egen logg över vad du faktiskt gjorde. De stämmer. Skriv aldrig sådana rader själv, och ta inte tillbaka eller rätta tidigare svar om användaren inte frågar.
+- Lova inget du inte gjort än. Gör det först och berätta sedan vad som hände.
+- Använd appens ord: Rutiner, Att göra, Hobby, Bonus, Batteri. Säg inte vanor, poäng eller hälsotips.
 - Svara på svenska, kort (1–3 meningar), peppigt men inte överdrivet. Ingen markdown.`;
+}
+
+// Modellen minns bara text, så det den gjorde följer med som en loggrad. Utan den ser den
+// sina egna påståenden utan spår av arbetet och "rättar" dem.
+const ACTION_LOG = { add: 'La till', done: 'Bockade av', undone: 'Ångrade bock', update: 'Ändrade', delete: 'Tog bort', skip: 'Tog bort en dag av', move: 'Flyttade ett pass av', notes: 'Planerade innehåll i' };
+
+export function toModelMessages(chat) {
+  return chat.map(({ role, content, actions }) => {
+    if (!actions?.length) return { role, content };
+    const log = actions.map(a => `${ACTION_LOG[a.kind]} "${a.item.name}" (${a.item.date}, id ${a.item.id})`).join('; ');
+    return { role, content: `${content}\n\n[Utfört: ${log}]` };
+  });
 }
 
 /**
@@ -114,17 +219,23 @@ export async function runAgent(client, history, today) {
   const actions = [];
 
   for (let step = 0; step < MAX_STEPS; step++) {
-    const res = await client.messages.create({
-      model,
-      max_tokens: 4096,
-      system: systemPrompt(today),
-      tools,
-      messages
-    });
+    let res;
+    try {
+      res = await client.messages.create({
+        model,
+        max_tokens: 4096,
+        system: systemPrompt(today),
+        tools,
+        messages
+      });
+    } catch (err) {
+      if (!actions.length) throw err;
+      return { reply: PARTIAL_REPLY, actions }; // det som hunnit sparas ska inte se misslyckat ut
+    }
 
     // Svaret klipptes av: tool_use-input kan vara ofullständig, så inga verktyg körs.
     if (res.stop_reason === 'max_tokens') {
-      return { reply: 'Planen blev för lång för mig, be om färre dagar så försöker jag igen.', actions };
+      return { reply: actions.length ? PARTIAL_REPLY : 'Planen blev för lång för mig, be om färre dagar så försöker jag igen.', actions };
     }
 
     if (res.stop_reason !== 'tool_use') {
@@ -137,7 +248,7 @@ export async function runAgent(client, history, today) {
     const results = [];
     for (const block of res.content.filter(b => b.type === 'tool_use')) {
       try {
-        const { result, actions: a } = await runTool(block.name, block.input);
+        const { result, actions: a } = await runTool(block.name, block.input, today);
         actions.push(...a);
         results.push({ type: 'tool_result', tool_use_id: block.id, content: JSON.stringify(result) });
       } catch (err) {
@@ -147,5 +258,5 @@ export async function runAgent(client, history, today) {
     }
     messages.push({ role: 'user', content: results });
   }
-  return { reply: 'Jag hann inte bli klar, försök formulera dig kortare.', actions };
+  return { reply: actions.length ? PARTIAL_REPLY : 'Jag hann inte bli klar, försök formulera dig kortare.', actions };
 }
