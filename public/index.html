@@ -165,7 +165,7 @@
   .screen-header{padding:18px 20px 14px;flex-shrink:0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
 
   /* ENERGI: morgonens check-in är starten, fokus använder, laddare ger tillbaka. --lc är nivåns färg */
-  .energy{--lc:var(--cat-routine);position:relative;margin:4px 20px 12px;padding:16px 18px;border-radius:var(--r-xl);background:var(--bg-surface);box-shadow:0 0 0 1px var(--border);display:flex;flex-direction:column;gap:12px;flex-shrink:0;}
+  .energy{--lc:var(--cat-routine);position:relative;margin:4px 20px 10px;padding:14px 16px 12px;border-radius:var(--r-xl);background:var(--bg-surface);box-shadow:0 0 0 1px var(--border);display:flex;flex-direction:column;gap:10px;flex-shrink:0;}
   .en-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:32px;}
   .en-label{display:block;font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);}
   .en-checkin{display:flex;align-items:center;gap:8px;min-height:44px;padding:4px 12px 4px 10px;margin:-6px -6px -6px 0;border-radius:var(--r-full);background:var(--bg-surface-2);text-align:left;}
@@ -181,51 +181,53 @@
   .level-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:66px;padding:8px 2px;border-radius:14px;background:var(--bg-surface-2);font-size:var(--t-xs);font-weight:600;color:var(--text-2);line-height:1.15;transition:transform .1s ease-out;}
   .level-btn:active{transform:scale(.95);}
   .level-btn[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--lc);color:var(--text-1);}
-  .en-main{display:flex;flex-direction:column;gap:12px;width:100%;text-align:left;}
+  .en-main{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left;}
+  .en-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
   .en-now{display:flex;align-items:center;gap:10px;}
-  .en-num{font-family:var(--font-d);font-size:3.5rem;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;color:var(--lc);transition:color .4s;}
+  .en-num{font-family:var(--font-d);font-size:2.75rem;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;color:var(--lc);transition:color .4s;}
   .en-chip{padding:5px 10px;border-radius:var(--r-full);font-size:var(--t-xs);font-weight:700;background:var(--lc);color:var(--on-cat);transition:background .4s;}
-  .en-focus{display:flex;flex-direction:column;gap:4px;}
-  .en-focus > span:last-child{display:flex;align-items:center;gap:6px;font-size:var(--t-md);color:var(--text-2);}
-  .en-focus svg.ic{width:16px;height:16px;}
-  .en-focus b{color:var(--text-1);font-variant-numeric:tabular-nums;}
+  .en-focus{display:flex;align-items:center;gap:5px;font-size:var(--t-sm);color:var(--text-2);white-space:nowrap;}
+  .en-focus svg.ic{width:15px;height:15px;}
+  .en-focus b{color:var(--text-1);font-size:var(--t-md);font-variant-numeric:tabular-nums;}
   .en-bar{display:flex;flex-direction:column;gap:6px;}
-  .en-moon-row{display:block;position:relative;height:20px;margin-right:11px;}
+  .en-moon-row{display:block;position:relative;height:18px;margin-right:11px;}
   .en-moon{position:absolute;bottom:0;transform:translateX(-50%);display:flex;align-items:center;gap:4px;font-size:var(--t-xs);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums;transition:left .7s cubic-bezier(.22,1,.36,1),color .3s;}
   .en-moon svg{width:13px;height:13px;fill:currentColor;}
   .en-moon.low{color:var(--danger);}
   .en-bar-row{display:flex;align-items:center;gap:4px;}
-  .en-shell{display:block;position:relative;flex:1;height:46px;padding:4px;border-radius:14px;box-shadow:inset 0 0 0 2px var(--border-strong);}
+  .en-shell{display:block;position:relative;flex:1;height:34px;padding:4px;border-radius:12px;box-shadow:inset 0 0 0 2px var(--border-strong);}
   .en-shell.over{animation:en-warn 1.6s ease-in-out infinite;}
   @keyframes en-warn{0%,100%{box-shadow:inset 0 0 0 2px var(--border-strong);}50%{box-shadow:inset 0 0 0 2px var(--danger);}}
-  .en-track{display:block;position:relative;height:100%;border-radius:9px;background:var(--bg-surface-3);overflow:hidden;}
+  .en-track{display:block;position:relative;height:100%;border-radius:7px;background:var(--bg-surface-3);overflow:hidden;}
   .en-keep,.en-chunk{position:absolute;top:0;bottom:0;transition:width .7s cubic-bezier(.22,1,.36,1),left .7s cubic-bezier(.22,1,.36,1),background .4s;}
   .en-keep{left:0;background:var(--lc);}
   .en-chunks{position:absolute;inset:0;}
   .en-chunk{background:var(--c);opacity:.5;border-left:2px solid var(--bg-surface-3);}
   .en-marker{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--text-1);transition:left .7s cubic-bezier(.22,1,.36,1);}
   .en-marker.low{background:var(--danger);}
-  .en-nub{width:7px;height:18px;border-radius:0 4px 4px 0;background:var(--border-strong);flex-shrink:0;}
-  .en-scale{display:block;position:relative;height:16px;margin-right:11px;font-size:var(--t-xs);color:var(--text-3);}
-  .en-scale span{position:absolute;top:0;}
-  .en-warn{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;margin-top:12px;padding:8px 12px;border-radius:14px;background:var(--ai-dim);box-shadow:inset 0 0 0 1px var(--ai);text-align:left;font-size:var(--t-sm);}
+  .en-nub{width:6px;height:14px;border-radius:0 4px 4px 0;background:var(--border-strong);flex-shrink:0;}
+  .en-warn{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;margin-top:10px;padding:8px 12px;border-radius:14px;background:var(--ai-dim);box-shadow:inset 0 0 0 1px var(--ai);text-align:left;font-size:var(--t-sm);}
   .en-warn .ai-dot{width:32px;height:32px;border-radius:50%;background:var(--ai);color:var(--on-cat);display:grid;place-items:center;flex-shrink:0;}
   .en-warn .ai-dot svg.ic{width:16px;height:16px;}
   .en-warn > span:nth-child(2){flex:1;}
   .en-warn > svg.ic{width:16px;height:16px;color:var(--text-2);}
-  .en-chargers{display:flex;flex-wrap:wrap;gap:8px;padding-top:12px;border-top:1px solid var(--border);}
-  .en-chargers .en-label{width:100%;}
-  .charger{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:14px;background:var(--bg-surface-2);font-size:var(--t-sm);font-weight:600;max-width:100%;transition:background .2s ease,transform .1s ease-out;}
-  .charger:active{transform:scale(.95);}
-  .charger svg.ic{width:16px;height:16px;color:var(--cat-bonus);}
-  .charger b{font-family:var(--font-d);font-variant-numeric:tabular-nums;color:var(--cat-bonus);}
-  .charger span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  /* Laddarna är egna ikoner på en rad: ett tryck laddar, plustecknet lägger till en ny */
+  .en-chargers{display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px solid var(--border);overflow-x:auto;scrollbar-width:none;margin:0 -16px;padding-left:16px;padding-right:16px;}
+  .en-chargers::-webkit-scrollbar{display:none;}
+  .en-chargers .en-label{margin-right:2px;flex-shrink:0;}
+  .charger{position:relative;width:44px;height:44px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:var(--bg-surface-2);color:var(--cat-bonus);transition:background .2s ease,color .2s ease,transform .1s ease-out;}
+  .charger:active{transform:scale(.9);}
+  .charger svg.ic{width:20px;height:20px;}
+  .charger b{position:absolute;right:-4px;top:-4px;min-width:22px;padding:1px 4px;border-radius:9px;background:var(--bg-surface);box-shadow:0 0 0 1px var(--border-strong);font-size:.625rem;font-weight:700;line-height:1.5;color:var(--text-1);font-variant-numeric:tabular-nums;}
   .charger.done{background:var(--cat-bonus);color:var(--on-cat);}
-  .charger.done svg.ic,.charger.done b{color:var(--on-cat);}
   .charger.add{background:none;border:1.5px dashed var(--border-strong);color:var(--text-2);}
-  .charger.add svg.ic{color:var(--text-2);}
-  .charger.ask{background:var(--ai-dim);color:var(--text-1);}
-  .charger.ask svg.ic{color:var(--ai);}
+  .charger.add svg.ic{width:18px;height:18px;}
+
+  /* Ikonväljaren i formuläret */
+  .icon-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+  .icon-pick{height:46px;border-radius:14px;display:grid;place-items:center;background:var(--bg-surface-2);color:var(--text-2);transition:background .18s ease,color .18s ease,transform .1s ease-out;}
+  .icon-pick:active{transform:scale(.92);}
+  .icon-pick[aria-pressed="true"]{background:var(--cat-bonus);color:var(--on-cat);}
 
   /* DAGENS PLAN: samma ringar som bockarna, en båge per typ. Laddare räknas inte, de är vila */
   .plan-card{display:flex;align-items:center;gap:18px;width:calc(100% - 40px);margin:0 20px 12px;padding:14px 18px;border-radius:var(--r-xl);background:var(--bg-surface);box-shadow:0 0 0 1px var(--border);flex-shrink:0;text-align:left;}
@@ -611,6 +613,19 @@
   <symbol id="i-bonus" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
   <symbol id="i-ai" viewBox="0 0 24 24"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <!-- Laddarnas ikoner, användaren väljer själv -->
+  <symbol id="i-c-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="i-c-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></symbol>
+  <symbol id="i-c-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+  <symbol id="i-c-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-c-coffee" viewBox="0 0 24 24"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z"/><path d="M6 2v2M10 2v2M14 2v2"/></symbol>
+  <symbol id="i-c-book" viewBox="0 0 24 24"><path d="M2 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H2z"/><path d="M22 4h-7a3 3 0 0 0-3 3v14a2 2 0 0 1 2-2h8z"/></symbol>
+  <symbol id="i-c-game" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10.5v4M5 12.5h4"/><path d="M15.5 12h.01M18 14h.01"/></symbol>
+  <symbol id="i-c-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+  <symbol id="i-c-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 4 13c0-6 7-10 16-10 0 9-4 16-10 17z"/><path d="M2 22c3-4 6-7 10-9"/></symbol>
+  <symbol id="i-c-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="i-c-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a5 5 0 0 1 4 5v2"/></symbol>
+  <symbol id="i-c-star" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
   <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
   <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
@@ -662,15 +677,16 @@
         </div>
         <div id="en-body" hidden>
           <button class="en-main" id="en-main" onclick="openBatterySheet()">
-            <span class="en-now"><span class="en-num" id="en-num">0%</span><span class="en-chip" id="en-chip"></span></span>
-            <span class="en-focus"><span class="en-label">Fokus</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>räcker till <b id="en-hours"></b></span></span>
+            <span class="en-top">
+              <span class="en-now"><span class="en-num" id="en-num">0%</span><span class="en-chip" id="en-chip"></span></span>
+              <span class="en-focus"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg><b id="en-hours"></b> fokus</span>
+            </span>
             <span class="en-bar" aria-hidden="true">
               <span class="en-moon-row"><span class="en-moon" id="en-moon"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span id="en-moon-txt"></span></span></span>
               <span class="en-bar-row">
                 <span class="en-shell" id="en-shell"><span class="en-track"><span class="en-keep" id="en-keep"></span><span class="en-chunks" id="en-chunks"></span></span><span class="en-marker" id="en-marker"></span></span>
                 <span class="en-nub"></span>
               </span>
-              <span class="en-scale"><span style="left:0">Ladda</span><span style="left:20%">Hushålla</span><span style="left:50%">Bra läge</span></span>
             </span>
           </button>
           <button class="en-warn" id="en-warn" hidden onclick="askAiFrom('Planen räcker inte idag. Vad kan jag flytta?')">
@@ -861,7 +877,7 @@
         </div>
       </div>
 
-      <div class="time-grid">
+      <div class="time-grid" id="group-time">
         <div class="form-group">
           <label class="form-label" for="input-time">Tid</label>
           <button type="button" class="form-input date-btn" id="input-time" onclick="openClock(this)"><span></span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg></button>
@@ -870,6 +886,11 @@
           <label class="form-label" for="input-minutes">Minuter</label>
           <input type="number" class="form-input" id="input-minutes" min="1" max="600" step="1" inputmode="numeric" />
         </div>
+      </div>
+
+      <div class="form-group" id="group-icon" hidden>
+        <span class="form-label">Ikon</span>
+        <div class="icon-grid" id="icon-grid" role="group" aria-label="Välj ikon"></div>
       </div>
 
       <div class="form-group" id="group-charge" hidden>
@@ -1240,6 +1261,8 @@
   ];
   const levelColor = v => (v >= 50 ? 'var(--cat-routine)' : v >= 20 ? 'var(--cat-bonus)' : 'var(--danger)');
   const fmtMin = m => { const h = Math.floor(m / 60), r = m % 60; return h && r ? `${h}h ${r}m` : h ? `${h}h` : `${r}m`; };
+  const CHARGER_ICONS = { bolt: 'Blixt', music: 'Musik', heart: 'Hjärta', sun: 'Sol', coffee: 'Kaffe', book: 'Bok', game: 'Spel', phone: 'Samtal', leaf: 'Natur', moon: 'Vila', people: 'Vänner', star: 'Stjärna' };
+  const chargerIcon = name => `<svg class="ic" aria-hidden="true"><use href="#i-c-${CHARGER_ICONS[name] ? name : 'bolt'}"/></svg>`;
   const energyText = o => (o.energy > 0 ? `+${o.energy} %` : `${-o.energy} %`);
   const SLUGS = { 'screen-home': 'idag', 'screen-routines': 'rutiner', 'screen-todos': 'att-gora', 'screen-hobbies': 'hobby', 'screen-ai': 'ai' };
   const TAB_IDS = { 'screen-home': 'tab-home', 'screen-routines': 'tab-routines', 'screen-todos': 'tab-todos', 'screen-hobbies': 'tab-hobbies', 'screen-ai': 'tab-ai' };
@@ -1820,7 +1843,7 @@
 
   function renderDayView() {
     const isToday = activeDate === today();
-    const listed = isToday ? day.items.filter(o => o.type !== 'bonus') : day.items; // idag ligger laddarna i energikortet
+    const listed = day.items; // laddarna ligger i energikortet, inte i schemat
     const open = listed.filter(o => !o.done);
     const done = listed.filter(o => o.done);
     let html = '';
@@ -2078,14 +2101,13 @@
     }
 
     // Laddarna: användarens egna, ett tryck bockar av. Inga påhittade förslag.
-    const chargers = activeDate === today() ? day.items.filter(o => o.type === 'bonus') : [];
+    const chargers = day.chargers ?? [];
     chargers.forEach(remember);
     setHtml(document.getElementById('en-chargers'), `<span class="en-label">Laddare</span>` +
-      chargers.map(o => `<button class="charger ${o.done ? 'done' : ''}" aria-pressed="${Boolean(o.done)}" aria-label="${esc(o.name)}, ger ${Number(o.energy)} procent energi" onclick="toggleCharger(${Number(o.id)}, '${esc(o.date)}', this)">
-          ${icon('bonus')}<span>${esc(o.name)}</span><b>+${Number(o.energy)}%</b>
+      chargers.map(o => `<button class="charger ${o.done ? 'done' : ''}" title="${esc(o.name)}" aria-pressed="${Boolean(o.done)}" aria-label="${esc(o.name)}, ger ${Number(o.energy)} procent energi" onclick="toggleCharger(${Number(o.id)}, '${esc(o.date)}', this)">
+          ${chargerIcon(o.icon)}<b>+${Number(o.energy)}</b>
         </button>`).join('') +
-      `<button class="charger add" onclick="openModal('bonus')">${icon('plus')}${chargers.length ? 'Ny' : 'Lägg till egen'}</button>` +
-      `<button class="charger ask" onclick="askAiFrom('Hjälp mig hitta mina egna laddare')">${icon('ai')}Hitta mina laddare</button>`);
+      `<button class="charger add" aria-label="Ny laddare" onclick="openModal('bonus')">${icon('plus')}</button>`);
 
     // Dagens plan: en båge per typ, en procent av varvet är en procent av planens minuter.
     const p = e.plan;
@@ -2130,7 +2152,7 @@
     }
     try {
       const { delta } = await api.setDone(id, date, done);
-      if (done) toast(`+${delta} % energi`, {
+      if (done) toast(`${known.get(key)?.name ?? 'Laddat'} · +${delta} % energi`, {
         label: 'Ångra',
         run: async () => {
           await api.setDone(id, date, false).catch(err => toast('Kunde inte ångra: ' + err.message, { error: true }));
@@ -2381,7 +2403,7 @@
     bonus: { placeholder: 'Det som ger dig energi' }
   };
 
-  let form = { type: 'routine', repeating: true, days: [], prio: 'Medium', charge: 10, editing: null, occurrence: null };
+  let form = { type: 'routine', repeating: true, days: [], prio: 'Medium', charge: 10, icon: 'bolt', editing: null, occurrence: null };
 
   function buildDayPills() {
     document.getElementById('day-pills').innerHTML = DAY_ORDER.map(d =>
@@ -2412,9 +2434,15 @@
     field('group-period').hidden = !field('input-period').checked;
     document.querySelectorAll('.day-pill').forEach(b => b.setAttribute('aria-pressed', form.days.includes(Number(b.dataset.day))));
     document.querySelectorAll('.prio-btn[data-prio]').forEach(b => b.setAttribute('aria-pressed', b.dataset.prio === form.prio));
-    // En laddare har ingen längd som räknas, men väljer själv hur mycket den ger.
-    field('group-charge').hidden = form.type !== 'bonus';
-    field('input-minutes').closest('.form-group').hidden = form.type === 'bonus';
+    // En laddare finns varje dag och har ingen tid: bara namn, ikon och hur mycket den ger.
+    const charger = form.type === 'bonus';
+    field('group-charge').hidden = !charger;
+    field('group-icon').hidden = !charger;
+    if (charger) {
+      for (const id of ['group-freq', 'group-date', 'group-repeat', 'group-time', 'edit-scope', 'session-box']) field(id).hidden = true;
+      field('icon-grid').innerHTML = Object.entries(CHARGER_ICONS).map(([name, label]) =>
+        `<button type="button" class="icon-pick" aria-pressed="${form.icon === name}" aria-label="${label}" onclick="setIcon('${name}')">${chargerIcon(name)}</button>`).join('');
+    } else field('group-time').hidden = false;
     document.querySelectorAll('.prio-btn[data-charge]').forEach(b => b.setAttribute('aria-pressed', Number(b.dataset.charge) === form.charge));
   }
 
@@ -2433,6 +2461,7 @@
   }
   function setPrio(prio) { form.prio = prio; syncForm(); }
   function setCharge(charge) { form.charge = charge; syncForm(); }
+  function setIcon(name) { form.icon = name; syncForm(); }
 
   function toggleMore(open) {
     const group = field('group-more');
@@ -2463,7 +2492,7 @@
   }
 
   function openModal(type) {
-    form = { type, repeating: type === 'routine' || type === 'hobby', days: [0, 1, 2, 3, 4, 5, 6], prio: 'Medium', charge: 10, editing: null, occurrence: null };
+    form = { type, repeating: type === 'routine' || type === 'hobby' || type === 'bonus', days: [0, 1, 2, 3, 4, 5, 6], prio: 'Medium', charge: 10, icon: 'bolt', editing: null, occurrence: null };
     const date = activeDate >= today() ? activeDate : today();
     fillForm({ date, from: startDate() });
     field('modal-title').textContent = 'Lägg till';
@@ -2484,6 +2513,7 @@
       days: o.repeat?.days ?? [0, 1, 2, 3, 4, 5, 6],
       prio: o.prio,
       charge: o.charge ?? 10,
+      icon: o.icon ?? 'bolt',
       editing: { id, start, name: o.name, type: o.type, repeat: o.repeat },
       occurrence: occurrenceDate
     };
@@ -2493,7 +2523,7 @@
     toggleMore(Boolean(o.desc) || o.prio !== 'Medium');
     renderDeleteArea();
     syncForm();
-    if (o.repeat) {
+    if (o.repeat && o.type !== 'bonus') {
       field('edit-scope').hidden = false;
       // Bara ett pass som inte är gjort än går att flytta eller hoppa över.
       if (occurrenceDate && !o.done) {
@@ -2527,6 +2557,12 @@
   function readForm() {
     const name = field('input-title').value.trim();
     if (!name) return showFormError('Skriv ett namn.', 'input-title');
+    if (form.type === 'bonus') {
+      return {
+        name, desc: field('input-desc').value.trim(), date: form.editing?.start ?? today(), time: null, minutes: null,
+        prio: form.prio, charge: form.charge, icon: form.icon, repeat: { days: [0, 1, 2, 3, 4, 5, 6], until: null }
+      };
+    }
 
     const minutesRaw = field('input-minutes').value.trim();
     const minutes = minutesRaw === '' ? null : Number(minutesRaw);
@@ -2578,7 +2614,7 @@
     closeSheet();
     await refresh();
     // Hamnar det på en annan dag än den som visas ska det inte se ut som att inget hände.
-    const where = item.repeat ? repeatLabel(item.repeat) : dayWord(item.date).toLowerCase();
+    const where = form.type === 'bonus' ? 'ny laddare' : item.repeat ? repeatLabel(item.repeat) : dayWord(item.date).toLowerCase();
     const elsewhere = !item.repeat && activeScreen === 'screen-home' && item.date !== activeDate;
     toast(`${item.name} · ${where}`, elsewhere ? { label: 'Visa', run: () => openDay(item.date) } : {});
   }

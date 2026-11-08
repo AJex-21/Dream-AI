@@ -17,6 +17,8 @@ export const LEVELS = [
   { level: 100, label: 'Full energi' }
 ];
 export const PLAN_TYPES = ['routine', 'todo', 'hobby'];
+// Laddare visas som en ikon som användaren själv väljer. Namnen matchar symbolerna i index.html.
+export const CHARGER_ICONS = ['bolt', 'music', 'heart', 'sun', 'coffee', 'book', 'game', 'phone', 'leaf', 'moon', 'people', 'star'];
 
 const MAX = 100;
 const clamp = v => Math.max(0, Math.min(MAX, v));

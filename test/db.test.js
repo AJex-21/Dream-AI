@@ -272,3 +272,13 @@ test('laddning: bara för laddare och inom 1–30 %', async () => {
   const gym = await db.addItem(routine({ charge: 10 }));
   assert.equal(gym.charge, null);
 });
+
+test('en laddare finns varje dag, med ikon, och ligger inte i schemat', async () => {
+  const c = await db.addItem({ date: today, type: 'bonus', name: 'Spela gitarr för skojs skull', icon: 'music', charge: 10 });
+  assert.deepEqual(c.repeat.days, [0, 1, 2, 3, 4, 5, 6]);
+  await assert.rejects(db.addItem({ date: today, type: 'bonus', name: 'X', icon: 'raket' }), /Ikonen/);
+  const day = await db.getDay(addDays(3), addDays(3));
+  assert.equal(day.items.length, 0);
+  assert.equal(day.chargers[0].icon, 'music');
+  assert.equal((await db.getWeek(today, today)).days.every(d => d.total === 0), true);
+});

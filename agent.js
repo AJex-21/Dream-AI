@@ -1,6 +1,6 @@
 // agent.js – Dream AI som agent: Claude väljer verktyg, servern kör dem, loopar tills svaret är klart.
 import * as db from './db.js';
-import { LEVELS } from './energy.js';
+import { CHARGER_ICONS, LEVELS } from './energy.js';
 
 const MAX_STEPS = 6; // skydd mot oändlig loop
 const PARTIAL_REPLY = 'Jag hann bara med en del, se korten ovanför. Säg till om jag ska fortsätta.';
@@ -26,6 +26,7 @@ const itemSchema = {
     minutes: { type: 'integer', description: 'Längd i minuter' },
     prio: { type: 'string', enum: db.PRIOS },
     charge: { type: 'integer', minimum: 1, maximum: 30, description: 'Bara för type bonus (laddare): hur många % energi det ger. Litet 5, normalt 10, stort 15–20.' },
+    icon: { type: 'string', enum: CHARGER_ICONS, description: 'Bara för type bonus (laddare): ikonen som passar bäst, t.ex. music för musik, people för vänner, phone för att ringa någon.' },
     repeat: repeatSchema
   },
   required: ['date', 'type', 'name']
@@ -206,7 +207,7 @@ Du kan läsa och ändra användarens schema med verktygen. Regler:
 - Hobbyplan: skapa planen direkt, utan motfrågor, 7 dagar från idag om inget annat sägs och med stegrande svårighet. Finns redan ett återkommande pass för hobbyn: behåll det och ge varje dag sitt moment med set_session_notes. Annars: lägg ett pass per dag med add_items (type "hobby", namn som "Gitarr: skalor"). Fråga bara om hobbyn saknas.
 - Säger användaren hur hen mår: kör set_checkin med närmaste nivå.
 - Är dagen överbokad (ikväll under 0) och användaren frågar vad hen ska göra: föreslå att flytta det som är minst viktigt med move_session eller ett nytt datum. Flytta inget utan att användaren sagt ja.
-- Laddare är personliga. Föreslå aldrig allmänna saker som vatten eller promenad. Vill användaren hitta sina laddare: fråga en gång vad som brukar ge hen energi eller göra hen glad, och lägg sedan in det hen säger som type "bonus" med charge, med repeat om det är något återkommande. Nämner användaren något som gav energi, erbjud att spara det som laddare.
+- Laddare är personliga. Föreslå aldrig allmänna saker som vatten eller promenad. Vill användaren hitta sina laddare: fråga en gång vad som brukar ge hen energi eller göra hen glad, och lägg sedan in det hen säger som type "bonus" med charge och en passande icon. En laddare finns varje dag automatiskt, ange ingen repeat. Nämner användaren något som gav energi, erbjud att spara det som laddare.
 - Hämta id med list_items innan du ändrar eller tar bort. Ta bort flera saker bara om användaren tydligt bett om det.
 - Rader i historiken som börjar med [Utfört: är appens egen logg över vad du faktiskt gjorde. De stämmer. Skriv aldrig sådana rader själv, och ta inte tillbaka eller rätta tidigare svar om användaren inte frågar.
 - Lova inget du inte gjort än. Gör det först och berätta sedan vad som hände.

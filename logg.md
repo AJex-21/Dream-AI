@@ -171,5 +171,7 @@ Målet var en modernare design med så lite text som möjligt. Logiken och serve
 
 **Testat.** 68 automatiska tester, varav nya för energins regler, check-in och laddare. Körd i riktig webbläsare i mörkt och ljust läge: check-in, avbockning, laddare och överbokad dag. Inte testat mot riktiga modellen än, eftersom det kräver API-nyckeln.
 
+**30. Mindre energikort, laddare som egna ikoner.** Efter test i appen tog kortet för mycket plats. Procent, statusord och fokustid står nu på en rad, batteriet är lägre och skalan under det togs bort (statusordet säger samma sak). Laddarna är en rad med runda ikoner som användaren väljer själv (12 st), med laddningen som en liten siffra. En laddare har ingen dag eller tid: den finns varje dag och ligger inte i schemat eller veckovyn. Formuläret för en laddare har därför bara namn, ikon och hur mycket den ger. Alternativet var att behålla knappar med namn, men de bröt raden och "Upprepas/varje dag" var meningslöst för något man tar till när man behöver.
+
 **Kvarstår.** Livsbalans-radarn i förklaringsarket räknar fortfarande laddare som en egen axel.
 

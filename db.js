@@ -1,7 +1,7 @@
 // db.js – en JSON-fil som databas. Räcker för en användare/demo.
 import { readFile, writeFile, rename } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { LEVELS, chargeOf, deltaOf, energyFor } from './energy.js';
+import { CHARGER_ICONS, LEVELS, chargeOf, deltaOf, energyFor } from './energy.js';
 import {
   ALL_DAYS, addDays, balance, expand, formatDate, groupName, isAppointment, isValidDate,
   occurrence, occursOn, progress, sortDay, weekStart
@@ -138,6 +138,10 @@ function clean(input, partial = false) {
     if (c !== null && (!Number.isInteger(c) || c < 1 || c > 30)) fail('Laddningen måste vara ett heltal, 1–30 %.');
     out.charge = c;
   }
+  if (input.icon !== undefined) {
+    if (input.icon !== null && !CHARGER_ICONS.includes(input.icon)) fail(`Ikonen måste vara en av ${CHARGER_ICONS.join(', ')}.`);
+    out.icon = input.icon;
+  }
 
   if (!partial) {
     for (const k of ['date', 'type', 'name']) if (out[k] === undefined) fail(`${k} saknas`);
@@ -147,6 +151,7 @@ function clean(input, partial = false) {
     out.minutes ??= null;
     out.repeat ??= null;
     out.charge ??= null;
+    out.icon ??= null;
   }
   return out;
 }
@@ -156,7 +161,14 @@ function checkWhole(item) {
   if (item.type === 'routine') item.repeat ??= { days: ALL_DAYS, until: null };
   if (item.type === 'todo' && item.repeat) fail('En uppgift kan inte upprepas. Lägg den som rutin i stället.');
   if (item.repeat?.until && item.repeat.until < item.date) fail('Slutdatumet ligger före startdatumet.');
-  if (item.type !== 'bonus') item.charge = null; // bara en laddare laddar
+  if (item.type === 'bonus') {
+    // En laddare är något man tar till när man behöver, inte en tid i schemat: den finns varje dag.
+    item.repeat ??= { days: ALL_DAYS, until: null };
+    item.icon ??= 'bolt';
+  } else {
+    item.charge = null; // bara en laddare laddar
+    item.icon = null;
+  }
   return item;
 }
 
@@ -218,7 +230,8 @@ export async function getEnergy(today = localDate()) {
 export async function getDay(date, today = localDate()) {
   if (!isValidDate(date)) fail('Datumet måste vara ett riktigt datum (YYYY-MM-DD).');
   const store = await load();
-  const shown = visible(store.items);
+  const all = visible(store.items);
+  const shown = all.filter(i => i.type !== 'bonus'); // laddare ligger i energikortet, inte i schemat
   const list = sortDay(expand(shown, date, date, today)).map(priced);
   const todays = sortDay(expand(shown, today, today, today));
   const next = todays.find(o => !o.done && !o.overdue); // "Nästa" är dagens plan, inte gammalt som släpar
@@ -238,13 +251,14 @@ export async function getDay(date, today = localDate()) {
     todayTotal: todays.length,
     upcoming,
     next: next ? priced(next) : null,
+    chargers: expand(all.filter(i => i.type === 'bonus'), today, today, today).map(priced),
     energy: energyOf(store, today)
   };
 }
 
 export async function getWeek(date, today = localDate()) {
   if (!isValidDate(date)) fail('Datumet måste vara ett riktigt datum (YYYY-MM-DD).');
-  const shown = visible((await load()).items);
+  const shown = visible((await load()).items).filter(i => i.type !== 'bonus');
   const start = weekStart(date);
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = addDays(start, i);
