@@ -1,5 +1,6 @@
 // agent.js – Dream AI som agent: Claude väljer verktyg, servern kör dem, loopar tills svaret är klart.
 import * as db from './db.js';
+import { CHARGER_ICONS, LEVELS } from './energy.js';
 
 const MAX_STEPS = 6; // skydd mot oändlig loop
 const PARTIAL_REPLY = 'Jag hann bara med en del, se korten ovanför. Säg till om jag ska fortsätta.';
@@ -18,12 +19,14 @@ const itemSchema = {
   type: 'object',
   properties: {
     date: { type: 'string', description: 'YYYY-MM-DD. Engångssak: dagen. todo: deadline. Med repeat: första dagen.' },
-    type: { type: 'string', enum: db.TYPES, description: 'routine = rutin som upprepas, todo = att göra: uppgift med deadline, eller en tid att passa om time anges, hobby = det användaren vill bli bättre på, bonus = litet extra (vatten, promenad, paus)' },
+    type: { type: 'string', enum: db.TYPES, description: 'routine = rutin som upprepas, todo = att göra: uppgift med deadline, eller en tid att passa om time anges, hobby = det användaren vill bli bättre på, bonus = laddare: något personligt som ger användaren energi' },
     name: { type: 'string', description: 'Kort titel, max ca 4 ord. Hobbypass skrivs "Hobby: moment", t.ex. "Gitarr: skalor".' },
     desc: { type: 'string', description: 'En mening om vad som ska göras' },
     time: { type: 'string', description: 'Klockslag HH:MM, bara om det finns en bestämd tid. En todo med time är en tid att passa, som tandläkaren.' },
     minutes: { type: 'integer', description: 'Längd i minuter' },
     prio: { type: 'string', enum: db.PRIOS },
+    charge: { type: 'integer', minimum: 1, maximum: 30, description: 'Bara för type bonus (laddare): hur många % energi det ger. Litet 5, normalt 10, stort 15–20.' },
+    icon: { type: 'string', enum: CHARGER_ICONS, description: 'Bara för type bonus (laddare): ikonen som passar bäst, t.ex. music för musik, people för vänner, phone för att ringa någon.' },
     repeat: repeatSchema
   },
   required: ['date', 'type', 'name']
@@ -115,9 +118,18 @@ export const tools = [
     }
   },
   {
-    name: 'get_battery',
-    description: 'Hämta hälsobatteriet just nu: nivå i %, hur många timmar det räcker och vad som laddat det.',
+    name: 'get_energy',
+    description: 'Dagens energi: check-in, energi nu i %, ikväll (nu minus det som är kvar), hur mycket planen behöver, hur länge energin räcker i fokus och hur stor del av dagens plan som är klar per typ.',
     input_schema: { type: 'object', properties: {} }
+  },
+  {
+    name: 'set_checkin',
+    description: 'Spara hur användaren mår idag. Det blir dagens startenergi. Använd när användaren säger hur hen mår eller orkar ("helt slut", "trött", "okej", "pigg", "full energi").',
+    input_schema: {
+      type: 'object',
+      properties: { level: { type: 'integer', enum: LEVELS.map(l => l.level), description: LEVELS.map(l => `${l.level} = ${l.label}`).join(', ') } },
+      required: ['level']
+    }
   },
   {
     name: 'get_progress',
@@ -156,8 +168,13 @@ async function runTool(name, input, today) {
       const item = await db.deleteItem(input.id, { date: input.date, today });
       return { result: item, actions: [{ kind: input.date ? 'skip' : 'delete', item }] };
     }
-    case 'get_battery':
-      return { result: await db.getBattery(), actions: [] };
+    case 'get_energy':
+      return { result: await db.getEnergy(today), actions: [] };
+    case 'set_checkin': {
+      const energy = await db.setCheckin(input.level, { today });
+      const item = { id: 0, type: 'routine', name: `Check-in: ${energy.label}`, date: today };
+      return { result: energy, actions: [{ kind: 'checkin', item }] };
+    }
     case 'get_progress':
       return { result: await db.getProgress({ query: input.query, today }), actions: [] };
     default:
@@ -174,7 +191,8 @@ Idag är ${weekday} ${today}. Räkna ut datum som "imorgon" eller "på fredag" u
 Så fungerar appen:
 - Det som återkommer är EN post med repeat (veckodagar och ev. sista dag). Det gäller hur långt fram som helst, och man bockar av dag för dag.
 - En todo har en deadline i date. Är den inte klar när dagen passerat följer den med till idag.
-- Batteriet visar hur väl användaren håller sin egen plan, inte hur hen mår eller hur mycket energi hen har. Det laddas när något bockas av, med sin andel av veckans plan, och sjunker 1 % i timmen. Att planera in saker påverkar det inte. Tomt betyder bara att det var ett tag sedan, inget händer.
+- Energin gäller idag. Den börjar på morgonens check-in (20 helt slut, 40 trött, 60 okej, 80 pigg, 100 full energi). Fokus använder energi: 1 timme = 20 %, och längden kommer från passet (20 minuter om den saknas). Laddare (type bonus) ger tillbaka så många % som användaren valt. Ikväll = energin nu minus det som är kvar idag. Under 0 betyder att dagen är överbokad.
+- Att använda energi på fokus är bra, inte en förlust: det blir framsteg i dagens plan. Prata aldrig om uppgifter som något som "tar" eller "kostar".
 - En todo med klockslag är en tid att passa, som tandläkaren. Den kan inte bli försenad.
 - Appen har inga notiser. Lova aldrig att påminna, säg i stället att det ligger i schemat.
 
@@ -187,17 +205,19 @@ Du kan läsa och ändra användarens schema med verktygen. Regler:
 - Ett enstaka pass som ska byta dag: move_session. Lägg aldrig till en ny post för det.
 - Frågar användaren om hen håller i något eller hur det går: kör get_progress och svara med siffrorna.
 - Hobbyplan: skapa planen direkt, utan motfrågor, 7 dagar från idag om inget annat sägs och med stegrande svårighet. Finns redan ett återkommande pass för hobbyn: behåll det och ge varje dag sitt moment med set_session_notes. Annars: lägg ett pass per dag med add_items (type "hobby", namn som "Gitarr: skalor"). Fråga bara om hobbyn saknas.
-- Hälsotips (vatten, promenad, mikropaus) läggs som type "bonus".
+- Säger användaren hur hen mår: kör set_checkin med närmaste nivå.
+- Är dagen överbokad (ikväll under 0) och användaren frågar vad hen ska göra: föreslå att flytta det som är minst viktigt med move_session eller ett nytt datum. Flytta inget utan att användaren sagt ja.
+- Laddare är personliga. Föreslå aldrig allmänna saker som vatten eller promenad. Vill användaren hitta sina laddare: fråga en gång vad som brukar ge hen energi eller göra hen glad, och lägg sedan in det hen säger som type "bonus" med charge och en passande icon. En laddare finns varje dag automatiskt, ange ingen repeat. Nämner användaren något som gav energi, erbjud att spara det som laddare.
 - Hämta id med list_items innan du ändrar eller tar bort. Ta bort flera saker bara om användaren tydligt bett om det.
 - Rader i historiken som börjar med [Utfört: är appens egen logg över vad du faktiskt gjorde. De stämmer. Skriv aldrig sådana rader själv, och ta inte tillbaka eller rätta tidigare svar om användaren inte frågar.
 - Lova inget du inte gjort än. Gör det först och berätta sedan vad som hände.
-- Använd appens ord: Rutiner, Att göra, Hobby, Bonus, Batteri. Säg inte vanor, poäng eller hälsotips.
+- Använd appens ord: Rutiner, Att göra, Hobby, Laddare, Energi, Fokus. Säg inte vanor, poäng, batteri eller hälsotips.
 - Svara på svenska, kort (1–3 meningar), peppigt men inte överdrivet. Ingen markdown.`;
 }
 
 // Modellen minns bara text, så det den gjorde följer med som en loggrad. Utan den ser den
 // sina egna påståenden utan spår av arbetet och "rättar" dem.
-const ACTION_LOG = { add: 'La till', done: 'Bockade av', undone: 'Ångrade bock', update: 'Ändrade', delete: 'Tog bort', skip: 'Tog bort en dag av', move: 'Flyttade ett pass av', notes: 'Planerade innehåll i' };
+const ACTION_LOG = { checkin: 'Sparade check-in', add: 'La till', done: 'Bockade av', undone: 'Ångrade bock', update: 'Ändrade', delete: 'Tog bort', skip: 'Tog bort en dag av', move: 'Flyttade ett pass av', notes: 'Planerade innehåll i' };
 
 export function toModelMessages(chat) {
   return chat.map(({ role, content, actions }) => {

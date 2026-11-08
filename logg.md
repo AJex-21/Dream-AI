@@ -152,3 +152,28 @@ Målet var en modernare design med så lite text som möjligt. Logiken och serve
 **24. Tiden väljs på en klocka som snurras.** Först blev tiden rutor för timme och minut i samma layout som kalendern, men det kändes som ett formulär och togs bort. Nu är det två ringar i batteriets stil, timmar innanför och minuter utanför. Hela klockan är ett enda tal, minuter sedan midnatt, så ringarna hänger ihop som visarna på en riktig klocka. En svepning fortsätter snurra och landar med fjäder: snabbt på jämna fem minuter, lugnt på exakt minut, så att 18:07 fortfarande går. Tiden är valfri, därför finns knappen "Ingen tid". Piltangenter fungerar också.
 
 **Hittat när designen kördes i riktig webbläsare, inte i koden.** Rubriken ovan, ett tomt svepfält utan bock, en prick mitt i radarn för kategorier utan data, flikar som nådde kanten på 320 px och datumet som stod två gånger på andra dagar än idag.
+
+## Iteration: energi i stället för batteri (2026-11-08)
+
+**Problemet.** Batteriet visade hur väl man håller sin plan och sjönk 1 % i timmen med en nedräkning. Det gick inte att förklara för någon som såg det första gången. Att göra något laddade batteriet, fast det i verkligheten kostar energi, och nedräkningen blandade in en tredje sak: tid. Tre idéer i en siffra gjorde att ingen av dem gick fram.
+
+**25. Batteriet visar energi, inte följsamhet.** Fyra regler: morgonens check-in är starten, 1 timme fokus = 20 %, laddare ger tillbaka och ikväll = nu minus det som är kvar. Alternativet var att behålla den gamla modellen och förklara den bättre, men problemet var modellen, inte texten. Ingen timer: siffran ändras bara när användaren gör något.
+
+**26. Kostnaden kommer från passets längd.** Alternativet var att användaren eller AI:n sätter en kostnad per uppgift. Det blir en siffra till att gissa på. Längden finns redan, och en regel räcker: 1 timme = 20 %. Då betyder procenten också tid: 40 % räcker till ca 2 timmar fokus.
+
+**27. Två mått som aldrig blandas: energi i procent, dagens plan i minuter per typ.** I en tidig prototyp kändes plugg som något dåligt, eftersom en uppgift bara syntes som ett minus. Nu flyttar en avbockning energi till ringen "Dagens plan", som fylls i typens färg. Låg energi och full ring är en bra dag. Ordet "investerat" testades och valdes bort, det lät som ekonomi.
+
+**28. Laddare är användarens egna.** Typen `bonus` blev laddare med egen laddning (5–20 %). Fasta knappar för vatten och promenad valdes bort, de var för allmänna och sa ingenting om personen. Användaren lägger till sina egna i formuläret, eller ber AI:n hitta dem. AI:n får inte föreslå allmänna saker, utan frågar vad som brukar ge just den personen energi.
+
+**29. Check-in sparas per dag och kan ändras.** Inte i förväg, bara idag. Agenten har ett nytt verktyg, `set_checkin`, så "jag är helt slut idag" räcker.
+
+**Designen togs fram i prototyp innan något byggdes.** Sex varv: för mycket text, sedan helt utan text (för vagt, en ny användare förstod inte vad 35 % betydde), sedan en balans där varje siffra har en kort etikett, ett statusord (Ladda, Hushålla, Bra läge, Full fart) och en omräkning till fokustid.
+
+**Testat.** 68 automatiska tester, varav nya för energins regler, check-in och laddare. Körd i riktig webbläsare i mörkt och ljust läge: check-in, avbockning, laddare och överbokad dag. Inte testat mot riktiga modellen än, eftersom det kräver API-nyckeln.
+
+**30. Mindre energikort, laddare som egna ikoner.** Efter test i appen tog kortet för mycket plats. Procent, statusord och fokustid står nu på en rad, batteriet är lägre och skalan under det togs bort (statusordet säger samma sak). Laddarna är en rad med runda ikoner som användaren väljer själv (12 st), med laddningen som en liten siffra. En laddare har ingen dag eller tid: den finns varje dag och ligger inte i schemat eller veckovyn. Formuläret för en laddare har därför bara namn, ikon och hur mycket den ger. Alternativet var att behålla knappar med namn, men de bröt raden och "Upprepas/varje dag" var meningslöst för något man tar till när man behöver.
+
+**31. Idag delas i översikt och dagbok.** Hemskärmen hade både läget och hela listan, och Dagens plan var full av siffror. Nu är Idag en översikt: energin, laddarna, Dagens plan och ett kort till dagboken med nästa sak och hur många som är kvar. Dagboken är en egen sida med veckoremsan, dagens lista och veckovyn, och där bockar man av. Dagens plan visar en stapel per typ i stället för minuter, siffrorna finns kvar för skärmläsare. Alternativet var att bara krympa kortet, men problemet var att två olika uppgifter delade samma skärm: att se hur det går och att göra saker.
+
+**Kvarstår.** Livsbalans-radarn i förklaringsarket räknar fortfarande laddare som en egen axel.
+

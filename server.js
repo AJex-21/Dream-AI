@@ -36,7 +36,8 @@ app.post('/api/items/:id/move', handle(req => db.moveSession(req.params.id, { ..
 app.get('/api/day', handle(req => db.getDay(req.query.date, todayOf(req.query.today))));
 app.get('/api/week', handle(req => db.getWeek(req.query.date, todayOf(req.query.today))));
 app.get('/api/overview', handle(req => db.getOverview(todayOf(req.query.today))));
-app.get('/api/battery', handle(() => db.getBattery()));
+app.get('/api/energy', handle(req => db.getEnergy(todayOf(req.query.today))));
+app.post('/api/checkin', handle(req => db.setCheckin(req.body?.level, { today: todayOf(req.body?.today) })));
 app.get('/api/profile', handle(() => db.getProfile()));
 app.post('/api/setup', handle(req => db.setup(req.body, todayOf(req.body?.today))));
 

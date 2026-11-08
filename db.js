@@ -1,7 +1,7 @@
 // db.js – en JSON-fil som databas. Räcker för en användare/demo.
 import { readFile, writeFile, rename } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { batteryAt, gainFor } from './battery.js';
+import { CHARGER_ICONS, LEVELS, chargeOf, deltaOf, energyFor } from './energy.js';
 import {
   ALL_DAYS, addDays, balance, expand, formatDate, groupName, isAppointment, isValidDate,
   occurrence, occursOn, progress, sortDay, weekStart
@@ -24,8 +24,8 @@ const fail = message => { throw new Error(message); };
 const eveningOf = date => new Date(date + 'T20:00:00').getTime(); // efterregistrering hamnar på dagen, inte nu
 const blankHistory = () => ({ doneOn: {}, skip: [], extra: [], notes: {} });
 
-// En bock fryser vad passet var värt, så att en ändring av regeln inte skriver om det förflutna.
-const tick = (item, items, date, at) => ({ at, gain: gainFor(item, items, date), minutes: item.minutes, time: item.time });
+// En bock fryser längd och laddning, så att en ändring av regeln inte skriver om det förflutna.
+const tick = (item, at) => ({ at, minutes: item.minutes, time: item.time, ...(item.type === 'bonus' ? { charge: chargeOf(item) } : {}) });
 
 // ---- Lagring ----
 
@@ -52,14 +52,16 @@ function migrate(db) {
     if (done) doneDates.get(item).push(old.date);
   }
   for (const [item, dates] of doneDates) {
-    for (const date of dates) item.doneOn[date] = tick(item, items, date, eveningOf(date));
+    for (const date of dates) item.doneOn[date] = tick(item, eveningOf(date));
   }
-  return { version: VERSION, nextId: db.nextId, profile: { name: 'Oscar' }, items, chat: [] };
+  return { version: VERSION, nextId: db.nextId, profile: { name: 'Oscar' }, items, chat: [], checkins: {} };
 }
 
 async function load() {
-  if (!existsSync(DB_PATH)) return { version: VERSION, nextId: 1, profile: null, items: [], chat: [] };
-  return migrate(JSON.parse(await readFile(DB_PATH, 'utf8')));
+  if (!existsSync(DB_PATH)) return { version: VERSION, nextId: 1, profile: null, items: [], chat: [], checkins: {} };
+  const db = migrate(JSON.parse(await readFile(DB_PATH, 'utf8')));
+  db.checkins ??= {}; // check-in kom till senare, äldre filer saknar den
+  return db;
 }
 
 // Temporär fil + rename: den riktiga filen är alltid hel, även om något avbryts mitt i.
@@ -131,6 +133,15 @@ function clean(input, partial = false) {
     out.minutes = m;
   }
   if (input.repeat !== undefined) out.repeat = cleanRepeat(input.repeat);
+  if (input.charge !== undefined) {
+    const c = input.charge === null ? null : Number(input.charge);
+    if (c !== null && (!Number.isInteger(c) || c < 1 || c > 30)) fail('Laddningen måste vara ett heltal, 1–30 %.');
+    out.charge = c;
+  }
+  if (input.icon !== undefined) {
+    if (input.icon !== null && !CHARGER_ICONS.includes(input.icon)) fail(`Ikonen måste vara en av ${CHARGER_ICONS.join(', ')}.`);
+    out.icon = input.icon;
+  }
 
   if (!partial) {
     for (const k of ['date', 'type', 'name']) if (out[k] === undefined) fail(`${k} saknas`);
@@ -139,6 +150,8 @@ function clean(input, partial = false) {
     out.time ??= null;
     out.minutes ??= null;
     out.repeat ??= null;
+    out.charge ??= null;
+    out.icon ??= null;
   }
   return out;
 }
@@ -148,6 +161,14 @@ function checkWhole(item) {
   if (item.type === 'routine') item.repeat ??= { days: ALL_DAYS, until: null };
   if (item.type === 'todo' && item.repeat) fail('En uppgift kan inte upprepas. Lägg den som rutin i stället.');
   if (item.repeat?.until && item.repeat.until < item.date) fail('Slutdatumet ligger före startdatumet.');
+  if (item.type === 'bonus') {
+    // En laddare är något man tar till när man behöver, inte en tid i schemat: den finns varje dag.
+    item.repeat ??= { days: ALL_DAYS, until: null };
+    item.icon ??= 'bolt';
+  } else {
+    item.charge = null; // bara en laddare laddar
+    item.icon = null;
+  }
   return item;
 }
 
@@ -163,8 +184,18 @@ const findItem = (db, id) => db.items.find(i => i.id === Number(id)) ?? fail(`In
 const visible = items => items.filter(i => !i.archived);
 const isActiveRule = (item, today) => item.repeat && (!item.repeat.until || item.repeat.until >= today);
 const hasHistory = item => Object.keys(item.doneOn).length > 0;
-// Vad en rad skulle ladda om den bockas av nu. Beror på hela planen, inte bara raden själv.
-const priced = (occ, items) => ({ ...occ, charge: gainFor(occ, items, occ.date) });
+// Vad en rad gör med energin: fokus använder, en laddare ger.
+const priced = occ => ({ ...occ, energy: deltaOf(occ) });
+
+// Dagens energi. Det som är gjort räknas från bockarna, även för sådant som tagits bort
+// efteråt, annars skulle energin hoppa när man städar. Det som är kvar är dagens plan.
+function energyOf(db, today) {
+  const done = db.items
+    .filter(i => i.doneOn[today])
+    .map(i => ({ type: i.type, minutes: i.doneOn[today].minutes, charge: i.doneOn[today].charge ?? i.charge }));
+  const remaining = expand(visible(db.items), today, today, today).filter(o => !o.done && o.type !== 'bonus');
+  return energyFor({ checkin: db.checkins[today] ?? null, done, remaining });
+}
 
 function pushItem(db, input) {
   const item = checkWhole({ id: db.nextId, ...clean(input), ...blankHistory() });
@@ -191,16 +222,17 @@ export async function listItems({ date, from, to, type, query, today = localDate
   return expand(wanted, start, end, today);
 }
 
-export async function getBattery() {
-  return batteryAt((await load()).items);
+export async function getEnergy(today = localDate()) {
+  return energyOf(await load(), today);
 }
 
-// En dag i schemat. Batteriet är alltid läget just nu, oavsett vilken dag man tittar på.
+// En dag i schemat. Energin gäller alltid idag, oavsett vilken dag man tittar på.
 export async function getDay(date, today = localDate()) {
   if (!isValidDate(date)) fail('Datumet måste vara ett riktigt datum (YYYY-MM-DD).');
-  const items = (await load()).items;
-  const shown = visible(items);
-  const list = sortDay(expand(shown, date, date, today)).map(o => priced(o, items));
+  const store = await load();
+  const all = visible(store.items);
+  const shown = all.filter(i => i.type !== 'bonus'); // laddare ligger i energikortet, inte i schemat
+  const list = sortDay(expand(shown, date, date, today)).map(priced);
   const todays = sortDay(expand(shown, today, today, today));
   const next = todays.find(o => !o.done && !o.overdue); // "Nästa" är dagens plan, inte gammalt som släpar
   const upcoming = date === today
@@ -208,7 +240,7 @@ export async function getDay(date, today = localDate()) {
       .filter(i => i.type === 'todo' && !hasHistory(i) && i.date > today && i.date <= addDays(today, 7))
       .sort((a, b) => a.date.localeCompare(b.date))
       .slice(0, 3)
-      .map(i => priced(occurrence(i, i.date, today), items))
+      .map(i => priced(occurrence(i, i.date, today)))
     : [];
   return {
     date,
@@ -217,15 +249,17 @@ export async function getDay(date, today = localDate()) {
     done: list.filter(o => o.done).length,
     total: list.length,
     todayTotal: todays.length,
+    todayDone: todays.filter(o => o.done).length,
     upcoming,
-    next: next ? priced(next, items) : null,
-    battery: batteryAt(items)
+    next: next ? priced(next) : null,
+    chargers: expand(all.filter(i => i.type === 'bonus'), today, today, today).map(priced),
+    energy: energyOf(store, today)
   };
 }
 
 export async function getWeek(date, today = localDate()) {
   if (!isValidDate(date)) fail('Datumet måste vara ett riktigt datum (YYYY-MM-DD).');
-  const shown = visible((await load()).items);
+  const shown = visible((await load()).items).filter(i => i.type !== 'bonus');
   const start = weekStart(date);
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = addDays(start, i);
@@ -241,12 +275,12 @@ export async function getOverview(today = localDate()) {
   const items = visible(all);
   const todayOf = item => {
     const occ = expand([item], today, today, today)[0];
-    return occ ? priced(occ, all) : null;
+    return occ ? priced(occ) : null;
   };
 
   const routines = items
     .filter(i => i.type === 'routine' && isActiveRule(i, today))
-    .map(i => ({ ...publicItem(i), today: todayOf(i), charge: gainFor(i, all, today), progress: progress([i], today) }));
+    .map(i => ({ ...publicItem(i), today: todayOf(i), energy: deltaOf(i), progress: progress([i], today) }));
 
   // En avslutad period försvinner inte utan visar hur det gick.
   const ended = items
@@ -260,7 +294,7 @@ export async function getOverview(today = localDate()) {
 
   const todos = items.filter(i => i.type === 'todo');
   const open = todos.filter(i => !hasHistory(i) && !(isAppointment(i) && i.date < today))
-    .map(i => priced(occurrence(i, i.date, today), all))
+    .map(i => priced(occurrence(i, i.date, today)))
     .sort((a, b) => a.date.localeCompare(b.date) || (a.time ?? '99:99').localeCompare(b.time ?? '99:99'));
   const done = todos.filter(hasHistory)
     .map(i => ({ doneDate: Object.keys(i.doneOn)[0], at: Object.values(i.doneOn)[0].at, item: i }))
@@ -280,7 +314,7 @@ export async function getOverview(today = localDate()) {
     return {
       name: g.name,
       progress: progress(g.items, today),
-      next: next ? priced(next, all) : null,
+      next: next ? priced(next) : null,
       offDay: offDay ? { id: offDay.id, name: offDay.name, type: offDay.type } : null
     };
   });
@@ -290,7 +324,7 @@ export async function getOverview(today = localDate()) {
     ended,
     todos: { open, done },
     hobbies,
-    bonus: expand(items.filter(i => i.type === 'bonus'), today, today, today).map(o => priced(o, all)),
+    bonus: expand(items.filter(i => i.type === 'bonus'), today, today, today).map(priced),
     balance: balance(all, today)
   };
 }
@@ -327,7 +361,6 @@ export const setDone = (id, { date, done = true, today = localDate() } = {}) => 
   const item = findItem(db, id);
   const day = date ?? today;
   if (!isValidDate(day)) fail('Datumet måste vara ett riktigt datum (YYYY-MM-DD).');
-  const before = batteryAt(db.items).level;
 
   let key = item.repeat ? day : item.date;
   if (item.type === 'todo' && !isAppointment(item)) key = day > today ? today : day; // går att bli klar i förtid
@@ -335,7 +368,7 @@ export const setDone = (id, { date, done = true, today = localDate() } = {}) => 
   if (done) {
     if (key > today) fail('Det ligger i framtiden. Bocka av det på dagen.');
     if (item.type === 'todo') item.doneOn = {};
-    const entry = tick(item, db.items, key, key === today ? Date.now() : eveningOf(key));
+    const entry = tick(item, key === today ? Date.now() : eveningOf(key));
     if (item.repeat && !occursOn(item, key, today)) covered = entry.covers = coverMissed(item, key, today);
     item.doneOn[key] = entry;
   } else if (item.type === 'todo') {
@@ -345,8 +378,7 @@ export const setDone = (id, { date, done = true, today = localDate() } = {}) => 
     delete item.doneOn[key];
   }
 
-  const battery = batteryAt(db.items);
-  return { item: occurrence(item, key, today), battery, gained: battery.level - before, covered };
+  return { item: occurrence(item, key, today), energy: energyOf(db, today), delta: deltaOf(item), covered };
 });
 
 // Gjort en annan dag än planerat: det räknas som det senast missade passet, så att sviten håller.
@@ -395,7 +427,7 @@ export const setNotes = (id, notes) => mutate(db => {
 });
 
 // Med date tas bara den dagen bort. Något med historik arkiveras i stället för att raderas,
-// annars skulle batteriet tappa det man redan gjort.
+// annars skulle historiken och dagens energi tappa det man redan gjort.
 export const deleteItem = (id, { date, today = localDate() } = {}) => mutate(db => {
   const item = findItem(db, id);
   if (item.repeat && date) {
@@ -412,6 +444,19 @@ export const deleteItem = (id, { date, today = localDate() } = {}) => mutate(db 
     db.items.splice(db.items.indexOf(item), 1);
   }
   return removed;
+});
+
+// ---- Check-in ----
+
+// Hur man mår på morgonen är dagens start. Går att ändra under dagen, men inte i förväg.
+export const setCheckin = (level, { date, today = localDate() } = {}) => mutate(db => {
+  const day = date ?? today;
+  if (!isValidDate(day)) fail('Datumet måste vara ett riktigt datum (YYYY-MM-DD).');
+  if (day > today) fail('Det går bara att checka in för idag.');
+  const l = Number(level);
+  if (!LEVELS.some(x => x.level === l)) fail(`Välj en nivå: ${LEVELS.map(x => x.level).join(', ')}.`);
+  db.checkins[day] = l;
+  return energyOf(db, today);
 });
 
 // ---- Profil och chatt ----
@@ -434,7 +479,7 @@ function demoItems(today) {
     { date: today, type: 'todo', name: 'Betala räkningar', desc: 'El- och internetfakturor' },
     { date: addDays(today, 2), type: 'todo', name: 'Tandläkarbesök', desc: 'Kontroll på Centrumkliniken', time: '14:30', prio: 'High' },
     { date: deadline, type: 'todo', name: 'Lämna in uppsats', prio: 'High' },
-    { date: today, type: 'bonus', name: 'Kall dusch', desc: '2 minuters återhämtningsboost', minutes: 2, prio: 'Low' }
+    { date: today, type: 'bonus', name: 'Kall dusch', desc: '2 minuters återhämtningsboost', minutes: 2, prio: 'Low', charge: 5 }
   ];
 }
 
@@ -447,10 +492,11 @@ export const setup = ({ name, demo = false } = {}, today = localDate()) => mutat
     const plan = demoItems(today).map(({ miss, ...input }) => ({ miss, item: pushItem(db, input) }));
     for (const { miss, item } of plan.filter(p => p.miss)) {
       expand([item], addDays(today, -7), addDays(today, -1), today).forEach((o, i) => {
-        if ((i + 1) % miss) item.doneOn[o.date] = tick(item, db.items, o.date, eveningOf(o.date));
+        if ((i + 1) % miss) item.doneOn[o.date] = tick(item, eveningOf(o.date));
       });
-      if (item.name === 'Morgonstretch') item.doneOn[today] = tick(item, db.items, today, Date.now() - 3600e3); // dagen har börjat
+      if (item.name === 'Morgonstretch') item.doneOn[today] = tick(item, Date.now() - 3600e3); // dagen har börjat
     }
+    db.checkins[today] = 60;
   }
   return db.profile;
 });

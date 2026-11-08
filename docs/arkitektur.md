@@ -11,7 +11,7 @@ flowchart LR
   subgraph Server [Backend: Node.js + Express]
     REST[REST-API<br>/api/day, /api/week, /api/overview, /api/items]
     AG[Agent<br>/api/chat]
-    LOGIC[schedule.js + battery.js<br>rena funktioner]
+    LOGIC[schedule.js + energy.js<br>rena funktioner]
     DB[(db.json)]
   end
   LLM[Claude API<br>tool use]
@@ -27,7 +27,7 @@ flowchart LR
   CHAT -- ladda om data --> UI
 ```
 
-UI:t och agenten använder **samma funktioner i `db.js`**. Det AI:n gör syns direkt i batteriet och listorna. Frontend räknar aldrig ut batteriet själv, så det finns bara en formel.
+UI:t och agenten använder **samma funktioner i `db.js`**. Det AI:n gör syns direkt i energin och listorna. Frontend räknar aldrig ut energin själv, så det finns bara en formel.
 
 ## Datamodell
 
@@ -40,11 +40,12 @@ Ett item är en **regel**, inte en rad per dag. Det som visas i schemat räknas 
   time,      // klockslag "18:00" eller null
   minutes,   // längd eller null
   repeat,    // { days: [1, 4], until: "2027-06-30" | null } eller null
-  doneOn,    // { "2026-11-02": { at, gain, minutes, time } }, en bock per dag
+  charge,    // bara laddare: hur många % den ger (1–30), annars null
+  doneOn,    // { "2026-11-02": { at, minutes, time, charge? } }, en bock per dag
   skip,      // dagar som tagits bort från en regel
   extra,     // dagar ett enskilt pass flyttats till
   notes,     // eget innehåll per dag, { "2026-11-03": "Skalor i C-dur" }
-  archived   // borttaget men med historik, räknas kvar i batteriet
+  archived   // borttaget men med historik, dagens bock räknas kvar i energin
 }
 ```
 
@@ -53,39 +54,28 @@ Ett item är en **regel**, inte en rad per dag. Det som visas i schemat räknas 
 | Rutin | Upprepas alltid: veckodagar, och ev. från/till. Bocka av dag för dag. |
 | Att göra | En gång, med deadline. Öppen uppgift följer med till idag som försenad. Klar uppgift ligger på dagen den blev klar. Med klockslag är det en **tid att passa**: den ligger kvar på sin dag och kan inte bli försenad. |
 | Hobby | En gång eller upprepad. "Gitarr: skalor" och "Gitarr: ackord" räknas som samma hobby i framstegen. |
-| Bonus | Liten hälsoboost, en gång eller upprepad. |
+| Laddare (`bonus`) | Något personligt som ger användaren energi, med egen laddning. En gång eller upprepad. |
 
-En bock fryser vad passet var (laddning, minuter, klockslag). Ändras regeln efteråt är det gjorda ändå orört. Bockar man av en dag då inget var planerat räknas det som det senast missade passet de senaste 6 dagarna, så att sviten håller.
+En bock fryser vad passet var (minuter, klockslag, och laddning för en laddare). Ändras regeln efteråt är det gjorda ändå orört. Bockar man av en dag då inget var planerat räknas det som det senast missade passet de senaste 6 dagarna, så att sviten håller.
 
 Filen är versionsmärkt. Gamla `db.json` (format 1) migreras när de läses: rutinrader med samma namn blir en regel, och `minTime`/`maxTime` blir `minutes`.
 
-## Batteriet
+## Energin
 
-Batteriet är **läget just nu**, inte en egenskap hos ett datum, och det visar **hur väl man håller sin egen plan**. Nivån lagras aldrig utan spelas upp ur `doneOn`:
-
-```
-nivå = 0
-för varje avbockning i tidsordning:
-  nivå -= 1 % per timme sedan förra händelsen (aldrig under 0)
-  nivå += avbockningens frysta laddning (aldrig över 100)
-nivå -= 1 % per timme fram till nu
-räcker = nivå timmar
-```
-
-Laddningen sätts när man bockar av:
+Energin gäller **idag** och räknas fram varje gång, den lagras aldrig. Det enda som sparas är morgonens check-in, `checkins: { "2026-11-08": 40 }`. Reglerna finns i `energy.js`:
 
 ```
-vikt(pass)   = 8 + min(minuter, 60) / 5
-planens vikt = summan av alla pass den veckan (rutin och hobby)
-veckoladdning = 7 * 24 * 1 % * 1,5 = 252 %
-laddning     = vikt(pass) / planens vikt * veckoladdning
+start    = check-in: 20 helt slut, 40 trött, 60 okej, 80 pigg, 100 full energi
+kostnad  = minuter * 20 / 60, avrundat till hela 5 %, minst 5   (1 h fokus = 20 %)
+laddning = laddarens egen siffra, annars 10
+nu       = start - kostnad för det som är gjort idag + laddning för gjorda laddare   (0–100)
+ikväll   = nu - kostnad för det som är kvar idag        (under 0 = överbokad dag)
+räcker   = nu / 20 timmar fokus
 ```
 
-Att göra och bonus ligger utanför planen och ger 5 %.
+Det gjorda räknas från bockarna med frysta minuter, även för sådant som tagits bort efteråt. Dagens plan räknas i minuter per typ (rutin, att göra, hobby). Laddare räknas inte in i planen, de är vila.
 
-Följer man hela planen laddas batteriet 1,5 gånger så mycket som det hinner tappa, **oavsett hur stor planen är**. Två tredjedelar av planen håller nivån, mindre sänker den. Simulering över tre veckor: en, tre och sex rutiner fylls alla till minst 85 % om planen hålls, och hälften av planen ger minst 40 enheter lägre nivå.
-
-Eftersom nivån räknas fram blir ångra, efterregistrering av en glömd dag och nästa morgon rätt utan specialfall. Att planera in något ändrar inte nivån, bara vad nästa bock är värd. Kategorierna i stapeln följer samma uppspelning, så delarna alltid summerar till nivån.
+Utan check-in finns ingen energi, bara planen. Appen frågar då "Hur mår du idag?" i energikortet, och agenten kan spara check-in när användaren säger hur hen mår.
 
 ## Agent-loopen
 
@@ -117,7 +107,8 @@ flowchart TD
 | `set_session_notes` | Ger enskilda dagar eget innehåll i ett återkommande pass | "Gör en gitarrplan för veckan" |
 | `set_done` | Bockar av eller ångrar en dag | "Jag har tränat" |
 | `delete_item` | Tar bort en post, eller med `date` bara en dag | "Ta bort tandläkaren" |
-| `get_battery` | Batteriet just nu: nivå, timmar kvar, kategorier | "Hur ligger jag till?" |
+| `get_energy` | Dagens energi: nu, ikväll, vad planen behöver, hur länge det räcker, plan per typ | "Hur ligger jag till?" |
+| `set_checkin` | Sparar hur användaren mår som dagens start | "Jag är helt slut idag" |
 | `get_progress` | Svit, pass denna vecka, minuter, senaste 30 dagarna | "Håller jag i gitarren?" |
 
 ## Pseudokod

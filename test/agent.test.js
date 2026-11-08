@@ -44,9 +44,9 @@ test('hobbyplan: agenten lägger till flera pass', async () => {
   assert.equal(last.content[0].tool_use_id, 't1');
 });
 
-test('bocka av: list_items → set_done, batteriet stiger', async () => {
+test('bocka av: list_items → set_done, dagens plan går framåt', async () => {
   const today = db.localDate();
-  const before = (await db.getBattery()).level;
+  const before = (await db.getEnergy(today)).plan.doneMinutes;
   const target = (await db.listItems({ date: today })).find(i => !i.done);
   const client = mockClient([
     toolUse('a', 'list_items', { date: today }),
@@ -55,7 +55,26 @@ test('bocka av: list_items → set_done, batteriet stiger', async () => {
   ]);
   const out = await runAgent(client, [{ role: 'user', content: `jag har gjort ${target.name}` }], today);
   assert.equal(out.actions[0].kind, 'done');
-  assert.ok((await db.getBattery()).level > before);
+  assert.ok((await db.getEnergy(today)).plan.doneMinutes > before);
+});
+
+test('check-in: "jag är trött" sparar startenergin och visas som kort', async () => {
+  const today = db.localDate();
+  const client = mockClient([toolUse('c', 'set_checkin', { level: 40 }), text('Okej, vi tar det lugnt idag.')]);
+  const out = await runAgent(client, [{ role: 'user', content: 'jag är trött idag' }], today);
+  assert.equal(out.actions[0].kind, 'checkin');
+  assert.equal(out.actions[0].item.name, 'Check-in: Trött');
+  assert.equal((await db.getEnergy(today)).checkin, 40);
+});
+
+test('laddare: agenten kan lägga in en personlig laddare med egen laddning', async () => {
+  const today = db.localDate();
+  const client = mockClient([
+    toolUse('l', 'add_items', { items: [{ date: today, type: 'bonus', name: 'Ringa mormor', charge: 15 }] }),
+    text('Sparat som laddare.')
+  ]);
+  const out = await runAgent(client, [{ role: 'user', content: 'jag blir glad av att ringa mormor' }], today);
+  assert.equal(out.actions[0].item.charge, 15);
 });
 
 test('återkommande: en post med repeat syns varje dag utan kopior', async () => {
@@ -119,7 +138,7 @@ test('ett ogiltigt item i add_items sparar ingenting', async () => {
 });
 
 test('loopen stannar efter MAX_STEPS', async () => {
-  const script = Array.from({ length: 10 }, (_, i) => toolUse('l' + i, 'get_battery', {}));
+  const script = Array.from({ length: 10 }, (_, i) => toolUse('l' + i, 'get_energy', {}));
   const out = await runAgent(mockClient(script), [{ role: 'user', content: 'loop' }], db.localDate());
   assert.match(out.reply, /hann inte/);
 });
