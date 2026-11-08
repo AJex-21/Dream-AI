@@ -1,13 +1,12 @@
-// Testar schemat och batteriet: rena funktioner, så tiden kan styras exakt.
+// Testar schemat: rena funktioner, så tiden kan styras exakt.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ALL_DAYS, addDays, balance, expand, isValidDate, occursOn, progress, sortDay, weekStart } from '../schedule.js';
-import { batteryAt, gainFor, DRAIN_PER_HOUR } from '../battery.js';
 
 const MON = '2026-11-02'; // måndag
 const at = (date, time = '12:00') => new Date(`${date}T${time}:00`).getTime();
 const item = over => ({ id: 1, type: 'routine', name: 'Gym', desc: '', prio: 'Medium', time: null, minutes: null, date: MON, repeat: null, doneOn: {}, skip: [], extra: [], notes: {}, ...over });
-const done = (date, time = '12:00', gain = 20) => ({ at: at(date, time), gain, minutes: null, time: null });
+const done = (date, time = '12:00') => ({ at: at(date, time), minutes: null, time: null });
 const days = (it, from, to, today = from) => expand([it], from, to, today).map(o => o.date);
 
 test('isValidDate stoppar påhittade datum', () => {
@@ -141,95 +140,4 @@ test('balans: det som är kvar idag räknas inte som missat', () => {
   assert.equal(balance([tonight], MON).routine, null);
   const yesterday = item({ date: '2026-11-01', repeat: { days: ALL_DAYS, until: null } });
   assert.equal(balance([yesterday], MON).routine, 0);
-});
-
-test('batteri: längre pass ger mer, en räkning ger mindre än ett träningspass', () => {
-  const long = item({ id: 1, minutes: 60, repeat: { days: [1], until: null } });
-  const short = item({ id: 2, minutes: 10, repeat: { days: [1], until: null } });
-  const plan = [long, short];
-  assert.ok(gainFor(long, plan, MON) > gainFor(short, plan, MON));
-  assert.ok(gainFor(item({ type: 'todo' }), plan, MON) < gainFor(short, plan, MON));
-});
-
-test('batteri: första passet på en söndag är inte värt en hel vecka', () => {
-  const sun = '2026-11-08';
-  const it = item({ date: sun, minutes: 20, repeat: { days: ALL_DAYS, until: null } });
-  assert.equal(gainFor(it, [it], sun), gainFor(it, [it], addDays(sun, 1)));
-});
-
-// Tre veckor med en plan, helt eller delvis gjord. Visar att det är följsamheten som räknas.
-function simulate(plan, doneShare = 1) {
-  const start = new Date(2026, 10, 2);
-  const rules = plan.map((p, i) => item({ id: i + 1, name: `P${i}`, minutes: p.minutes, repeat: { days: p.days, until: null } }));
-  let credit = 0;
-  for (let n = 0; n < 21; n++) {
-    const d = new Date(start); d.setDate(d.getDate() + n);
-    const date = addDays(MON, n);
-    for (const r of rules) {
-      if (!r.repeat.days.includes(d.getDay())) continue;
-      credit += doneShare;
-      if (credit < 1) continue;
-      credit -= 1;
-      r.doneOn[date] = { at: at(date, '19:00'), gain: gainFor(r, rules, date) };
-    }
-  }
-  return batteryAt(rules, at(addDays(MON, 20), '21:00')).level;
-}
-
-test('batteri: att hålla sin plan fyller batteriet, oavsett hur stor planen är', () => {
-  const small = [{ minutes: 20, days: ALL_DAYS }];
-  const oscar = [{ minutes: 60, days: [1, 4] }, { minutes: 20, days: ALL_DAYS }, { minutes: 10, days: ALL_DAYS }];
-  const big = [...oscar, { minutes: 45, days: [1, 2, 3, 4, 5] }, { minutes: 30, days: ALL_DAYS }, { minutes: 30, days: [2, 4, 6] }];
-  for (const plan of [small, oscar, big]) assert.ok(simulate(plan) >= 85, `full plan: ${simulate(plan)}`);
-});
-
-test('batteri: hälften av planen ger tydligt lägre nivå än hela', () => {
-  const oscar = [{ minutes: 60, days: [1, 4] }, { minutes: 20, days: ALL_DAYS }, { minutes: 10, days: ALL_DAYS }];
-  assert.ok(simulate(oscar, 0.5) < simulate(oscar) - 40, `${simulate(oscar, 0.5)} mot ${simulate(oscar)}`);
-});
-
-test('batteri: att planera in något påverkar det inte', () => {
-  const finished = item({ minutes: 60, doneOn: { [MON]: done(MON, '09:00') } });
-  const now = at(MON, '10:00');
-  const before = batteryAt([finished], now).level;
-  const planned = item({ id: 2, name: 'Gitarr', type: 'hobby', repeat: { days: ALL_DAYS, until: null } });
-  assert.equal(batteryAt([finished, planned], now).level, before);
-});
-
-test('batteri: sjunker med tiden, når noll och går att räkna på', () => {
-  const it = item({ minutes: 60, doneOn: { [MON]: done(MON, '09:00') } }); // +20 %
-  assert.equal(batteryAt([it], at(MON, '09:00')).level, 20);
-  const left = 20 - 4 * DRAIN_PER_HOUR;
-  assert.equal(batteryAt([it], at(MON, '13:00')).level, left);
-  assert.equal(batteryAt([it], at(MON, '13:00')).hoursLeft, Math.round((left / DRAIN_PER_HOUR) * 10) / 10);
-  const empty = batteryAt([it], at('2026-11-04', '09:00'));
-  assert.equal(empty.level, 0);
-  assert.equal(empty.emptyAt, null);
-});
-
-test('batteri: gårdagens pass följer med till nästa morgon', () => {
-  const it = item({ minutes: 60, doneOn: { [MON]: done(MON, '18:00') } });
-  assert.ok(batteryAt([it], at('2026-11-03', '00:30')).level > 0);
-});
-
-test('batteri: ångra ger samma nivå som om bocken aldrig satts', () => {
-  const a = item({ minutes: 60, doneOn: { [MON]: done(MON, '09:00') } });
-  const b = item({ id: 2, minutes: 30, doneOn: { [MON]: done(MON, '10:00') } });
-  const now = at(MON, '11:00');
-  const undone = { ...b, doneOn: {} };
-  assert.equal(batteryAt([a, undone], now).level, batteryAt([a], now).level);
-});
-
-test('batteri: taket är 100 och delarna summerar alltid till nivån', () => {
-  const many = Array.from({ length: 12 }, (_, i) => item({
-    id: i + 1,
-    type: ['routine', 'hobby', 'todo', 'bonus'][i % 4],
-    minutes: 60,
-    doneOn: { [MON]: done(MON, `0${i % 9}:30`, 20) }
-  }));
-  for (const now of [at(MON, '09:00'), at(MON, '17:45'), at('2026-11-03', '03:10')]) {
-    const b = batteryAt(many, now);
-    assert.ok(b.level <= 100);
-    assert.equal(Object.values(b.byType).reduce((s, v) => s + v, 0), b.level);
-  }
 });

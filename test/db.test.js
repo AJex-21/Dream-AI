@@ -70,10 +70,11 @@ test('en tid att passa går inte att bocka av i förtid och försvinner från li
 
 test('en ändring av regeln rör inte det som redan är bockat', async () => {
   const { id } = await db.addItem(routine({ date: db.localDate(), minutes: 20 }));
+  await db.setCheckin(60);
   await db.setDone(id, {});
-  const before = (await db.getBattery()).level;
+  const before = (await db.getEnergy()).now;
   await db.updateItem(id, { minutes: 60, time: '19:00' });
-  assert.equal((await db.getBattery()).level, before);
+  assert.equal((await db.getEnergy()).now, before);
   const day = await db.getDay(db.localDate());
   assert.equal(day.items[0].minutes, 20);
   assert.equal(day.items[0].time, null);
@@ -111,13 +112,14 @@ test('eget innehåll per dag syns den dagen och följer med en flytt', async () 
   assert.equal((await db.getDay(addDays(2), today)).items[0].desc, 'Öva');
 });
 
-test('ta bort något som är gjort tar inte tillbaka laddningen', async () => {
-  const { id } = await db.addItem({ date: db.localDate(), type: 'bonus', name: 'Promenad' });
+test('ta bort en laddare som är gjord tar inte tillbaka energin', async () => {
+  const { id } = await db.addItem({ date: db.localDate(), type: 'bonus', name: 'Promenad', charge: 15 });
+  await db.setCheckin(40);
   await db.setDone(id, {});
-  const before = (await db.getBattery()).level;
-  assert.ok(before > 0);
+  const before = (await db.getEnergy()).now;
+  assert.equal(before, 55);
   await db.deleteItem(id, {});
-  assert.equal((await db.getBattery()).level, before);
+  assert.equal((await db.getEnergy()).now, before);
   assert.equal((await db.listItems({ query: 'Promenad' })).length, 0);
 });
 
@@ -158,14 +160,15 @@ test('ta bort en dag lämnar resten av regeln', async () => {
   assert.equal((await db.getDay(addDays(2), today)).total, 1);
 });
 
-test('regel med historik avslutas: försvinner framåt, bockarna finns kvar i batteriet', async () => {
-  const { id } = await db.addItem(routine({ date: addDays(-7) }));
+test('regel med historik avslutas: försvinner framåt, dagens bock räknas kvar i energin', async () => {
+  const { id } = await db.addItem(routine({ date: addDays(-7), minutes: 60 }));
+  await db.setCheckin(80, { today });
   await db.setDone(id, { date: today, today });
-  const before = (await db.getBattery()).level;
+  const before = (await db.getEnergy(today)).now;
   await db.deleteItem(id, { today });
   assert.equal((await db.getDay(addDays(1), today)).total, 0);
   assert.equal((await db.listItems()).length, 0);
-  assert.equal((await db.getBattery()).level, before);
+  assert.equal((await db.getEnergy(today)).now, before);
 });
 
 test('regel utan historik raderas helt', async () => {
@@ -174,12 +177,14 @@ test('regel utan historik raderas helt', async () => {
   assert.equal(JSON.parse(readFileSync(process.env.DB_PATH, 'utf8')).items.length, 0);
 });
 
-test('dagvyn: batteriet är läget nu, inte den valda dagens', async () => {
+test('dagvyn: energin gäller idag, inte den valda dagen', async () => {
   const { id } = await db.addItem(routine({ minutes: 60, date: db.localDate() }));
+  await db.setCheckin(60);
   await db.setDone(id, { date: db.localDate() });
   const a = await db.getDay('2026-01-01');
   const b = await db.getDay('2027-06-01');
-  assert.equal(a.battery.level, b.battery.level);
+  assert.equal(a.energy.now, 40);
+  assert.equal(b.energy.now, 40);
 });
 
 test('dagvyn: kommande deadlines syns idag, försenade rullar över', async () => {
@@ -237,4 +242,33 @@ test('migrering från gamla formatet behåller rutiner, bockar och tider', async
   assert.equal(items[1].repeat.days.length, 7);
   assert.equal(items[2].repeat, null);
   assert.equal((await db.addItem(routine())).id, 13);
+});
+
+test('check-in: bara de fem nivåerna, bara idag', async () => {
+  await assert.rejects(db.setCheckin(50, { today }), /Välj en nivå/);
+  await assert.rejects(db.setCheckin(60, { date: addDays(1), today }), /checka in för idag/);
+  const e = await db.setCheckin(80, { today });
+  assert.equal(e.now, 80);
+  assert.equal(e.label, 'Pigg');
+});
+
+test('energin: fokus använder, laddare ger, ikväll räknar med det som är kvar', async () => {
+  const gym = await db.addItem(routine({ minutes: 60 }));
+  await db.addItem({ date: today, type: 'hobby', name: 'Gitarr', minutes: 30 });
+  const music = await db.addItem({ date: today, type: 'bonus', name: 'Spela favoritlåten', charge: 15 });
+  await db.setCheckin(40, { today });
+  const done = await db.setDone(gym.id, { date: today, today });
+  assert.equal(done.delta, -20);
+  assert.equal(done.energy.now, 20);
+  assert.equal(done.energy.tonight, 10);
+  const charged = await db.setDone(music.id, { date: today, today });
+  assert.equal(charged.delta, 15);
+  assert.equal(charged.energy.now, 35);
+  assert.equal(charged.energy.plan.pct, Math.round((60 / 90) * 100));
+});
+
+test('laddning: bara för laddare och inom 1–30 %', async () => {
+  await assert.rejects(db.addItem({ date: today, type: 'bonus', name: 'Musik', charge: 50 }), /1–30/);
+  const gym = await db.addItem(routine({ charge: 10 }));
+  assert.equal(gym.charge, null);
 });

@@ -164,35 +164,89 @@
 
   .screen-header{padding:18px 20px 14px;flex-shrink:0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
 
-  /* BATTERIRINGEN: appens signatur, samma ringar som bockarna och tidslinjen */
-  .battery-card{
-    position:relative;
-    display:flex;
-    align-items:center;
-    gap:18px;
-    width:calc(100% - 40px);
-    flex-shrink:0;
-    text-align:left;
-    margin:4px 20px 14px;
-  }
-  .ring-wrap{position:relative;width:148px;height:148px;flex-shrink:0;transition:transform .25s cubic-bezier(.3,1.3,.5,1);}
-  .battery-card:active .ring-wrap{transform:scale(.97);}
+  /* ENERGI: morgonens check-in är starten, fokus använder, laddare ger tillbaka. --lc är nivåns färg */
+  .energy{--lc:var(--cat-routine);position:relative;margin:4px 20px 12px;padding:16px 18px;border-radius:var(--r-xl);background:var(--bg-surface);box-shadow:0 0 0 1px var(--border);display:flex;flex-direction:column;gap:12px;flex-shrink:0;}
+  .en-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:32px;}
+  .en-label{display:block;font-size:var(--t-xs);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-2);}
+  .en-checkin{display:flex;align-items:center;gap:8px;min-height:44px;padding:4px 12px 4px 10px;margin:-6px -6px -6px 0;border-radius:var(--r-full);background:var(--bg-surface-2);text-align:left;}
+  .en-checkin b{display:block;font-size:var(--t-sm);font-weight:600;line-height:1.15;}
+  .en-checkin small{display:block;font-size:var(--t-xs);color:var(--text-2);font-variant-numeric:tabular-nums;}
+  .mini-bat{display:flex;align-items:center;gap:2px;flex-shrink:0;}
+  .mini-bat i{display:flex;width:26px;height:13px;padding:2px;border:2px solid var(--text-2);border-radius:4px;}
+  .mini-bat i::before{content:'';width:var(--l,0%);background:var(--lc,var(--text-2));border-radius:1px;}
+  .mini-bat::after{content:'';width:3px;height:5px;border-radius:0 2px 2px 0;background:var(--text-2);}
+  .en-ask h2{font-family:var(--font-d);font-size:var(--t-xl);font-weight:700;letter-spacing:-.015em;}
+  .en-ask p{font-size:var(--t-sm);color:var(--text-2);margin-top:2px;}
+  .levels{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px;}
+  .level-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-height:66px;padding:8px 2px;border-radius:14px;background:var(--bg-surface-2);font-size:var(--t-xs);font-weight:600;color:var(--text-2);line-height:1.15;transition:transform .1s ease-out;}
+  .level-btn:active{transform:scale(.95);}
+  .level-btn[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--lc);color:var(--text-1);}
+  .en-main{display:flex;flex-direction:column;gap:12px;width:100%;text-align:left;}
+  .en-now{display:flex;align-items:center;gap:10px;}
+  .en-num{font-family:var(--font-d);font-size:3.5rem;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums;color:var(--lc);transition:color .4s;}
+  .en-chip{padding:5px 10px;border-radius:var(--r-full);font-size:var(--t-xs);font-weight:700;background:var(--lc);color:var(--on-cat);transition:background .4s;}
+  .en-focus{display:flex;flex-direction:column;gap:4px;}
+  .en-focus > span:last-child{display:flex;align-items:center;gap:6px;font-size:var(--t-md);color:var(--text-2);}
+  .en-focus svg.ic{width:16px;height:16px;}
+  .en-focus b{color:var(--text-1);font-variant-numeric:tabular-nums;}
+  .en-bar{display:flex;flex-direction:column;gap:6px;}
+  .en-moon-row{display:block;position:relative;height:20px;margin-right:11px;}
+  .en-moon{position:absolute;bottom:0;transform:translateX(-50%);display:flex;align-items:center;gap:4px;font-size:var(--t-xs);font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums;transition:left .7s cubic-bezier(.22,1,.36,1),color .3s;}
+  .en-moon svg{width:13px;height:13px;fill:currentColor;}
+  .en-moon.low{color:var(--danger);}
+  .en-bar-row{display:flex;align-items:center;gap:4px;}
+  .en-shell{display:block;position:relative;flex:1;height:46px;padding:4px;border-radius:14px;box-shadow:inset 0 0 0 2px var(--border-strong);}
+  .en-shell.over{animation:en-warn 1.6s ease-in-out infinite;}
+  @keyframes en-warn{0%,100%{box-shadow:inset 0 0 0 2px var(--border-strong);}50%{box-shadow:inset 0 0 0 2px var(--danger);}}
+  .en-track{display:block;position:relative;height:100%;border-radius:9px;background:var(--bg-surface-3);overflow:hidden;}
+  .en-keep,.en-chunk{position:absolute;top:0;bottom:0;transition:width .7s cubic-bezier(.22,1,.36,1),left .7s cubic-bezier(.22,1,.36,1),background .4s;}
+  .en-keep{left:0;background:var(--lc);}
+  .en-chunks{position:absolute;inset:0;}
+  .en-chunk{background:var(--c);opacity:.5;border-left:2px solid var(--bg-surface-3);}
+  .en-marker{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--text-1);transition:left .7s cubic-bezier(.22,1,.36,1);}
+  .en-marker.low{background:var(--danger);}
+  .en-nub{width:7px;height:18px;border-radius:0 4px 4px 0;background:var(--border-strong);flex-shrink:0;}
+  .en-scale{display:block;position:relative;height:16px;margin-right:11px;font-size:var(--t-xs);color:var(--text-3);}
+  .en-scale span{position:absolute;top:0;}
+  .en-warn{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;margin-top:12px;padding:8px 12px;border-radius:14px;background:var(--ai-dim);box-shadow:inset 0 0 0 1px var(--ai);text-align:left;font-size:var(--t-sm);}
+  .en-warn .ai-dot{width:32px;height:32px;border-radius:50%;background:var(--ai);color:var(--on-cat);display:grid;place-items:center;flex-shrink:0;}
+  .en-warn .ai-dot svg.ic{width:16px;height:16px;}
+  .en-warn > span:nth-child(2){flex:1;}
+  .en-warn > svg.ic{width:16px;height:16px;color:var(--text-2);}
+  .en-chargers{display:flex;flex-wrap:wrap;gap:8px;padding-top:12px;border-top:1px solid var(--border);}
+  .en-chargers .en-label{width:100%;}
+  .charger{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:14px;background:var(--bg-surface-2);font-size:var(--t-sm);font-weight:600;max-width:100%;transition:background .2s ease,transform .1s ease-out;}
+  .charger:active{transform:scale(.95);}
+  .charger svg.ic{width:16px;height:16px;color:var(--cat-bonus);}
+  .charger b{font-family:var(--font-d);font-variant-numeric:tabular-nums;color:var(--cat-bonus);}
+  .charger span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .charger.done{background:var(--cat-bonus);color:var(--on-cat);}
+  .charger.done svg.ic,.charger.done b{color:var(--on-cat);}
+  .charger.add{background:none;border:1.5px dashed var(--border-strong);color:var(--text-2);}
+  .charger.add svg.ic{color:var(--text-2);}
+  .charger.ask{background:var(--ai-dim);color:var(--text-1);}
+  .charger.ask svg.ic{color:var(--ai);}
+
+  /* DAGENS PLAN: samma ringar som bockarna, en båge per typ. Laddare räknas inte, de är vila */
+  .plan-card{display:flex;align-items:center;gap:18px;width:calc(100% - 40px);margin:0 20px 12px;padding:14px 18px;border-radius:var(--r-xl);background:var(--bg-surface);box-shadow:0 0 0 1px var(--border);flex-shrink:0;text-align:left;}
+  .ring-wrap{position:relative;width:112px;height:112px;flex-shrink:0;transition:transform .25s cubic-bezier(.3,1.3,.5,1);}
+  .plan-card:active .ring-wrap{transform:scale(.97);}
   .ring{width:100%;height:100%;display:block;overflow:visible;}
   .ring circle{fill:none;stroke-width:15;}
   .ring-track{stroke:var(--bg-surface-3);}
   .ring-seg{stroke-linecap:round;stroke-dasharray:0 100;opacity:0;}
   .ring .ring-halo{stroke-width:6;opacity:0;transform-box:fill-box;transform-origin:center;}
-  .ring-num{font-family:var(--font-d);font-size:56px;font-weight:700;letter-spacing:-.03em;text-anchor:middle;font-variant-numeric:tabular-nums;fill:var(--text-1);}
+  .ring-num{font-family:var(--font-d);font-size:52px;font-weight:700;letter-spacing:-.03em;text-anchor:middle;font-variant-numeric:tabular-nums;fill:var(--text-1);}
   .ring-pct{font-size:22px;font-weight:600;fill:var(--text-2);}
+  .ring-sub{font-size:20px;font-weight:600;fill:var(--text-2);text-anchor:middle;}
+  .plan-rows{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px;}
+  .plan-row{display:flex;align-items:center;gap:8px;font-size:var(--t-sm);}
+  .plan-row svg.ic{width:15px;height:15px;color:var(--c);}
+  .plan-row > span{flex:1;color:var(--text-2);}
+  .plan-row b{font-family:var(--font-d);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .plan-row small{color:var(--text-3);font-size:var(--t-xs);font-weight:500;}
 
-  .hero-info{flex:1;min-width:0;display:flex;flex-direction:column;}
-  .t-val{display:block;font-family:var(--font-d);font-size:var(--t-xl);font-weight:700;line-height:1.12;letter-spacing:-.015em;overflow-wrap:anywhere;}
-  .t-lab{display:block;font-size:var(--t-sm);color:var(--text-2);margin-top:4px;line-height:1.3;}
-  .hero-cats{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin-top:12px;}
-  .hero-cat{display:flex;align-items:center;gap:5px;font-size:var(--t-sm);font-weight:600;font-variant-numeric:tabular-nums;color:var(--text-1);}
-  .hero-cat svg.ic{width:15px;height:15px;color:var(--c);}
-
-  /* Laddningen flyger från bocken till sin båge i ringen: man ser vad som orsakade den */
+  /* Fokus flyger från bocken till sin båge i ringen: man ser vad som blev framsteg */
   .fly{position:absolute;left:0;top:0;width:14px;height:14px;margin:-7px;border-radius:50%;background:var(--c);box-shadow:0 0 14px var(--c);z-index:50;pointer-events:none;}
 
   /* VECKOREMSA */
@@ -496,11 +550,11 @@
 
   .explain{font-size:var(--t-md);line-height:1.5;color:var(--text-2);}
   .explain b{color:var(--text-1);font-weight:600;}
-  .bat-legend{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
-  .bat-cell{display:flex;flex-direction:column;gap:3px;background:var(--bg-surface-2);border-radius:14px;padding:10px;min-width:0;}
-  .bat-cell svg.ic{width:17px;height:17px;color:var(--c);}
-  .bat-cell b{font-family:var(--font-d);font-size:var(--t-xl);font-weight:700;line-height:1.05;font-variant-numeric:tabular-nums;}
-  .bat-cell span{font-size:var(--t-xs);color:var(--text-2);white-space:nowrap;}
+  .rules{display:flex;flex-direction:column;gap:10px;}
+  .rule{display:flex;gap:12px;align-items:flex-start;font-size:var(--t-md);line-height:1.4;color:var(--text-2);}
+  .rule b{color:var(--text-1);font-weight:600;}
+  .rule i{width:28px;height:28px;border-radius:50%;background:var(--bg-surface-2);display:grid;place-items:center;flex-shrink:0;font-style:normal;font-weight:700;font-family:var(--font-d);color:var(--text-1);}
+  .charge-group{grid-template-columns:repeat(4,1fr);}
   .balance-title{font-family:var(--font-d);font-size:var(--t-lg);font-weight:700;margin-top:4px;}
   .balance-body{display:flex;flex-direction:column;align-items:center;width:100%;flex-shrink:0;}
   .balance-svg{width:100%;max-width:310px;height:auto;display:block;}
@@ -528,8 +582,9 @@
   }
   /* Glömmer inte mindre skärmar: ringen krymper före texten */
   @media (max-width:350px){
-    .ring-wrap{width:118px;height:118px;}
-    .battery-card{gap:12px;}
+    .ring-wrap{width:96px;height:96px;}
+    .plan-card{gap:12px;}
+    .levels{gap:4px;}
     .tabbar{left:8px;right:8px;}
     .tab-btn span{font-size:.6875rem;letter-spacing:-.01em;}
   }
@@ -571,7 +626,7 @@
 
   <main class="screen-container">
 
-    <!-- IDAG: dagen i tidsordning, batteriet är alltid läget just nu -->
+    <!-- IDAG: dagens energi, dagens plan och dagen i tidsordning -->
     <section id="screen-home" class="screen active" aria-label="Idag">
       <header class="topbar">
         <div class="top-title">
@@ -592,7 +647,42 @@
         </div>
       </header>
 
-      <button class="battery-card" id="battery-card-element" onclick="openBatterySheet()">
+      <section class="energy" id="energy-card" aria-label="Energi idag">
+        <div class="en-head">
+          <span class="en-label">Energi</span>
+          <button class="en-checkin" id="en-checkin" onclick="openCheckin()" hidden>
+            <span class="mini-bat" id="en-checkin-bat"><i></i></span>
+            <span><b id="en-checkin-label"></b><small id="en-checkin-start"></small></span>
+          </button>
+        </div>
+        <div class="en-ask" id="en-ask" hidden>
+          <h2>Hur mår du idag?</h2>
+          <p>Det blir dagens start.</p>
+          <div class="levels" id="en-levels" role="group" aria-label="Välj hur mycket energi du har"></div>
+        </div>
+        <div id="en-body" hidden>
+          <button class="en-main" id="en-main" onclick="openBatterySheet()">
+            <span class="en-now"><span class="en-num" id="en-num">0%</span><span class="en-chip" id="en-chip"></span></span>
+            <span class="en-focus"><span class="en-label">Fokus</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>räcker till <b id="en-hours"></b></span></span>
+            <span class="en-bar" aria-hidden="true">
+              <span class="en-moon-row"><span class="en-moon" id="en-moon"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span id="en-moon-txt"></span></span></span>
+              <span class="en-bar-row">
+                <span class="en-shell" id="en-shell"><span class="en-track"><span class="en-keep" id="en-keep"></span><span class="en-chunks" id="en-chunks"></span></span><span class="en-marker" id="en-marker"></span></span>
+                <span class="en-nub"></span>
+              </span>
+              <span class="en-scale"><span style="left:0">Ladda</span><span style="left:20%">Hushålla</span><span style="left:50%">Bra läge</span></span>
+            </span>
+          </button>
+          <button class="en-warn" id="en-warn" hidden onclick="askAiFrom('Planen räcker inte idag. Vad kan jag flytta?')">
+            <span class="ai-dot"><svg class="ic" aria-hidden="true"><use href="#i-ai"/></svg></span>
+            <span id="en-warn-txt"></span>
+            <svg class="ic" aria-hidden="true"><use href="#i-right"/></svg>
+          </button>
+        </div>
+        <div class="en-chargers" id="en-chargers"></div>
+      </section>
+
+      <button class="plan-card" id="plan-card" onclick="openBatterySheet()">
         <span class="ring-wrap">
           <svg class="ring" id="ring" viewBox="0 0 200 200" aria-hidden="true">
             <circle class="ring-halo" id="ring-halo" cx="100" cy="100" r="86"/>
@@ -601,20 +691,16 @@
               <circle class="ring-seg" id="seg-routine" style="stroke:var(--cat-routine)" cx="100" cy="100" r="86" pathLength="100"/>
               <circle class="ring-seg" id="seg-todo" style="stroke:var(--cat-todo)" cx="100" cy="100" r="86" pathLength="100"/>
               <circle class="ring-seg" id="seg-hobby" style="stroke:var(--cat-hobby)" cx="100" cy="100" r="86" pathLength="100"/>
-              <circle class="ring-seg" id="seg-bonus" style="stroke:var(--cat-bonus)" cx="100" cy="100" r="86" pathLength="100"/>
             </g>
-            <text class="ring-num" x="100" y="120"><tspan id="ring-val">0</tspan><tspan class="ring-pct" dx="2">%</tspan></text>
+            <text class="ring-num" x="100" y="110"><tspan id="ring-val">0</tspan><tspan class="ring-pct" dx="2">%</tspan></text>
+            <text class="ring-sub" x="100" y="140">klart</text>
           </svg>
         </span>
-        <span class="hero-info">
-          <span class="t-val" id="battery-time-left"></span>
-          <span class="t-lab" id="battery-time-lab"></span>
-          <span class="hero-cats">
-            <span class="hero-cat" style="--c:var(--cat-routine)"><svg class="ic" aria-hidden="true"><use href="#i-routine"/></svg><span id="leg-routine">0</span></span>
-            <span class="hero-cat" style="--c:var(--cat-todo)"><svg class="ic" aria-hidden="true"><use href="#i-todo"/></svg><span id="leg-todo">0</span></span>
-            <span class="hero-cat" style="--c:var(--cat-hobby)"><svg class="ic" aria-hidden="true"><use href="#i-hobby"/></svg><span id="leg-hobby">0</span></span>
-            <span class="hero-cat" style="--c:var(--cat-bonus)"><svg class="ic" aria-hidden="true"><use href="#i-bonus"/></svg><span id="leg-bonus">0</span></span>
-          </span>
+        <span class="plan-rows">
+          <span class="en-label">Dagens plan</span>
+          <span class="plan-row" style="--c:var(--cat-routine)"><svg class="ic" aria-hidden="true"><use href="#i-routine"/></svg><span>Rutiner</span><b id="plan-routine"></b></span>
+          <span class="plan-row" style="--c:var(--cat-todo)"><svg class="ic" aria-hidden="true"><use href="#i-todo"/></svg><span>Att göra</span><b id="plan-todo"></b></span>
+          <span class="plan-row" style="--c:var(--cat-hobby)"><svg class="ic" aria-hidden="true"><use href="#i-hobby"/></svg><span>Hobby</span><b id="plan-hobby"></b></span>
         </span>
       </button>
 
@@ -648,8 +734,8 @@
       <div class="screen-header"><div class="title-group"><h1>Hobby</h1></div></div>
       <div class="list" id="list-hobbies"></div>
       <div class="section-head">
-        <h2>Bonus idag</h2>
-        <button class="icon-btn" aria-label="Lägg till bonus" style="color:var(--cat-bonus);margin-right:-10px" onclick="openModal('bonus')"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <h2>Laddare idag</h2>
+        <button class="icon-btn" aria-label="Lägg till laddare" style="color:var(--cat-bonus);margin-right:-10px" onclick="openModal('bonus')"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button>
       </div>
       <div class="list" id="list-bonus"></div>
     </section>
@@ -720,7 +806,7 @@
         <button type="button" class="type-btn" style="--c:var(--cat-routine)" data-type="routine" onclick="setType('routine')"><svg class="ic" aria-hidden="true"><use href="#i-routine"/></svg>Rutin</button>
         <button type="button" class="type-btn" style="--c:var(--cat-todo)" data-type="todo" onclick="setType('todo')"><svg class="ic" aria-hidden="true"><use href="#i-todo"/></svg>Att göra</button>
         <button type="button" class="type-btn" style="--c:var(--cat-hobby)" data-type="hobby" onclick="setType('hobby')"><svg class="ic" aria-hidden="true"><use href="#i-hobby"/></svg>Hobby</button>
-        <button type="button" class="type-btn" style="--c:var(--cat-bonus)" data-type="bonus" onclick="setType('bonus')"><svg class="ic" aria-hidden="true"><use href="#i-bonus"/></svg>Bonus</button>
+        <button type="button" class="type-btn" style="--c:var(--cat-bonus)" data-type="bonus" onclick="setType('bonus')"><svg class="ic" aria-hidden="true"><use href="#i-bonus"/></svg>Laddare</button>
       </div>
 
       <div class="form-group">
@@ -786,6 +872,16 @@
         </div>
       </div>
 
+      <div class="form-group" id="group-charge" hidden>
+        <span class="form-label">Hur mycket ger det dig?</span>
+        <div class="prio-group charge-group" role="group" aria-label="Hur mycket energi det ger">
+          <button type="button" class="prio-btn" data-charge="5" onclick="setCharge(5)">+5 %</button>
+          <button type="button" class="prio-btn" data-charge="10" onclick="setCharge(10)">+10 %</button>
+          <button type="button" class="prio-btn" data-charge="15" onclick="setCharge(15)">+15 %</button>
+          <button type="button" class="prio-btn" data-charge="20" onclick="setCharge(20)">+20 %</button>
+        </div>
+      </div>
+
       <button type="button" class="more-toggle" id="btn-more" aria-expanded="false" aria-controls="group-more" onclick="toggleMore()"><svg class="ic" aria-hidden="true"><use href="#i-right"/></svg>Fler val</button>
       <div class="more-fields" id="group-more" hidden>
         <div class="form-group">
@@ -811,23 +907,22 @@
     </form>
   </div>
 
-  <!-- BATTERIET FÖRKLARAT -->
+  <!-- ENERGIN FÖRKLARAD -->
   <div class="modal-overlay" id="battery-modal" onclick="closeSheetOnOverlay(event)">
     <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="battery-sheet-title">
       <div class="sheet-grip">
         <div class="modal-handle"></div>
         <div class="modal-header">
-          <h2 id="battery-sheet-title">Batteriet</h2>
+          <h2 id="battery-sheet-title">Så räknas energin</h2>
           <button type="button" class="modal-close" aria-label="Stäng" onclick="closeSheet()"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
         </div>
       </div>
-      <div class="bat-legend">
-        <div class="bat-cell" style="--c:var(--cat-routine)"><svg class="ic" aria-hidden="true"><use href="#i-routine"/></svg><b id="bat-routine">0</b><span>Rutiner</span></div>
-        <div class="bat-cell" style="--c:var(--cat-todo)"><svg class="ic" aria-hidden="true"><use href="#i-todo"/></svg><b id="bat-todo">0</b><span>Att göra</span></div>
-        <div class="bat-cell" style="--c:var(--cat-hobby)"><svg class="ic" aria-hidden="true"><use href="#i-hobby"/></svg><b id="bat-hobby">0</b><span>Hobby</span></div>
-        <div class="bat-cell" style="--c:var(--cat-bonus)"><svg class="ic" aria-hidden="true"><use href="#i-bonus"/></svg><b id="bat-bonus">0</b><span>Bonus</span></div>
+      <div class="rules">
+        <p class="rule"><i>1</i><span><b>Start:</b> morgonens check-in, från 20 % (helt slut) till 100 % (full energi).</span></p>
+        <p class="rule"><i>2</i><span><b>Fokus:</b> 1 timme = 20 % energi. Det du lägger energi på blir framsteg i dagens plan.</span></p>
+        <p class="rule"><i>3</i><span><b>Laddare:</b> det som ger just dig energi, så mycket du själv valt.</span></p>
+        <p class="rule"><i>4</i><span><b>Ikväll:</b> det som blir kvar när dagens plan är gjord. Under 0 betyder att dagen är för full.</span></p>
       </div>
-      <p class="explain" id="battery-explain"></p>
 
       <h3 class="balance-title">Plan som blev gjord, 7 dagar</h3>
       <div class="balance-body">
@@ -859,11 +954,27 @@
             <text class="balance-axis-label" x="140" y="224" text-anchor="middle">Hobby</text>
             <text class="balance-axis-pct" id="radar-lbl-hobby" x="140" y="239" text-anchor="middle">–</text>
 
-            <text class="balance-axis-label" x="44" y="120" text-anchor="end">Bonus</text>
+            <text class="balance-axis-label" x="44" y="120" text-anchor="end">Laddare</text>
             <text class="balance-axis-pct" id="radar-lbl-bonus" x="44" y="135" text-anchor="end">–</text>
           </g>
         </svg>
       </div>
+      <div class="modal-actions"></div>
+    </div>
+  </div>
+
+  <!-- CHECK-IN: hur man mår är dagens start -->
+  <div class="modal-overlay" id="checkin-modal" onclick="closeSheetOnOverlay(event)">
+    <div class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="checkin-title">
+      <div class="sheet-grip">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+          <h2 id="checkin-title">Hur mår du nu?</h2>
+          <button type="button" class="modal-close" aria-label="Stäng" onclick="closeSheet()"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+        </div>
+      </div>
+      <p class="explain">Det blir dagens start. Det du redan gjort räknas fortfarande.</p>
+      <div class="levels" id="checkin-levels" role="group" aria-label="Välj hur mycket energi du har"></div>
       <div class="modal-actions"></div>
     </div>
   </div>
@@ -926,7 +1037,7 @@
   <div class="modal-overlay" id="setup-modal" data-locked="1">
     <form class="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="setup-title" onsubmit="finishSetup(event, false)" novalidate>
       <div class="sheet-grip"><div class="modal-header" style="padding-top:18px"><h2 id="setup-title">Välkommen till Pulse</h2></div></div>
-      <p class="explain">Gör det du planerat, så laddas batteriet.</p>
+      <p class="explain">Checka in på morgonen, så visar appen hur mycket energi du har och vad dagens plan behöver.</p>
       <div class="form-group">
         <label class="form-label" for="setup-name">Vad heter du?</label>
         <input type="text" class="form-input" id="setup-name" maxlength="30" autocomplete="given-name" />
@@ -961,6 +1072,7 @@
     update: (id, patch) => api.req('PATCH', `/api/items/${id}`, patch),
     remove: (id, date) => api.req('DELETE', `/api/items/${id}?today=${today()}${date ? `&date=${date}` : ''}`),
     setDone: (id, date, done) => api.req('POST', `/api/items/${id}/done`, { date, done, today: today() }),
+    checkin: level => api.req('POST', '/api/checkin', { level, today: today() }),
     move: (id, from, to) => api.req('POST', `/api/items/${id}/move`, { from, to, today: today() }),
     profile: () => api.req('GET', '/api/profile'),
     setup: (name, demo) => api.req('POST', '/api/setup', { name, demo, today: today() }),
@@ -1120,7 +1232,15 @@
   }
 
   // ===== TILLSTÅND =====
-  const TYPE_NAME = { routine: 'rutin', todo: 'uppgift', hobby: 'hobby', bonus: 'bonus' };
+  const TYPE_NAME = { routine: 'rutin', todo: 'uppgift', hobby: 'hobby', bonus: 'laddare' };
+  const PLAN_CATS = ['routine', 'todo', 'hobby']; // laddare är vila, inte en del av planen
+  const LEVELS = [
+    { level: 20, label: 'Helt slut' }, { level: 40, label: 'Trött' }, { level: 60, label: 'Okej' },
+    { level: 80, label: 'Pigg' }, { level: 100, label: 'Full energi' }
+  ];
+  const levelColor = v => (v >= 50 ? 'var(--cat-routine)' : v >= 20 ? 'var(--cat-bonus)' : 'var(--danger)');
+  const fmtMin = m => { const h = Math.floor(m / 60), r = m % 60; return h && r ? `${h}h ${r}m` : h ? `${h}h` : `${r}m`; };
+  const energyText = o => (o.energy > 0 ? `+${o.energy} %` : `${-o.energy} %`);
   const SLUGS = { 'screen-home': 'idag', 'screen-routines': 'rutiner', 'screen-todos': 'att-gora', 'screen-hobbies': 'hobby', 'screen-ai': 'ai' };
   const TAB_IDS = { 'screen-home': 'tab-home', 'screen-routines': 'tab-routines', 'screen-todos': 'tab-todos', 'screen-hobbies': 'tab-hobbies', 'screen-ai': 'tab-ai' };
   const SCREEN_ORDER = Object.keys(TAB_IDS);
@@ -1178,7 +1298,7 @@
     }
   }
 
-  // Körs varje sekund: klockan, midnatt och batteriet håller sig aktuella utan omladdning.
+  // Körs varje sekund: klockan och midnatt håller sig aktuella utan omladdning.
   let lastMinute = null;
   function tick() {
     const now = new Date();
@@ -1300,7 +1420,7 @@
     history.replaceState(null, '', routeHash());
     renderHome();
     const box = document.getElementById(view === 'week' ? 'week-view' : 'day-view');
-    const top = view === 'day' ? [document.getElementById('battery-card-element'), document.getElementById('date-row')] : [];
+    const top = view === 'day' ? ['energy-card', 'plan-card', 'date-row'].map(id => document.getElementById(id)).filter(el => !el.hidden) : [];
     cascade([...top, ...box.querySelectorAll(LISTED)]);
   }
 
@@ -1546,7 +1666,7 @@
   let renderHeldUntil = 0;
   function renderAll() {
     if (dragging || performance.now() < renderHeldUntil) { setTimeout(renderAll, 120); return; }
-    if (day) renderBattery(day.battery, day.next);
+    if (day) renderEnergy(day.energy);
     renderHome();
     renderRoutines();
     renderTodos();
@@ -1608,14 +1728,16 @@
   }
 
   // En rad i schemat. Klick på ringen bockar av, klick på resten öppnar ändra-arket.
-  function rowHtml(o, { editDate = o.date, showDate = false, showDeadline = false, next = false } = {}) {
+  function rowHtml(o, { editDate = o.date, showDate = false, showDeadline = false, next = false, energy = false } = {}) {
+    const chip = (next || energy) && !o.done && o.energy !== undefined
+      ? `<span class="item-charge" style="color:${o.energy > 0 ? 'var(--cat-bonus)' : 'var(--text-2)'}" aria-label="${o.energy > 0 ? `ger ${o.energy} procent energi` : `${-o.energy} procent energi`}">${energyText(o)}</span>` : '';
     remember(o);
     return `<div class="item-row ${o.done ? 'done' : ''} ${next ? 'next' : ''}" data-key="${Number(o.id)}:${esc(o.date)}" style="--dot:var(--cat-${esc(o.type)})">
       ${checkHtml(o)}
       <button class="item-info" aria-label="Ändra ${esc(o.name)}" onclick="openEdit(${Number(o.id)}, ${editDate ? `'${esc(editDate)}'` : 'null'})">
         <span class="item-top">
           <span class="item-name">${esc(o.name)}</span>
-          ${next ? `<span class="item-charge">+${Number(o.charge)} %</span>` : ''}
+          ${chip}
         </span>
         ${metaHtml(o, { showDate, showDeadline })}
         ${o.desc ? `<span class="item-desc">${esc(o.desc)}</span>` : ''}
@@ -1630,8 +1752,10 @@
 
   function renderHome() {
     const isWeek = homeView === 'week';
-    // Veckan handlar om planen, inte om läget just nu: den får hela skärmen.
-    document.getElementById('battery-card-element').hidden = isWeek;
+    // Energin gäller idag. Veckan och andra dagar handlar om planen, de får hela skärmen.
+    const showEnergy = !isWeek && activeDate === today();
+    document.getElementById('energy-card').hidden = !showEnergy;
+    document.getElementById('plan-card').hidden = !showEnergy;
     document.getElementById('date-row').hidden = isWeek;
     document.getElementById('btn-week-prev').hidden = !isWeek;
     document.getElementById('btn-week-next').hidden = !isWeek;
@@ -1695,17 +1819,18 @@
   }
 
   function renderDayView() {
-    const open = day.items.filter(o => !o.done);
-    const done = day.items.filter(o => o.done);
     const isToday = activeDate === today();
+    const listed = isToday ? day.items.filter(o => o.type !== 'bonus') : day.items; // idag ligger laddarna i energikortet
+    const open = listed.filter(o => !o.done);
+    const done = listed.filter(o => o.done);
     let html = '';
-    if (!day.items.length) {
+    if (!listed.length) {
       const nothingYet = isToday && !overview?.routines.length && !overview?.todos.open.length && !overview?.hobbies.length;
       html = `<p class="empty">${nothingYet ? 'Tomt än. Tryck på + för att börja.' : activeDate < today() ? 'Inget planerat.' : 'Inget planerat. Vila är också bra.'}</p>`;
     }
     if (open.length) {
       const isNext = o => isToday && day.next && o.id === day.next.id && o.date === day.next.date;
-      const rows = open.map(o => ({ o, html: rowHtml(o, { next: isNext(o) }) }));
+      const rows = open.map(o => ({ o, html: rowHtml(o, { next: isNext(o), energy: isToday }) }));
       // Nu-strecket hamnar där klockan är i dagens tidslinje. Bara för saker med klockslag.
       const now = new Date().toTimeString().slice(0, 5);
       const at = isToday ? rows.findIndex(r => r.o.time && r.o.time > now) : -1;
@@ -1827,7 +1952,7 @@
 
   // ===== BOCKA AV =====
   function ringInView() {
-    if (activeScreen !== 'screen-home' || homeView !== 'day') return false;
+    if (activeScreen !== 'screen-home' || homeView !== 'day' || document.getElementById('plan-card').hidden) return false;
     const r = document.getElementById('ring').getBoundingClientRect();
     return r.bottom > document.querySelector('.screen-container').getBoundingClientRect().top + 40;
   }
@@ -1835,7 +1960,7 @@
   // En liten komet från bocken till slutet av kategorins båge. Syns inte ringen säger ön vad som hände.
   function flyToRing(btn) {
     const color = getComputedStyle(btn).getPropertyValue('--dot');
-    if (calm.matches || !ringInView()) return;
+    if (calm.matches || !ringInView() || !PLAN_CATS.includes(btn.dataset.cat)) return;
     const device = document.getElementById('device').getBoundingClientRect();
     const from = btn.getBoundingClientRect();
     const to = ringPoint(btn.dataset.cat);
@@ -1876,10 +2001,11 @@
       navigator.vibrate?.(10);
     }
     try {
-      const { battery, gained, covered } = await api.setDone(id, date, done);
+      const { delta, covered } = await api.setDone(id, date, done);
       if (done) {
         const swap = covered ? ` · passet ${dayWord(covered).toLowerCase()}` : '';
-        toast(`${gained > 0 ? `+${gained} %` : 'Klart'}${swap}`, {
+        const minutes = known.get(key)?.minutes ?? 20;
+        toast(`${delta > 0 ? `+${delta} % energi` : `Klart · ${minutes} min fokus`}${swap}`, {
           label: 'Ångra',
           run: async () => {
             await api.setDone(id, date, false).catch(err => toast('Kunde inte ångra: ' + err.message, { error: true }));
@@ -1896,80 +2022,165 @@
     refresh();
   }
 
-  // ===== BATTERI =====
-  // När tar det slut, i ord. "Tisdag kväll" går att förstå direkt, det gör inte 12:57:36.
-  function emptyWords(iso) {
-    const at = new Date(iso);
-    const diff = daysBetween(today(), localDate(0, at));
-    const hour = at.getHours();
-    if (hour < 5) return diff <= 1 ? 'i natt' : `natten mot ${fmtWeekday(localDate(0, at))}`;
-    const part = hour < 10 ? 'morgon' : hour < 13 ? 'förmiddag' : hour < 18 ? 'eftermiddag' : 'kväll';
-    if (diff === 0) return { eftermiddag: 'i eftermiddag', kväll: 'ikväll' }[part] ?? `ca kl ${String(hour).padStart(2, '0')}`;
-    if (diff === 1) return part === 'morgon' ? 'imorgon bitti' : `imorgon ${part}`;
-    return `${fmtWeekday(localDate(0, at))} ${part}`;
+  // ===== ENERGI: servern räknar, här ritas det bara =====
+  function levelButtons(current) {
+    return LEVELS.map(l => `<button type="button" class="level-btn" aria-pressed="${l.level === current}" style="--lc:${levelColor(l.level)}" aria-label="${l.label}, ${l.level} procent" onclick="checkin(${l.level})">
+        <span class="mini-bat" style="--l:${l.level}%;--lc:${levelColor(l.level)}"><i></i></span>${l.label}
+      </button>`).join('');
   }
 
-  function leftWords(b) {
-    if (!b.level) return { val: 'Tomt', lab: 'Bocka av något för att ladda' };
-    const h = b.hoursLeft;
-    const val = h < 1 ? 'Räcker under en timme'
-      : h < 24 ? `Räcker ca ${Math.round(h)} h`
-      : `Räcker ca ${String(Math.round(h / 12) / 2).replace('.', ',')} dygn`;
-    return { val, lab: `till ${emptyWords(b.emptyAt)}` };
+  function setHtml(el, html) {
+    if (el.dataset.html !== html) { el.innerHTML = html; el.dataset.html = html; }
   }
 
-  function renderBattery(b, next) {
-    const words = leftWords(b);
-    const first = !document.getElementById('battery-time-left').textContent;
-    swapText(document.getElementById('battery-time-left'), words.val);
-    swapText(document.getElementById('battery-time-lab'), words.lab);
-    if (first) cascade(document.querySelectorAll('.t-val, .t-lab, .hero-cat'), { x: -8, y: 0, gap: 40, delay: 120 });
-    for (const t of CATS) document.getElementById(`bat-${t}`).textContent = b.byType[t];
-    setRing(b, first);
-    let state;
-    if (next) state = `Nästa: ${next.name}${next.time ? ` kl ${next.time}` : ''} ger +${next.charge} %`;
-    else if (day?.todayTotal) state = 'Allt klart för idag. Bra jobbat!';
-    else state = 'Inget planerat idag.';
-    document.getElementById('battery-card-element').setAttribute('aria-label', `Batteri ${b.level} procent. ${words.val} ${words.lab}. ${state}. Visa hur batteriet funkar.`);
+  function renderEnergy(e) {
+    const has = e.now !== null;
+    const card = document.getElementById('energy-card');
+    document.getElementById('en-ask').hidden = has;
+    document.getElementById('en-body').hidden = !has;
+    document.getElementById('en-checkin').hidden = !has;
+    if (!has) setHtml(document.getElementById('en-levels'), levelButtons(null));
+    else {
+      card.style.setProperty('--lc', levelColor(e.now));
+      document.getElementById('en-num').textContent = `${e.now}%`;
+      document.getElementById('en-chip').textContent = e.status;
+      document.getElementById('en-hours').textContent = fmtMin(e.focusMinutesLeft);
+      document.getElementById('en-checkin-label').textContent = e.label;
+      document.getElementById('en-checkin-start').textContent = `start ${e.checkin}%`;
+      const bat = document.getElementById('en-checkin-bat');
+      bat.style.setProperty('--l', `${e.checkin}%`);
+      bat.style.setProperty('--lc', levelColor(e.checkin));
+      document.getElementById('en-checkin').setAttribute('aria-label', `Check-in: ${e.label}, start ${e.checkin} procent. Ändra`);
+
+      // Batteriet: det som blir kvar ikväll är fyllt, varje pass som är kvar är ett block i sin färg.
+      const keep = Math.max(0, e.tonight);
+      document.getElementById('en-keep').style.width = `${keep}%`;
+      let pos = e.now;
+      const left = activeDate === today() ? day.items.filter(o => !o.done && o.type !== 'bonus') : [];
+      setHtml(document.getElementById('en-chunks'), left.map(o => {
+        const from = Math.max(pos + o.energy, 0), width = Math.max(pos - from, 0);
+        pos += o.energy;
+        return width ? `<span class="en-chunk" style="left:${from}%;width:${width}%;--c:var(--cat-${esc(o.type)})"></span>` : '';
+      }).join(''));
+      const low = e.tonight < 0;
+      const marker = document.getElementById('en-marker');
+      marker.style.left = `calc(4px + (100% - 8px) * ${keep / 100})`;
+      marker.classList.toggle('low', low);
+      const moon = document.getElementById('en-moon');
+      moon.style.left = `${Math.min(Math.max(keep, 12), 82)}%`;
+      moon.classList.toggle('low', low);
+      document.getElementById('en-moon-txt').textContent = `Ikväll ${e.tonight > 0 ? '+' : ''}${e.tonight}%`;
+      document.getElementById('en-shell').classList.toggle('over', low);
+      document.getElementById('en-warn').hidden = !low;
+      document.getElementById('en-warn-txt').innerHTML = `Planen behöver <b>${e.need}%</b>, du har ${e.now}%`;
+      document.getElementById('en-main').setAttribute('aria-label',
+        `Energi ${e.now} procent, ${e.status}. Räcker till ${fmtMin(e.focusMinutesLeft)} fokus. Ikväll ${e.tonight} procent. Visa hur energin räknas.`);
+    }
+
+    // Laddarna: användarens egna, ett tryck bockar av. Inga påhittade förslag.
+    const chargers = activeDate === today() ? day.items.filter(o => o.type === 'bonus') : [];
+    chargers.forEach(remember);
+    setHtml(document.getElementById('en-chargers'), `<span class="en-label">Laddare</span>` +
+      chargers.map(o => `<button class="charger ${o.done ? 'done' : ''}" aria-pressed="${Boolean(o.done)}" aria-label="${esc(o.name)}, ger ${Number(o.energy)} procent energi" onclick="toggleCharger(${Number(o.id)}, '${esc(o.date)}', this)">
+          ${icon('bonus')}<span>${esc(o.name)}</span><b>+${Number(o.energy)}%</b>
+        </button>`).join('') +
+      `<button class="charger add" onclick="openModal('bonus')">${icon('plus')}${chargers.length ? 'Ny' : 'Lägg till egen'}</button>` +
+      `<button class="charger ask" onclick="askAiFrom('Hjälp mig hitta mina egna laddare')">${icon('ai')}Hitta mina laddare</button>`);
+
+    // Dagens plan: en båge per typ, en procent av varvet är en procent av planens minuter.
+    const p = e.plan;
+    const share = t => (p.plannedMinutes ? (p.byType[t].done / p.plannedMinutes) * 100 : 0);
+    const first = !document.getElementById('plan-card').dataset.drawn;
+    document.getElementById('plan-card').dataset.drawn = '1';
+    for (const t of PLAN_CATS) {
+      ringSegs[t].to(share(t), { response: first ? 1.1 : 0.7 });
+      const b = p.byType[t];
+      document.getElementById(`plan-${t}`).innerHTML = b.planned ? `${fmtMin(b.done)} <small>/ ${fmtMin(b.planned)}</small>` : '<small>–</small>';
+    }
+    document.getElementById('plan-card').setAttribute('aria-label',
+      `Dagens plan: ${p.pct} procent klart. ` + PLAN_CATS.map(t => `${{ routine: 'Rutiner', todo: 'Att göra', hobby: 'Hobby' }[t]} ${fmtMin(p.byType[t].done)} av ${fmtMin(p.byType[t].planned)}`).join(', ') + '. Visa hur energin räknas.');
   }
 
-  // ===== RINGEN: en båge per kategori i samma ordning som i batteriet, en procent är en procent av varvet =====
+  async function checkin(level) {
+    try {
+      await api.checkin(level);
+    } catch (err) {
+      return toast('Kunde inte spara: ' + err.message, { error: true });
+    }
+    if (openSheetEl) closeSheet();
+    await refresh();
+  }
+
+  function openCheckin() {
+    setHtml(document.getElementById('checkin-levels'), levelButtons(day?.energy.checkin ?? null));
+    showSheet('checkin-modal');
+  }
+
+  const pendingChargers = new Set();
+  async function toggleCharger(id, date, btn) {
+    const key = `${id}:${date}`;
+    if (pendingChargers.has(key)) return;
+    pendingChargers.add(key);
+    const done = !btn.classList.contains('done');
+    btn.classList.toggle('done', done);
+    btn.setAttribute('aria-pressed', done);
+    if (done) {
+      play(btn, { transform: ['scale(.92)', 'scale(1.06)', 'scale(1)'] }, { duration: 360 });
+      navigator.vibrate?.(10);
+    }
+    try {
+      const { delta } = await api.setDone(id, date, done);
+      if (done) toast(`+${delta} % energi`, {
+        label: 'Ångra',
+        run: async () => {
+          await api.setDone(id, date, false).catch(err => toast('Kunde inte ångra: ' + err.message, { error: true }));
+          refresh();
+        }
+      });
+    } catch (e) {
+      btn.classList.toggle('done', !done);
+      btn.setAttribute('aria-pressed', !done);
+      toast('Kunde inte spara: ' + e.message, { error: true });
+    }
+    pendingChargers.delete(key);
+    refresh();
+  }
+
+  function askAiFrom(text) {
+    switchTab('screen-ai');
+    askAi(text);
+  }
+
+  // ===== RINGEN: en båge per typ i dagens plan =====
   const RING_GAP = 1; // mellanrum mellan bågarna, i procent av varvet
   const RING_CAP = 1.4; // de runda ändarna sticker ut så här långt
-  const ringSegs = Object.fromEntries(CATS.map(t => [t, new Spring(0, { damping: 0.9, response: 0.7, onUpdate: () => drawRing() })]));
+  const ringSegs = Object.fromEntries(PLAN_CATS.map(t => [t, new Spring(0, { damping: 0.9, response: 0.7, onUpdate: () => drawRing() })]));
   const ringKick = new Spring(0, { damping: 0.42, response: 0.5, onUpdate: k => { document.getElementById('ring').style.transform = `scale(${1 + k * 0.001})`; } });
 
   function drawRing() {
     let at = 0;
-    for (const t of CATS) {
+    for (const t of PLAN_CATS) {
       const value = Math.max(0, ringSegs[t].value);
       const length = Math.max(0.01, value - RING_GAP - 2 * RING_CAP); // små bågar blir en rund prick
       const seg = document.getElementById(`seg-${t}`);
       seg.style.strokeDasharray = `${length} 100`;
       seg.style.strokeDashoffset = -(at + (value - length) / 2);
       seg.style.opacity = value < 0.3 ? 0 : 1;
-      document.getElementById(`leg-${t}`).textContent = Math.round(value);
       at += value;
     }
     document.getElementById('ring-val').textContent = Math.round(at);
   }
 
-  // Vid start ritas ringen långsamt, efter det är den snabb.
-  function setRing(b, first) {
-    const response = first ? 1.1 : 0.7;
-    for (const t of CATS) ringSegs[t].to(b.byType[t], { response });
-  }
-
-  // Var på skärmen kategorins båge slutar.
+  // Var på skärmen typens båge slutar.
   function ringPoint(cat) {
-    const ends = CATS.slice(0, CATS.indexOf(cat) + 1).reduce((sum, t) => sum + ringSegs[t].value, 0);
+    const ends = PLAN_CATS.slice(0, PLAN_CATS.indexOf(cat) + 1).reduce((sum, t) => sum + ringSegs[t].value, 0);
     const r = document.getElementById('ring').getBoundingClientRect();
     const angle = (ends / 100) * 2 * Math.PI;
     const radius = (86 / 200) * r.width;
     return { x: r.left + r.width / 2 + Math.sin(angle) * radius, y: r.top + r.height / 2 - Math.cos(angle) * radius };
   }
 
-  // Ringen tar emot laddningen: en liten stöt och en våg som går ut från den.
+  // Ringen tar emot framsteget: en liten stöt och en våg som går ut från den.
   function ringPulse(color) {
     if (calm.matches) return;
     ringKick.velocity += 700;
@@ -1994,7 +2205,7 @@
       document.getElementById(`node-${k}`).style.display = b[k] === null ? 'none' : ''; // ingen plan, inget värde att visa
     }
     document.getElementById('balance-svg').setAttribute('aria-label',
-      `Livsbalans senaste 7 dagarna: rutiner ${label('routine')}, att göra ${label('todo')}, hobby ${label('hobby')}, bonus ${label('bonus')}`);
+      `Livsbalans senaste 7 dagarna: rutiner ${label('routine')}, att göra ${label('todo')}, hobby ${label('hobby')}, laddare ${label('bonus')}`);
   }
 
   function drawRadar() {
@@ -2012,10 +2223,6 @@
   }
 
   function openBatterySheet() {
-    const rate = day?.battery.drainPerHour ?? 1;
-    const fullDays = Math.round(100 / rate / 24);
-    document.getElementById('battery-explain').innerHTML =
-      `Visar <b>hur du håller din plan</b>, inte hur du mår. Längre pass laddar mer. Sjunker ${String(rate).replace('.', ',')} % i timmen, fullt räcker ca ${fullDays} dygn.`;
     showSheet('battery-modal');
     if (overview) renderRadar(overview.balance);
   }
@@ -2171,10 +2378,10 @@
     routine: { placeholder: 'Gym' },
     todo: { placeholder: 'Lämna in uppsats' },
     hobby: { placeholder: 'Gitarr' },
-    bonus: { placeholder: 'Promenad' }
+    bonus: { placeholder: 'Det som ger dig energi' }
   };
 
-  let form = { type: 'routine', repeating: true, days: [], prio: 'Medium', editing: null, occurrence: null };
+  let form = { type: 'routine', repeating: true, days: [], prio: 'Medium', charge: 10, editing: null, occurrence: null };
 
   function buildDayPills() {
     document.getElementById('day-pills').innerHTML = DAY_ORDER.map(d =>
@@ -2204,7 +2411,11 @@
     field('group-repeat').hidden = !repeating;
     field('group-period').hidden = !field('input-period').checked;
     document.querySelectorAll('.day-pill').forEach(b => b.setAttribute('aria-pressed', form.days.includes(Number(b.dataset.day))));
-    document.querySelectorAll('.prio-btn').forEach(b => b.setAttribute('aria-pressed', b.dataset.prio === form.prio));
+    document.querySelectorAll('.prio-btn[data-prio]').forEach(b => b.setAttribute('aria-pressed', b.dataset.prio === form.prio));
+    // En laddare har ingen längd som räknas, men väljer själv hur mycket den ger.
+    field('group-charge').hidden = form.type !== 'bonus';
+    field('input-minutes').closest('.form-group').hidden = form.type === 'bonus';
+    document.querySelectorAll('.prio-btn[data-charge]').forEach(b => b.setAttribute('aria-pressed', Number(b.dataset.charge) === form.charge));
   }
 
   function setType(type) {
@@ -2221,6 +2432,7 @@
     syncForm();
   }
   function setPrio(prio) { form.prio = prio; syncForm(); }
+  function setCharge(charge) { form.charge = charge; syncForm(); }
 
   function toggleMore(open) {
     const group = field('group-more');
@@ -2251,7 +2463,7 @@
   }
 
   function openModal(type) {
-    form = { type, repeating: type === 'routine' || type === 'hobby', days: [0, 1, 2, 3, 4, 5, 6], prio: 'Medium', editing: null, occurrence: null };
+    form = { type, repeating: type === 'routine' || type === 'hobby', days: [0, 1, 2, 3, 4, 5, 6], prio: 'Medium', charge: 10, editing: null, occurrence: null };
     const date = activeDate >= today() ? activeDate : today();
     fillForm({ date, from: startDate() });
     field('modal-title').textContent = 'Lägg till';
@@ -2271,6 +2483,7 @@
       repeating: Boolean(o.repeat),
       days: o.repeat?.days ?? [0, 1, 2, 3, 4, 5, 6],
       prio: o.prio,
+      charge: o.charge ?? 10,
       editing: { id, start, name: o.name, type: o.type, repeat: o.repeat },
       occurrence: occurrenceDate
     };
@@ -2344,8 +2557,9 @@
       desc: field('input-desc').value.trim(),
       date,
       time: field('input-time').value || null,
-      minutes,
+      minutes: form.type === 'bonus' ? null : minutes,
       prio: form.prio,
+      charge: form.type === 'bonus' ? form.charge : null,
       repeat
     };
   }
@@ -2449,8 +2663,8 @@
   // Samma sak flera gånger blir ett kort, så att svaret inte drunknar.
   function addActionCards(actions) {
     if (!actions?.length) return;
-    const labels = { add: 'La till', done: 'Bockade av', undone: 'Ångrade', update: 'Ändrade', delete: 'Tog bort', skip: 'Tog bort en dag', move: 'Flyttade', notes: 'Planerade' };
-    const icons = { add: '+', done: '✓', undone: '↺', update: '✎', delete: '×', skip: '×', move: '→', notes: '✎' };
+    const labels = { checkin: 'Checkade in', add: 'La till', done: 'Bockade av', undone: 'Ångrade', update: 'Ändrade', delete: 'Tog bort', skip: 'Tog bort en dag', move: 'Flyttade', notes: 'Planerade' };
+    const icons = { checkin: '●', add: '+', done: '✓', undone: '↺', update: '✎', delete: '×', skip: '×', move: '→', notes: '✎' };
     const groups = new Map();
     for (const a of actions) {
       const key = `${a.kind}:${a.item.name}`;
@@ -2496,7 +2710,11 @@
   // Förslagen utgår från hur dagen ser ut just nu, så att första frågan bara är ett tryck bort.
   function suggestions() {
     const list = [];
-    if (day?.next) list.push(`Flytta ${day.next.name} till imorgon`);
+    const e = day?.energy;
+    if (e && e.now === null) list.push('Jag är lite trött idag');
+    else if (e && e.tonight < 0) list.push('Planen räcker inte idag. Vad kan jag flytta?');
+    else if (day?.next) list.push(`Flytta ${day.next.name} till imorgon`);
+    if (!overview?.bonus.length) list.push('Hjälp mig hitta mina egna laddare');
     const hobby = overview?.hobbies[0];
     list.push(hobby ? `Gör en veckoplan för ${hobby.name.toLowerCase()}` : 'Hjälp mig planera veckan');
     list.push('Hur går det den här veckan?');
@@ -2545,7 +2763,7 @@
       typing.remove();
       cascade(addActionCards(actions)?.children ?? [], { y: 8 }); // korten först: det är svaret man ska läsa sist
       addBubble('assistant', reply).classList.add('fresh');
-      if (actions?.length) refresh(); // live-uppdatera batteri och listor
+      if (actions?.length) refresh(); // live-uppdatera energi och listor
     } catch (e) {
       typing.remove();
       addBubble('assistant', 'Oj, något gick fel: ' + e.message);
