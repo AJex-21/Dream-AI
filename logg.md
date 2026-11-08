@@ -173,5 +173,7 @@ Målet var en modernare design med så lite text som möjligt. Logiken och serve
 
 **30. Mindre energikort, laddare som egna ikoner.** Efter test i appen tog kortet för mycket plats. Procent, statusord och fokustid står nu på en rad, batteriet är lägre och skalan under det togs bort (statusordet säger samma sak). Laddarna är en rad med runda ikoner som användaren väljer själv (12 st), med laddningen som en liten siffra. En laddare har ingen dag eller tid: den finns varje dag och ligger inte i schemat eller veckovyn. Formuläret för en laddare har därför bara namn, ikon och hur mycket den ger. Alternativet var att behålla knappar med namn, men de bröt raden och "Upprepas/varje dag" var meningslöst för något man tar till när man behöver.
 
+**31. Idag delas i översikt och dagbok.** Hemskärmen hade både läget och hela listan, och Dagens plan var full av siffror. Nu är Idag en översikt: energin, laddarna, Dagens plan och ett kort till dagboken med nästa sak och hur många som är kvar. Dagboken är en egen sida med veckoremsan, dagens lista och veckovyn, och där bockar man av. Dagens plan visar en stapel per typ i stället för minuter, siffrorna finns kvar för skärmläsare. Alternativet var att bara krympa kortet, men problemet var att två olika uppgifter delade samma skärm: att se hur det går och att göra saker.
+
 **Kvarstår.** Livsbalans-radarn i förklaringsarket räknar fortfarande laddare som en egen axel.
 

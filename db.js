@@ -249,6 +249,7 @@ export async function getDay(date, today = localDate()) {
     done: list.filter(o => o.done).length,
     total: list.length,
     todayTotal: todays.length,
+    todayDone: todays.filter(o => o.done).length,
     upcoming,
     next: next ? priced(next) : null,
     chargers: expand(all.filter(i => i.type === 'bonus'), today, today, today).map(priced),

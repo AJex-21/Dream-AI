@@ -242,11 +242,21 @@
   .ring-pct{font-size:22px;font-weight:600;fill:var(--text-2);}
   .ring-sub{font-size:20px;font-weight:600;fill:var(--text-2);text-anchor:middle;}
   .plan-rows{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px;}
-  .plan-row{display:flex;align-items:center;gap:8px;font-size:var(--t-sm);}
-  .plan-row svg.ic{width:15px;height:15px;color:var(--c);}
-  .plan-row > span{flex:1;color:var(--text-2);}
-  .plan-row b{font-family:var(--font-d);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;}
-  .plan-row small{color:var(--text-3);font-size:var(--t-xs);font-weight:500;}
+  .plan-row{display:flex;align-items:center;gap:10px;}
+  .plan-row svg.ic{width:17px;height:17px;color:var(--c);}
+  .plan-row.empty{opacity:.35;}
+  .plan-bar{flex:1;height:8px;border-radius:4px;background:var(--bg-surface-3);overflow:hidden;}
+  .plan-bar i{display:block;height:100%;width:0;border-radius:4px;background:var(--c);transition:width .7s cubic-bezier(.22,1,.36,1);}
+
+  /* DAGBOKEN: översikten visar läget, dagboken är där man gör sakerna */
+  .journal-card{display:flex;align-items:center;gap:14px;width:calc(100% - 40px);margin:0 20px 12px;padding:14px 16px;border-radius:var(--r-xl);background:var(--bg-surface);box-shadow:0 0 0 1px var(--border);text-align:left;flex-shrink:0;}
+  .journal-card:active{transform:scale(.98);}
+  .jc-ic{width:44px;height:44px;border-radius:14px;background:var(--bg-surface-2);display:grid;place-items:center;flex-shrink:0;color:var(--text-1);}
+  .jc-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .jc-body b{font-family:var(--font-d);font-size:var(--t-lg);font-weight:700;}
+  .jc-body span{font-size:var(--t-sm);color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .jc-count{font-family:var(--font-d);font-weight:700;font-size:var(--t-sm);padding:4px 10px;border-radius:var(--r-full);background:var(--bg-surface-2);white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .journal-card > svg.ic{width:16px;height:16px;color:var(--text-2);}
 
   /* Fokus flyger från bocken till sin båge i ringen: man ser vad som blev framsteg */
   .fly{position:absolute;left:0;top:0;width:14px;height:14px;margin:-7px;border-radius:50%;background:var(--c);box-shadow:0 0 14px var(--c);z-index:50;pointer-events:none;}
@@ -641,24 +651,12 @@
 
   <main class="screen-container">
 
-    <!-- IDAG: dagens energi, dagens plan och dagen i tidsordning -->
-    <section id="screen-home" class="screen active" aria-label="Idag">
+    <!-- ÖVERSIKT: läget just nu. Energin och hur dagens plan går, inget att bocka av här -->
+    <section id="screen-overview" class="screen active" aria-label="Översikt">
       <header class="topbar">
         <div class="top-title">
-          <h1 id="day-title">Idag</h1>
-          <div class="top-sub">
-            <p id="day-count"></p>
-            <button class="link-btn" id="btn-go-today" aria-label="Till idag" onclick="selectDate(today())" hidden>Idag</button>
-          </div>
-        </div>
-        <div class="top-tools">
-          <button class="icon-btn" id="btn-week-prev" aria-label="Föregående vecka" onclick="shiftWeek(-1)" hidden><svg class="ic" aria-hidden="true"><use href="#i-left"/></svg></button>
-          <button class="icon-btn" id="btn-week-next" aria-label="Nästa vecka" onclick="shiftWeek(1)" hidden><svg class="ic" aria-hidden="true"><use href="#i-right"/></svg></button>
-          <button class="icon-btn" id="btn-calendar" aria-label="Välj datum i kalendern" onclick="openDatePicker()"><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg></button>
-          <div class="seg-toggle" role="group" aria-label="Visa dag eller vecka">
-            <button id="btn-view-day" aria-pressed="true" onclick="setHomeView('day')">Dag</button>
-            <button id="btn-view-week" aria-pressed="false" onclick="setHomeView('week')">Vecka</button>
-          </div>
+          <h1>Idag</h1>
+          <div class="top-sub"><p id="overview-date"></p></div>
         </div>
       </header>
 
@@ -698,7 +696,7 @@
         <div class="en-chargers" id="en-chargers"></div>
       </section>
 
-      <button class="plan-card" id="plan-card" onclick="openBatterySheet()">
+      <button class="plan-card" id="plan-card" onclick="openDay(today())">
         <span class="ring-wrap">
           <svg class="ring" id="ring" viewBox="0 0 200 200" aria-hidden="true">
             <circle class="ring-halo" id="ring-halo" cx="100" cy="100" r="86"/>
@@ -714,11 +712,41 @@
         </span>
         <span class="plan-rows">
           <span class="en-label">Dagens plan</span>
-          <span class="plan-row" style="--c:var(--cat-routine)"><svg class="ic" aria-hidden="true"><use href="#i-routine"/></svg><span>Rutiner</span><b id="plan-routine"></b></span>
-          <span class="plan-row" style="--c:var(--cat-todo)"><svg class="ic" aria-hidden="true"><use href="#i-todo"/></svg><span>Att göra</span><b id="plan-todo"></b></span>
-          <span class="plan-row" style="--c:var(--cat-hobby)"><svg class="ic" aria-hidden="true"><use href="#i-hobby"/></svg><span>Hobby</span><b id="plan-hobby"></b></span>
+          <span class="plan-row" id="plan-row-routine" style="--c:var(--cat-routine)" title="Rutiner"><svg class="ic" aria-hidden="true"><use href="#i-routine"/></svg><span class="plan-bar"><i id="plan-routine"></i></span></span>
+          <span class="plan-row" id="plan-row-todo" style="--c:var(--cat-todo)" title="Att göra"><svg class="ic" aria-hidden="true"><use href="#i-todo"/></svg><span class="plan-bar"><i id="plan-todo"></i></span></span>
+          <span class="plan-row" id="plan-row-hobby" style="--c:var(--cat-hobby)" title="Hobby"><svg class="ic" aria-hidden="true"><use href="#i-hobby"/></svg><span class="plan-bar"><i id="plan-hobby"></i></span></span>
         </span>
       </button>
+
+      <button class="journal-card" id="journal-card" onclick="openDay(today())">
+        <span class="jc-ic"><svg class="ic" aria-hidden="true"><use href="#i-c-book"/></svg></span>
+        <span class="jc-body"><b>Dagbok</b><span id="jc-next"></span></span>
+        <span class="jc-count" id="jc-count"></span>
+        <svg class="ic" aria-hidden="true"><use href="#i-right"/></svg>
+      </button>
+    </section>
+
+    <!-- DAGBOK: dagen i tidsordning, här bockar man av -->
+    <section id="screen-home" class="screen" aria-label="Dagbok">
+      <header class="topbar">
+        <button class="icon-btn" aria-label="Till översikten" style="margin:0 -10px 0 -12px" onclick="goToday()"><svg class="ic" aria-hidden="true"><use href="#i-left"/></svg></button>
+        <div class="top-title">
+          <h1 id="day-title">Idag</h1>
+          <div class="top-sub">
+            <p id="day-count"></p>
+            <button class="link-btn" id="btn-go-today" aria-label="Till idag" onclick="selectDate(today())" hidden>Idag</button>
+          </div>
+        </div>
+        <div class="top-tools">
+          <button class="icon-btn" id="btn-week-prev" aria-label="Föregående vecka" onclick="shiftWeek(-1)" hidden><svg class="ic" aria-hidden="true"><use href="#i-left"/></svg></button>
+          <button class="icon-btn" id="btn-week-next" aria-label="Nästa vecka" onclick="shiftWeek(1)" hidden><svg class="ic" aria-hidden="true"><use href="#i-right"/></svg></button>
+          <button class="icon-btn" id="btn-calendar" aria-label="Välj datum i kalendern" onclick="openDatePicker()"><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg></button>
+          <div class="seg-toggle" role="group" aria-label="Visa dag eller vecka">
+            <button id="btn-view-day" aria-pressed="true" onclick="setHomeView('day')">Dag</button>
+            <button id="btn-view-week" aria-pressed="false" onclick="setHomeView('week')">Vecka</button>
+          </div>
+        </div>
+      </header>
 
       <div class="date-row" id="date-row">
         <button class="week-arrow" aria-label="Föregående vecka" onclick="shiftWeek(-1)"><svg class="ic" aria-hidden="true"><use href="#i-left"/></svg></button>
@@ -1264,13 +1292,14 @@
   const CHARGER_ICONS = { bolt: 'Blixt', music: 'Musik', heart: 'Hjärta', sun: 'Sol', coffee: 'Kaffe', book: 'Bok', game: 'Spel', phone: 'Samtal', leaf: 'Natur', moon: 'Vila', people: 'Vänner', star: 'Stjärna' };
   const chargerIcon = name => `<svg class="ic" aria-hidden="true"><use href="#i-c-${CHARGER_ICONS[name] ? name : 'bolt'}"/></svg>`;
   const energyText = o => (o.energy > 0 ? `+${o.energy} %` : `${-o.energy} %`);
-  const SLUGS = { 'screen-home': 'idag', 'screen-routines': 'rutiner', 'screen-todos': 'att-gora', 'screen-hobbies': 'hobby', 'screen-ai': 'ai' };
-  const TAB_IDS = { 'screen-home': 'tab-home', 'screen-routines': 'tab-routines', 'screen-todos': 'tab-todos', 'screen-hobbies': 'tab-hobbies', 'screen-ai': 'tab-ai' };
+  const SLUGS = { 'screen-overview': 'idag', 'screen-home': 'dagbok', 'screen-routines': 'rutiner', 'screen-todos': 'att-gora', 'screen-hobbies': 'hobby', 'screen-ai': 'ai' };
+  const TAB_IDS = { 'screen-overview': 'tab-home', 'screen-home': 'tab-home', 'screen-routines': 'tab-routines', 'screen-todos': 'tab-todos', 'screen-hobbies': 'tab-hobbies', 'screen-ai': 'tab-ai' };
   const SCREEN_ORDER = Object.keys(TAB_IDS);
   const CATS = ['routine', 'todo', 'hobby', 'bonus'];
   const LISTED = '.hobby-card, .week-day, .list-label, .empty, .item-row:not(.hobby-card *)'; // det som kommer in en i taget
   const icon = name => `<svg class="ic" aria-hidden="true"><use href="#i-${name}"/></svg>`;
   const FAB = {
+    'screen-overview': ['Lägg till', 'routine'],
     'screen-home': ['Lägg till', 'routine'],
     'screen-routines': ['Ny rutin', 'routine'],
     'screen-todos': ['Ny uppgift', 'todo'],
@@ -1279,7 +1308,7 @@
 
   let knownToday = today();
   let activeDate = knownToday;
-  let activeScreen = 'screen-home';
+  let activeScreen = 'screen-overview';
   let shownScreen = null;
   let homeView = 'day';
   let fabType = 'routine';
@@ -1360,13 +1389,13 @@
   // ===== NAVIGATION: skärm och dag står i adressen, så omladdning och bakåt fungerar =====
   function routeHash() {
     if (activeScreen !== 'screen-home') return '#' + SLUGS[activeScreen];
-    const view = homeView === 'week' ? 'vecka' : 'idag';
+    const view = homeView === 'week' ? 'vecka' : 'dagbok';
     return activeDate === today() ? `#${view}` : `#${view}/${activeDate}`;
   }
 
   function readRoute() {
     const [slug, date] = location.hash.slice(1).split('/');
-    const screen = Object.keys(SLUGS).find(k => SLUGS[k] === slug) ?? 'screen-home';
+    const screen = slug === 'vecka' ? 'screen-home' : Object.keys(SLUGS).find(k => SLUGS[k] === slug) ?? 'screen-overview';
     if (screen === 'screen-home') {
       homeView = slug === 'vecka' ? 'week' : 'day';
       activeDate = /^\d{4}-\d{2}-\d{2}$/.test(date ?? '') && !isNaN(parseDay(date)) ? date : today();
@@ -1419,10 +1448,11 @@
     showScreen(screenId);
   }
 
-  // Idag-fliken betyder alltid idag, även om man senast tittade på en annan dag.
+  // Idag-fliken går till översikten, och dagboken börjar om på idag nästa gång.
   function goToday() {
     activeDate = today();
-    switchTab('screen-home');
+    homeView = 'day';
+    switchTab('screen-overview');
     refresh();
   }
 
@@ -1443,7 +1473,7 @@
     history.replaceState(null, '', routeHash());
     renderHome();
     const box = document.getElementById(view === 'week' ? 'week-view' : 'day-view');
-    const top = view === 'day' ? ['energy-card', 'plan-card', 'date-row'].map(id => document.getElementById(id)).filter(el => !el.hidden) : [];
+    const top = view === 'day' ? [document.getElementById('date-row')] : [];
     cascade([...top, ...box.querySelectorAll(LISTED)]);
   }
 
@@ -1775,10 +1805,6 @@
 
   function renderHome() {
     const isWeek = homeView === 'week';
-    // Energin gäller idag. Veckan och andra dagar handlar om planen, de får hela skärmen.
-    const showEnergy = !isWeek && activeDate === today();
-    document.getElementById('energy-card').hidden = !showEnergy;
-    document.getElementById('plan-card').hidden = !showEnergy;
     document.getElementById('date-row').hidden = isWeek;
     document.getElementById('btn-week-prev').hidden = !isWeek;
     document.getElementById('btn-week-next').hidden = !isWeek;
@@ -1975,7 +2001,7 @@
 
   // ===== BOCKA AV =====
   function ringInView() {
-    if (activeScreen !== 'screen-home' || homeView !== 'day' || document.getElementById('plan-card').hidden) return false;
+    if (activeScreen !== 'screen-overview') return false;
     const r = document.getElementById('ring').getBoundingClientRect();
     return r.bottom > document.querySelector('.screen-container').getBoundingClientRect().top + 40;
   }
@@ -2117,10 +2143,19 @@
     for (const t of PLAN_CATS) {
       ringSegs[t].to(share(t), { response: first ? 1.1 : 0.7 });
       const b = p.byType[t];
-      document.getElementById(`plan-${t}`).innerHTML = b.planned ? `${fmtMin(b.done)} <small>/ ${fmtMin(b.planned)}</small>` : '<small>–</small>';
+      document.getElementById(`plan-${t}`).style.width = b.planned ? `${(b.done / b.planned) * 100}%` : '0%';
+      document.getElementById(`plan-row-${t}`).classList.toggle('empty', !b.planned);
     }
     document.getElementById('plan-card').setAttribute('aria-label',
-      `Dagens plan: ${p.pct} procent klart. ` + PLAN_CATS.map(t => `${{ routine: 'Rutiner', todo: 'Att göra', hobby: 'Hobby' }[t]} ${fmtMin(p.byType[t].done)} av ${fmtMin(p.byType[t].planned)}`).join(', ') + '. Visa hur energin räknas.');
+      `Dagens plan: ${p.pct} procent klart. ` + PLAN_CATS.map(t => `${{ routine: 'Rutiner', todo: 'Att göra', hobby: 'Hobby' }[t]} ${fmtMin(p.byType[t].done)} av ${fmtMin(p.byType[t].planned)}`).join(', ') + '. Öppna dagboken.');
+
+    // Dagboken: vad som är nästa och hur mycket som är kvar idag.
+    document.getElementById('overview-date').textContent = fmtDay(today());
+    const left = day.todayTotal - day.todayDone;
+    const nextText = day.next ? `Nästa: ${day.next.name}${day.next.time ? ` kl ${day.next.time}` : ''}` : day.todayTotal ? 'Allt klart för idag' : 'Inget planerat idag';
+    document.getElementById('jc-next').textContent = nextText;
+    document.getElementById('jc-count').textContent = left ? `${left} kvar` : '✓';
+    document.getElementById('journal-card').setAttribute('aria-label', `Dagbok. ${nextText}. ${left} kvar idag.`);
   }
 
   async function checkin(level) {
